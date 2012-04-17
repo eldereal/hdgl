@@ -1,4 +1,4 @@
-package hdgl.store;
+﻿package hdgl.store;
 
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -1,7 +1,7 @@
-package hdgl.db.graph;
+ï»¿package hdgl.db.graph;
 
 /**
- * ¶ÔÒ»¸öÍ¼µÄÖ»¶Á·ÃÎÊ½Ó¿Ú
+ * å¯¹ä¸€ä¸ªå›¾çš„åªè¯»è®¿é—®æ¥å£
  * 
  * @author elm
  *

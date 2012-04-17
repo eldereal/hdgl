@@ -1,4 +1,4 @@
-package hdgl.store.impl.fs;
+﻿package hdgl.store.impl.fs;
 
 
 import java.io.ByteArrayInputStream;

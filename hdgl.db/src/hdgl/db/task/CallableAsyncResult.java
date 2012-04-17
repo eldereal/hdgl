@@ -1,4 +1,4 @@
-package hdgl.db.task;
+锘縫ackage hdgl.db.task;
 
 import java.util.Vector;
 import java.util.concurrent.Callable;
@@ -44,7 +44,7 @@ public class CallableAsyncResult<T> implements Runnable, Callable<T>, AsyncResul
 		try{
 			call();
 		}catch(ExecutionException ex){
-			//该异常已被处理，此处忽略即可
+			//璇ュ紓甯稿凡琚鐞嗭紝姝ゅ蹇界暐鍗冲彲
 		}		
 	}
 	

@@ -1,4 +1,4 @@
-package hdgl.store.impl.hdfs;
+﻿package hdgl.store.impl.hdfs;
 
 import hdgl.store.*;
 

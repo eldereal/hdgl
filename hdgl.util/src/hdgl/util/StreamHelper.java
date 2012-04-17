@@ -1,4 +1,4 @@
-package hdgl.util;
+ï»¿package hdgl.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -9,7 +9,7 @@ import java.io.OutputStream;
 public class StreamHelper {
     
     /**
-     * ²»ÄÜÊµÀı»¯¸¨ÖúÀà
+     * ä¸èƒ½å®ä¾‹åŒ–è¾…åŠ©ç±»
      */
     private StreamHelper(){
         
@@ -18,7 +18,7 @@ public class StreamHelper {
     public static int BUFFER_SIZE=256*256;
     
     /**
-     * ´ÓInputStreamÖĞ¶ÁÈ¡È«²¿Êı¾İ£¬²¢Êä³öµ½OutputStreamÖĞ
+     * ä»InputStreamä¸­è¯»å–å…¨éƒ¨æ•°æ®ï¼Œå¹¶è¾“å‡ºåˆ°OutputStreamä¸­
      */
     public static void transfer(InputStream in, OutputStream out, boolean closeStreams) throws IOException{
         BufferedInputStream bin = new BufferedInputStream(in);

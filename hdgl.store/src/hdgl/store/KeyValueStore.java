@@ -1,4 +1,4 @@
-package hdgl.store;
+﻿package hdgl.store;
 import java.io.Closeable;
 import java.io.IOException;
 /**

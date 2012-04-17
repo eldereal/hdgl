@@ -1,4 +1,4 @@
-package hdgl.store;
+﻿package hdgl.store;
 
 public interface KeyBlobStoreImpl<TK> {
     

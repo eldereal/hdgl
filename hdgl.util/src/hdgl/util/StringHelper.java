@@ -1,11 +1,11 @@
-package hdgl.util;
+ï»¿package hdgl.util;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * ×Ö·û´®µÄ¸¨Öú·½·¨
+ * å­—ç¬¦ä¸²çš„è¾…åŠ©æ–¹æ³•
  * @author elm
  *
  */
@@ -13,19 +13,19 @@ public class StringHelper {
     
     
     /**
-     * ²»ÄÜÊµÀý»¯¸¨ÖúÀà
+     * ä¸èƒ½å®žä¾‹åŒ–è¾…åŠ©ç±»
      */
     private StringHelper(){
         
     }
     
     /**
-     * <p>½«×Ö·û´®±àÂëÎªÎÄ¼þÂ·¾¶Ãû<p>
-     * <p>¹æÔòÈçÏÂ£º</p>
+     * <p>å°†å­—ç¬¦ä¸²ç¼–ç ä¸ºæ–‡ä»¶è·¯å¾„å<p>
+     * <p>è§„åˆ™å¦‚ä¸‹ï¼š</p>
      * <ul>
-     *  <li>ÒÔÏÂ×Ö·û½«±»Ô­ÑùÊä³ö£ºa-z, A-Z, 0-9, _(ÏÂ»®Ïß), -(¼õºÅ)</li>
-     *  <li>Èý¸ö·Ö¸ôÏß×Ö·û: / | \ ½«»á±»×ª»»ÎªÆ½Ì¨µÄÂ·¾¶·Ö¸ô·û£¬WindowsÏÂÊÇ'\\', UnixÏÂÊÇ'/'</li>
-     *  <li>ÆäËü×Ö·û»á±»×ª»»Îª"$xxxx"£¬ÆäÖÐxxxxÊÇ¸Ã×Ö·ûµÄÊ®Áù½øÖÆUnicodeÖµ</li>
+     *  <li>ä»¥ä¸‹å­—ç¬¦å°†è¢«åŽŸæ ·è¾“å‡ºï¼ša-z, A-Z, 0-9, _(ä¸‹åˆ’çº¿), -(å‡å·)</li>
+     *  <li>ä¸‰ä¸ªåˆ†éš”çº¿å­—ç¬¦: / | \ å°†ä¼šè¢«è½¬æ¢ä¸ºå¹³å°çš„è·¯å¾„åˆ†éš”ç¬¦ï¼ŒWindowsä¸‹æ˜¯'\\', Unixä¸‹æ˜¯'/'</li>
+     *  <li>å…¶å®ƒå­—ç¬¦ä¼šè¢«è½¬æ¢ä¸º"$xxxx"ï¼Œå…¶ä¸­xxxxæ˜¯è¯¥å­—ç¬¦çš„åå…­è¿›åˆ¶Unicodeå€¼</li>
      * </ul>
      * @param name
      * @return

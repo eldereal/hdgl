@@ -1,36 +1,36 @@
-package hdgl.db.task;
+ï»¿package hdgl.db.task;
 
 import java.util.concurrent.Future;
 
 /**
- * Òì²½·ÃÎÊ½Ó¿Ú£¬ÓÃÓÚ·â×°Òì²½Ö´ĞĞ½á¹û¡£ĞèÒª×¢ÒâµÄÊÇ»ñÈ¡´Ë½Ó¿ÚÖ®ºó¸ÃÈÎÎñ»¹Î´¿ªÊ¼£¬
- * ĞèÒªµ÷ÓÃrun»òsync·½·¨Ö®ºó²Å»á¿ªÊ¼ÈÎÎñ¡£
+ * å¼‚æ­¥è®¿é—®æ¥å£ï¼Œç”¨äºå°è£…å¼‚æ­¥æ‰§è¡Œç»“æœã€‚éœ€è¦æ³¨æ„çš„æ˜¯è·å–æ­¤æ¥å£ä¹‹åè¯¥ä»»åŠ¡è¿˜æœªå¼€å§‹ï¼Œ
+ * éœ€è¦è°ƒç”¨runæˆ–syncæ–¹æ³•ä¹‹åæ‰ä¼šå¼€å§‹ä»»åŠ¡ã€‚
  * 
  * @author elm
  *
- * @param <T> ½á¹ûµÄ·µ»ØÀàĞÍ
+ * @param <T> ç»“æœçš„è¿”å›ç±»å‹
  */
 public interface AsyncResult<T> extends Future<T> {
 	
 	/**
-	 * ¿ªÊ¼Ö´ĞĞ´ËÒì²½ÈÎÎñ
+	 * å¼€å§‹æ‰§è¡Œæ­¤å¼‚æ­¥ä»»åŠ¡
 	 */
 	public void start();	
 	
 	/**
-	 * ·µ»Ø¸ÃÈÎÎñÊÇ·ñÖ§³ÖCancel²Ù×÷	 
+	 * è¿”å›è¯¥ä»»åŠ¡æ˜¯å¦æ”¯æŒCancelæ“ä½œ	 
 	 */
 	public boolean supportCancel();	
 	
 	/**
-	 * Ïòµ±Ç°ÈÎÎñÌí¼Ó»Øµ÷½Ó¿Ú
-	 * @param callback »Øµ÷º¯Êı½Ó¿Ú
+	 * å‘å½“å‰ä»»åŠ¡æ·»åŠ å›è°ƒæ¥å£
+	 * @param callback å›è°ƒå‡½æ•°æ¥å£
 	 */
 	public void addCallback(AsyncCallback<T> callback);
 	
 	/**
-	 * ÒÆ³ıÄ³Ò»¸ö»Øµ÷½Ó¿Ú
-	 * @param callback »Øµ÷º¯Êı½Ó¿Ú
+	 * ç§»é™¤æŸä¸€ä¸ªå›è°ƒæ¥å£
+	 * @param callback å›è°ƒå‡½æ•°æ¥å£
 	 */
 	public void removeCallback(AsyncCallback<T> callback);
 	

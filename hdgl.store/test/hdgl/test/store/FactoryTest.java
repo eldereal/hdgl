@@ -1,4 +1,4 @@
-package hdgl.test.store;
+﻿package hdgl.test.store;
 
 import static org.junit.Assert.*;
 

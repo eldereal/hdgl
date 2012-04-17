@@ -1,4 +1,4 @@
-package hdgl.test.db.task;
+﻿package hdgl.test.db.task;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.Callable;

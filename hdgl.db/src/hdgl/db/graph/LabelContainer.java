@@ -1,33 +1,33 @@
-package hdgl.db.graph;
+ï»¿package hdgl.db.graph;
 
 import hdgl.db.task.AsyncResult;
 
 /**
- * ÓµÓĞ±êÇ©µÄÊµÌå£¨¶¥µãºÍ±ß£©µÄ¹«ÓÃ½Ó¿Ú
+ * æ‹¥æœ‰æ ‡ç­¾çš„å®ä½“ï¼ˆé¡¶ç‚¹å’Œè¾¹ï¼‰çš„å…¬ç”¨æ¥å£
  * @author elm
  *
  */
 public abstract class LabelContainer {
 
 	/**
-	 * »ñÈ¡±êÇ©×îĞÂµÄÊ±¼ä´Á
-	 * @param name ±êÇ©Ãû
-	 * @return ±êÇ©×îĞÂµÄÊ±¼ä´Á
+	 * è·å–æ ‡ç­¾æœ€æ–°çš„æ—¶é—´æˆ³
+	 * @param name æ ‡ç­¾å
+	 * @return æ ‡ç­¾æœ€æ–°çš„æ—¶é—´æˆ³
 	 */
 	public abstract long getTimestamp(String name);
 	
 	/**
-	 * »ñÈ¡±êÇ©×îĞÂµÄÖµ£¬Èç¹û±êÇ©²»´æÔÚ£¬·µ»Ønull¡£
-	 * @param name ±êÇ©Ãû
-	 * @return ±êÇ©µÄÖµ
+	 * è·å–æ ‡ç­¾æœ€æ–°çš„å€¼ï¼Œå¦‚æœæ ‡ç­¾ä¸å­˜åœ¨ï¼Œè¿”å›nullã€‚
+	 * @param name æ ‡ç­¾å
+	 * @return æ ‡ç­¾çš„å€¼
 	 */
 	public abstract Object getLabel(String name);
 	
 	/**
-	 * Ç¿ÀàĞÍµÄ»ñÈ¡±êÇ©Öµ×îĞÂµÄ·½·¨¡£Èç¹û±êÇ©²»´æÔÚ»òÕßÀàĞÍ²»Æ¥Åä£¬¶¼»á·µ»Ønull
-	 * @param name ±êÇ©Ãû
-	 * @param type Òª»ñÈ¡µÄÊı¾İÀàĞÍ
-	 * @return typeÀàĞÍµÄ±êÇ©µÄÖµ
+	 * å¼ºç±»å‹çš„è·å–æ ‡ç­¾å€¼æœ€æ–°çš„æ–¹æ³•ã€‚å¦‚æœæ ‡ç­¾ä¸å­˜åœ¨æˆ–è€…ç±»å‹ä¸åŒ¹é…ï¼Œéƒ½ä¼šè¿”å›null
+	 * @param name æ ‡ç­¾å
+	 * @param type è¦è·å–çš„æ•°æ®ç±»å‹
+	 * @return typeç±»å‹çš„æ ‡ç­¾çš„å€¼
 	 */
 	public <T> T getLabel(String name, Class<T> type){
 		try{
@@ -38,44 +38,44 @@ public abstract class LabelContainer {
 	}
 	
 	/**
-	 * »ñÈ¡±êÇ©µÄÀúÊ·¸üĞÂÊ±¼ä´Á£¬Ë³ĞòÎª½µĞò£¨´Ó×îĞÂµ½×î¾É£©£¬°üÀ¨µ±Ç°×îĞÂµÄÊ±¼ä´Á¡£
-	 * <b>»ñÈ¡ÀúÊ·Ê±¼ä´Á¿ÉÄÜ»áºÜÂı£¬ËùÒÔÊ¹ÓÃÒì²½½Ó¿Úµ÷ÓÃ</b>
-	 * <p>´Ë·½·¨ÓĞ¿ÉÄÜ²»±»Ö§³Ö£¬´ËÊ±»áÅ×³öUnsupportedOperationException¡£
-	 * Òª²âÊÔ´Ë·½·¨ÊÇ·ñ±»Ö§³Ö£¬ÇëÊ¹ÓÃGraph.supportHistory()</p>
-	 * @param name ±êÇ©Ãû
-	 * @return ÀúÊ·Ê±¼ä´ÁÁĞ±íµÄÒì²½½á¹û
-	 * @throws UnsupportedOperationException Èç¹û¸ÃÍ¼²»Ö§³Ö¼ìË÷ÀúÊ·Öµ
+	 * è·å–æ ‡ç­¾çš„å†å²æ›´æ–°æ—¶é—´æˆ³ï¼Œé¡ºåºä¸ºé™åºï¼ˆä»æœ€æ–°åˆ°æœ€æ—§ï¼‰ï¼ŒåŒ…æ‹¬å½“å‰æœ€æ–°çš„æ—¶é—´æˆ³ã€‚
+	 * <b>è·å–å†å²æ—¶é—´æˆ³å¯èƒ½ä¼šå¾ˆæ…¢ï¼Œæ‰€ä»¥ä½¿ç”¨å¼‚æ­¥æ¥å£è°ƒç”¨</b>
+	 * <p>æ­¤æ–¹æ³•æœ‰å¯èƒ½ä¸è¢«æ”¯æŒï¼Œæ­¤æ—¶ä¼šæŠ›å‡ºUnsupportedOperationExceptionã€‚
+	 * è¦æµ‹è¯•æ­¤æ–¹æ³•æ˜¯å¦è¢«æ”¯æŒï¼Œè¯·ä½¿ç”¨Graph.supportHistory()</p>
+	 * @param name æ ‡ç­¾å
+	 * @return å†å²æ—¶é—´æˆ³åˆ—è¡¨çš„å¼‚æ­¥ç»“æœ
+	 * @throws UnsupportedOperationException å¦‚æœè¯¥å›¾ä¸æ”¯æŒæ£€ç´¢å†å²å€¼
 	 */
 	public abstract AsyncResult<Iterable<Long>> getHistoricalTimestamps(String name) throws UnsupportedOperationException;
 	
 	/**
-	 * »ñÈ¡½ØÖ¹µ½timestampÊ±¿ÌµÄ×îĞÂµÄÖµ£¬¼´ÖµµÄÊ±¼ä´ÁĞ¡ÓÚµÈÓÚtimestampµÄÖµµÄ¼¯ºÏÖĞÊ±¼ä´Á×î´óµÄÖµ¡£
-	 * Èç¹û¸ÃÖµÔÚtimestampÊ±¿ÌÖ®Ç°²¢²»´æÔÚ£¬Ôò·µ»Ønull
-	 * <b>»ñÈ¡ÀúÊ·µÄÖµ¿ÉÄÜ»áºÜÂı£¬ËùÒÔÊ¹ÓÃÒì²½½Ó¿Úµ÷ÓÃ</b>
-	 * <p>´Ë·½·¨ÓĞ¿ÉÄÜ²»±»Ö§³Ö£¬´ËÊ±»áÅ×³öUnsupportedOperationException¡£
-	 * Òª²âÊÔ´Ë·½·¨ÊÇ·ñ±»Ö§³Ö£¬ÇëÊ¹ÓÃGraph.supportHistory()</p>
+	 * è·å–æˆªæ­¢åˆ°timestampæ—¶åˆ»çš„æœ€æ–°çš„å€¼ï¼Œå³å€¼çš„æ—¶é—´æˆ³å°äºç­‰äºtimestampçš„å€¼çš„é›†åˆä¸­æ—¶é—´æˆ³æœ€å¤§çš„å€¼ã€‚
+	 * å¦‚æœè¯¥å€¼åœ¨timestampæ—¶åˆ»ä¹‹å‰å¹¶ä¸å­˜åœ¨ï¼Œåˆ™è¿”å›null
+	 * <b>è·å–å†å²çš„å€¼å¯èƒ½ä¼šå¾ˆæ…¢ï¼Œæ‰€ä»¥ä½¿ç”¨å¼‚æ­¥æ¥å£è°ƒç”¨</b>
+	 * <p>æ­¤æ–¹æ³•æœ‰å¯èƒ½ä¸è¢«æ”¯æŒï¼Œæ­¤æ—¶ä¼šæŠ›å‡ºUnsupportedOperationExceptionã€‚
+	 * è¦æµ‹è¯•æ­¤æ–¹æ³•æ˜¯å¦è¢«æ”¯æŒï¼Œè¯·ä½¿ç”¨Graph.supportHistory()</p>
 	 * 
-	 * @param name Òª»ñÈ¡µÄÖµ
-	 * @param timestamp ½ØÖ¹µÄÊ±¼ä´Á
-	 * @return ·µ»Ø½ØÖ¹µ½timestampÊ±¿ÌµÄ×îĞÂµÄÖµµÄÒì²½½Ó¿Ú 
-	 * @throws UnsupportedOperationException Èç¹û¸ÃÍ¼²»Ö§³Ö¼ìË÷ÀúÊ·Öµ
+	 * @param name è¦è·å–çš„å€¼
+	 * @param timestamp æˆªæ­¢çš„æ—¶é—´æˆ³
+	 * @return è¿”å›æˆªæ­¢åˆ°timestampæ—¶åˆ»çš„æœ€æ–°çš„å€¼çš„å¼‚æ­¥æ¥å£ 
+	 * @throws UnsupportedOperationException å¦‚æœè¯¥å›¾ä¸æ”¯æŒæ£€ç´¢å†å²å€¼
 	 */
 	public abstract AsyncResult<Object> getHistoricalLabel(String name,long timestamp) throws UnsupportedOperationException;
 	
 	/**
-	 * getHistoricalLabel(String name,long timestamp)µÄÇ¿ÀàĞÍ°æ±¾
-	 * »ñÈ¡½ØÖ¹µ½timestampÊ±¿ÌµÄ×îĞÂµÄÖµ£¬¼´ÖµµÄÊ±¼ä´ÁĞ¡ÓÚµÈÓÚtimestampµÄÖµµÄ¼¯ºÏÖĞÊ±¼ä´Á×î´óµÄÖµ¡£
-	 * Èç¹û¸ÃÖµÔÚtimestampÊ±¿ÌÖ®Ç°²¢²»´æÔÚ£¬»òÕß²¢²»ÊÇtypeÀàĞÍ£¬Ôò·µ»Ønull
-	 * <b>»ñÈ¡ÀúÊ·µÄÖµ¿ÉÄÜ»áºÜÂı£¬ËùÒÔÊ¹ÓÃÒì²½½Ó¿Úµ÷ÓÃ</b>
-	 * <p>´Ë·½·¨ÓĞ¿ÉÄÜ²»±»Ö§³Ö£¬´ËÊ±»áÅ×³öUnsupportedOperationException¡£
-	 * Òª²âÊÔ´Ë·½·¨ÊÇ·ñ±»Ö§³Ö£¬ÇëÊ¹ÓÃGraph.supportHistory()</p>
+	 * getHistoricalLabel(String name,long timestamp)çš„å¼ºç±»å‹ç‰ˆæœ¬
+	 * è·å–æˆªæ­¢åˆ°timestampæ—¶åˆ»çš„æœ€æ–°çš„å€¼ï¼Œå³å€¼çš„æ—¶é—´æˆ³å°äºç­‰äºtimestampçš„å€¼çš„é›†åˆä¸­æ—¶é—´æˆ³æœ€å¤§çš„å€¼ã€‚
+	 * å¦‚æœè¯¥å€¼åœ¨timestampæ—¶åˆ»ä¹‹å‰å¹¶ä¸å­˜åœ¨ï¼Œæˆ–è€…å¹¶ä¸æ˜¯typeç±»å‹ï¼Œåˆ™è¿”å›null
+	 * <b>è·å–å†å²çš„å€¼å¯èƒ½ä¼šå¾ˆæ…¢ï¼Œæ‰€ä»¥ä½¿ç”¨å¼‚æ­¥æ¥å£è°ƒç”¨</b>
+	 * <p>æ­¤æ–¹æ³•æœ‰å¯èƒ½ä¸è¢«æ”¯æŒï¼Œæ­¤æ—¶ä¼šæŠ›å‡ºUnsupportedOperationExceptionã€‚
+	 * è¦æµ‹è¯•æ­¤æ–¹æ³•æ˜¯å¦è¢«æ”¯æŒï¼Œè¯·ä½¿ç”¨Graph.supportHistory()</p>
 	 * 
 	 * @see getHistoricalLabel(String name,long timestamp)
-	 * @param name Òª»ñÈ¡µÄÖµ
-	 * @param timestamp ½ØÖ¹µÄÊ±¼ä´Á
-	 * @param type Òª»ñÈ¡µÄÖµµÄÀàĞÍ
-	 * @return ·µ»Ø½ØÖ¹µ½timestampÊ±¿ÌµÄ×îĞÂµÄÖµµÄÒì²½½Ó¿Ú
-	 * @throws UnsupportedOperationException Èç¹û¸ÃÍ¼²»Ö§³Ö¼ìË÷ÀúÊ·Öµ
+	 * @param name è¦è·å–çš„å€¼
+	 * @param timestamp æˆªæ­¢çš„æ—¶é—´æˆ³
+	 * @param type è¦è·å–çš„å€¼çš„ç±»å‹
+	 * @return è¿”å›æˆªæ­¢åˆ°timestampæ—¶åˆ»çš„æœ€æ–°çš„å€¼çš„å¼‚æ­¥æ¥å£
+	 * @throws UnsupportedOperationException å¦‚æœè¯¥å›¾ä¸æ”¯æŒæ£€ç´¢å†å²å€¼
 	 *
 	 */
 	public abstract <T> AsyncResult<T> getHistoricalLabel(String name,long timestamp,Class<T> type) throws UnsupportedOperationException;

@@ -1,4 +1,4 @@
-package hdgl.db.task;
+﻿package hdgl.db.task;
 
 public class TaskAbortedException extends RuntimeException {
 

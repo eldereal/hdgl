@@ -1,9 +1,9 @@
-package hdgl.test;
+锘縫ackage hdgl.test;
 
 public final class TestHelper {
 	
 	/**
-	 * 不能实例化辅助类
+	 * 涓嶈兘瀹炰緥鍖栬緟鍔╃被
 	 */
 	@SuppressWarnings("unused")
 	private void TestHelper(){
