@@ -36,4 +36,16 @@ public interface MutableGraph {
 	 * @return 提交操作的异步结果
 	 */
 	public AsyncResult<Boolean> commit();
+	
+	public void setLabel(LabelContainer container, String name, Object value);
+	
+	public void removeLabel(LabelContainer container, String name);
+	
+	public <N extends Node> N createNode(Class<N> nodeType);
+	
+	public <R extends Relationship> R createRelationship(Node start, Node end, Class<R> relationshipType);
+	
+	public void removeNode(Node node);
+	
+	public void removeRelationship(Relationship relationship);
 }
