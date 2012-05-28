@@ -37,15 +37,51 @@ public interface MutableGraph {
 	 */
 	public AsyncResult<Boolean> commit();
 	
+	/**
+	 * 取消本次修改
+	 */
+	public void rollback();
+	
+	/**
+	 * 设置标签的值
+	 * @param container 标签容器
+	 * @param name 标签名
+	 * @param value 标签的值
+	 */
 	public void setLabel(LabelContainer container, String name, Object value);
 	
+	/**
+	 * 删除一个标签
+	 * @param container
+	 * @param name
+	 */
 	public void removeLabel(LabelContainer container, String name);
 	
+	/**
+	 * 创建一个特定类型的顶点
+	 * @param nodeType
+	 * @return
+	 */
 	public <N extends Node> N createNode(Class<N> nodeType);
 	
+	/**
+	 * 创建一个边
+	 * @param start
+	 * @param end
+	 * @param relationshipType
+	 * @return
+	 */
 	public <R extends Relationship> R createRelationship(Node start, Node end, Class<R> relationshipType);
 	
+	/**
+	 * 移除一个顶点
+	 * @param node
+	 */
 	public void removeNode(Node node);
 	
+	/**
+	 * 移除一条边
+	 * @param relationship
+	 */
 	public void removeRelationship(Relationship relationship);
 }
