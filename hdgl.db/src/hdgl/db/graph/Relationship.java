@@ -1,5 +1,9 @@
 ﻿package hdgl.db.graph;
 
-public abstract class Relationship {
+import hdgl.db.graph.HdglException.RelationshipIdMustBeNegativeException;
 
+public interface Relationship extends LabelContainer {
+	
+		
+	
 }

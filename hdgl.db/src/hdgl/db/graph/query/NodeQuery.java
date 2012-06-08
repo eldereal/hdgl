@@ -1,4 +1,4 @@
-package hdgl.db.query;
+package hdgl.db.graph.query;
 
 import hdgl.db.graph.Node;
 import hdgl.db.task.AsyncResult;
@@ -34,7 +34,7 @@ public interface NodeQuery<N extends Node>{
 	 * @param op
 	 * @param labelValue
 	 * @return
-	 * @see hdgl.db.query.Op
+	 * @see hdgl.db.graph.query.Op
 	 */
 	public NodeQuery<N> filter(String labelName, String op, Object labelValue);
 	

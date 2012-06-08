@@ -7,8 +7,10 @@ import hdgl.db.task.AsyncResult;
  * @author elm
  *
  */
-public abstract class LabelContainer {
+public interface LabelContainer {
 
+	public int getId();
+	
 	/**
 	 * 获取标签最新的时间戳
 	 * @param name 标签名
@@ -29,13 +31,7 @@ public abstract class LabelContainer {
 	 * @param type 要获取的数据类型
 	 * @return type类型的标签的值
 	 */
-	public <T> T getLabel(String name, Class<T> type){
-		try{
-			return type.cast(getLabel(name));
-		}catch (ClassCastException e) {
-			return null;
-		}
-	}
+	public <T> T getLabel(String name, Class<T> type);
 	
 	/**
 	 * 获取标签的历史更新时间戳，顺序为降序（从最新到最旧），包括当前最新的时间戳。

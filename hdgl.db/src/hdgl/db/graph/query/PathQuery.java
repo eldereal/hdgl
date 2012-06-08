@@ -1,4 +1,4 @@
-package hdgl.db.query;
+package hdgl.db.graph.query;
 
 import hdgl.db.graph.Path;
 import hdgl.db.task.AsyncResult;

@@ -1,4 +1,4 @@
-package hdgl.db.query;
+package hdgl.db.graph.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;

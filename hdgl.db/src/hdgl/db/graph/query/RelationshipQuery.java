@@ -1,4 +1,4 @@
-package hdgl.db.query;
+package hdgl.db.graph.query;
 
 import hdgl.db.graph.Node;
 import hdgl.db.graph.Relationship;
@@ -28,7 +28,7 @@ public interface RelationshipQuery<R extends Relationship>{
 	 * @param op
 	 * @param labelValue
 	 * @return
-	 * @see hdgl.db.query.Op
+	 * @see hdgl.db.graph.query.Op
 	 */
 	public RelationshipQuery<R> filter(String labelName, String op, Object labelValue);
 	

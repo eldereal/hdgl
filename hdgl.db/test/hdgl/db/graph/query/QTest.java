@@ -1,7 +1,8 @@
-package hdgl.db.query;
+package hdgl.db.graph.query;
 
 import static org.junit.Assert.*;
-import hdgl.db.query.Q.FilterQ;
+import hdgl.db.graph.query.Q;
+import hdgl.db.graph.query.Q.FilterQ;
 
 import org.junit.Test;
 

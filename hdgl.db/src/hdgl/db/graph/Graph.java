@@ -1,10 +1,12 @@
 ﻿package hdgl.db.graph;
 
-import hdgl.db.query.NodeQuery;
-import hdgl.db.query.PathQuery;
-import hdgl.db.query.RelationshipQuery;
+import hdgl.db.graph.query.NodeQuery;
+import hdgl.db.graph.query.PathQuery;
+import hdgl.db.graph.query.RelationshipQuery;
 import hdgl.db.task.AsyncCallback;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -13,8 +15,9 @@ import java.util.Date;
  * @author elm
  *
  */
-public abstract class Graph extends LabelContainer {
+public interface Graph extends LabelContainer, Closeable {
 
+	
 	/**
 	 * 获取本图使用的当前的时间戳
 	 * @return
@@ -31,8 +34,10 @@ public abstract class Graph extends LabelContainer {
 	/**
 	 * 开始对图进行修改。返回一个新的修改句柄
 	 * @return
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
-	public abstract MutableGraph beginModify();
+	public abstract MutableGraph beginModify() throws IOException, InterruptedException;
 	
 	/**
 	 * 返回图中所有顶点的结果集
