@@ -3,7 +3,7 @@ package hdgl.db.impl.hadoop;
 import hdgl.db.graph.LabelContainer;
 import hdgl.db.task.AsyncResult;
 
-public abstract class HLabelContainer implements LabelContainer {
+public class HLabelContainer implements LabelContainer {
 
 	protected int id;
 	

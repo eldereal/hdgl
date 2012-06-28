@@ -4,21 +4,21 @@ import java.io.IOException;
 
 public class HdglException extends IOException {
 
+	public static class NodeNotFound extends HdglException{
+		public NodeNotFound(){
+			super("Cannot find node");
+		}
+	}
+	
 	public static class DataIsNotWritableOrSerializableException extends HdglException{
 		public DataIsNotWritableOrSerializableException(){
 			super("Data must be Writable or Serializable to serialize");
 		}
 	}
 	
-	public static class NodeIdMustBePositiveException extends HdglException{
-		public NodeIdMustBePositiveException(){
-			super("Id for a node must greater than zero");
-		}
-	}
-	
-	public static class RelationshipIdMustBeNegativeException extends HdglException{
-		public RelationshipIdMustBeNegativeException(){
-			super("Id for a relationship must lesser than zero");
+	public static class ConcurrentModifyInOneSessionException extends HdglException{
+		public ConcurrentModifyInOneSessionException(){
+			super("Another MutableGraph is already opend in current session");
 		}
 	}
 	

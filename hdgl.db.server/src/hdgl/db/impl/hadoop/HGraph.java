@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
@@ -29,25 +30,29 @@ import hdgl.db.task.AsyncResult;
 public class HGraph extends HLabelContainer implements Graph, Watcher {
 
 	
-	private static final String CLIENT_ID = "/hdgl/client/";
-	private static final String SESSION_ID = "/hdgl/session/";
 	private static Logger Log = Logger.getLogger(HGraph.class);
 	
 	Configuration configuration;
-	String clientId;
+	int sessionId;
 	ZooKeeper zk;
+	HGraphZKStore zkstore;
+	FileSystem fs;
+	HGraphFSStore fsstore;
+	String ns;
 	
-	public HGraph(Configuration conf) throws IOException, InterruptedException {
+	public HGraph(Configuration conf) throws InterruptedException, IOException {
 		super(0);
-		try{
-			configuration = conf;
-			zk = HConf.getZooKeeper(configuration, this);
-			clientId = zk.create(CLIENT_ID, new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-			Log.debug("New Graph Client: " + clientId);
-		}catch (KeeperException e) {
-			Log.error("Zookeeper error:", e);
-			throw new HdglException(e);
-		}
+		configuration = conf;
+		zk = HConf.getZooKeeper(configuration, this);
+		zkstore = new HGraphZKStore(conf, zk);
+		sessionId = zkstore.allocSessionId();
+		
+		fs = HConf.getFileSystem(conf);
+		fsstore = new HGraphFSStore(conf, fs, sessionId);
+		fsstore.initSession();
+		
+		ns = HConf.getGraphNamespace(conf);
+		Log.debug("New Graph Session: " + sessionId);
 	}
 	
 	@Override
@@ -61,17 +66,9 @@ public class HGraph extends HLabelContainer implements Graph, Watcher {
 	}
 
 	@Override
-	public MutableGraph beginModify() throws IOException, InterruptedException {
-		try{
-			String sessionId=SESSION_ID;
-			sessionId = zk.create(sessionId, new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-			Log.debug("New MutableGraph: "+sessionId);
-			return new HMutableGraph(configuration, this, sessionId);
-		}catch (KeeperException e) {
-			Log.error("Zookeeper error:", e);
-			throw new HdglException(e);
-		}
-		
+	public MutableGraph beginModify(){
+		Log.debug("New MutableGraph: " + sessionId);
+		return new HMutableGraph(configuration, this, sessionId, zkstore, fsstore);	
 	}
 
 	@Override
@@ -149,6 +146,8 @@ public class HGraph extends HLabelContainer implements Graph, Watcher {
 			zk.close();
 		} catch (InterruptedException e) {
 			throw new HdglException(e);
+		} finally{
+			fs.close();
 		}
 	}
 

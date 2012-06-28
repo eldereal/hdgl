@@ -111,10 +111,36 @@ public class Log implements Writable {
 			out.writeInt(i);
 		}
 		if(data!=null){
-			ObjectWritable.writeObject(out, data, data.getClass(), configuration, true);
+			ObjectWritable.writeObject(out, data,getDeclaredClass(data), configuration, true);
 		}		
 	}
 
+	Class<?> getDeclaredClass(Object obj) {
+
+		Class<?> declaredClass = obj.getClass();
+		if (declaredClass == Boolean.class) { // boolean
+			return Boolean.TYPE;
+		} else if (declaredClass == Character.class) { // char
+			return Character.TYPE;
+		} else if (declaredClass == Byte.class) { // byte
+			return Byte.TYPE;
+		} else if (declaredClass == Short.class) { // short
+			return Short.TYPE;
+		} else if (declaredClass == Integer.class) { // int
+			return Integer.TYPE;
+		} else if (declaredClass == Long.class) { // long
+			return Long.TYPE;
+		} else if (declaredClass == Float.class) { // float
+			return Float.TYPE;
+		} else if (declaredClass == Double.class) { // double
+			return Double.TYPE;
+		} else if (declaredClass == Void.class) { // void
+			return Void.TYPE;
+		} else {
+			return declaredClass;
+		}
+	}
+	
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		boolean hasdata = readFlag(in.readInt());

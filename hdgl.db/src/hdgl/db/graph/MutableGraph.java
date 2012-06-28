@@ -1,5 +1,8 @@
 ﻿package hdgl.db.graph;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+
 import hdgl.db.task.AsyncResult;
 
 /**
@@ -39,30 +42,34 @@ public interface MutableGraph {
 	
 	/**
 	 * 取消本次修改
+	 * @throws IOException 
 	 */
-	public void rollback();
+	public void rollback() throws IOException;
 	
 	/**
 	 * 设置标签的值
 	 * @param container 标签容器
 	 * @param name 标签名
 	 * @param value 标签的值
+	 * @throws IOException 
 	 */
-	public void setLabel(LabelContainer container, String name, Object value);
+	public void setLabel(LabelContainer container, String name, Object value) throws InterruptedException, IOException;
 	
 	/**
 	 * 删除一个标签
 	 * @param container
 	 * @param name
 	 */
-	public void removeLabel(LabelContainer container, String name);
+	public void removeLabel(LabelContainer container, String name) throws IOException, InterruptedException;
 	
 	/**
 	 * 创建一个特定类型的顶点
 	 * @param nodeType
-	 * @return
+	 * @return 
+	 * @throws InterruptedException 
+	 * @throws HdglException 
 	 */
-	public <N extends Node> N createNode(Class<N> nodeType);
+	public <N extends Node> N createNode(Class<N> nodeType) throws IOException, InterruptedException;
 	
 	/**
 	 * 创建一个边
@@ -70,18 +77,24 @@ public interface MutableGraph {
 	 * @param end
 	 * @param relationshipType
 	 * @return
+	 * @throws InterruptedException 
+	 * @throws HdglException 
 	 */
-	public <R extends Relationship> R createRelationship(Node start, Node end, Class<R> relationshipType);
+	public <R extends Relationship> R createRelationship(Node start, Node end, Class<R> relationshipType) throws IOException, InterruptedException;
 	
 	/**
 	 * 移除一个顶点
 	 * @param node
+	 * @throws HdglException 
+	 * @throws InterruptedException 
 	 */
-	public void removeNode(Node node);
+	public void removeNode(Node node) throws IOException, InterruptedException;
 	
 	/**
 	 * 移除一条边
 	 * @param relationship
+	 * @throws InterruptedException 
+	 * @throws HdglException 
 	 */
-	public void removeRelationship(Relationship relationship);
+	public void removeRelationship(Relationship relationship) throws IOException, InterruptedException;
 }
