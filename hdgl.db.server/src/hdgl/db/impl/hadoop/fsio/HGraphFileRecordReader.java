@@ -1,4 +1,4 @@
-package hdgl.db.impl.hadoop.fsio;
+/*package hdgl.db.impl.hadoop.fsio;
 
 import hdgl.db.impl.hadoop.HConf;
 
@@ -80,4 +80,4 @@ public class HGraphFileRecordReader extends
 		}
 		return more;
 	}
-}
+}*/

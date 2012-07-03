@@ -13,12 +13,18 @@ public class HConf {
 	public static final String ZK_SESSION_TIMEOUT="hdgl.zookeeper.timeout";
 	public static final String HDGL_GRAPH_NS="hdgl.graph.namespace";
 	public static final String HDGL_STORE_RECORD_SIZE="hdgl.store.recordsize";
+	public static final String HDGL_REGION_PORT="hdgl.regionserver.port";
 	public static class Defaults{
 		public static final String ZK_SERVER="localhost:2181";
 		public static final int ZK_SESSION_TIMEOUT = 60000;
 		public static final String HDGL_GRAPH_NS="graph";
 		public static final String HDGL_STORE_RECORD_SIZE = "4k";
+		public static final int HDGL_REGION_PORT = 5367;
 		
+	}
+	
+	public static Configuration getConfiguration(){
+		return new Configuration();
 	}
 	
 	public static ZooKeeper getZooKeeper(Configuration conf,Watcher watcher) throws IOException{
@@ -45,6 +51,10 @@ public class HConf {
 		}else{
 			return Integer.parseInt(num);
 		}
+	}
+	
+	public static int getDefaultRegionServerPort(Configuration conf){
+		return conf.getInt(HDGL_REGION_PORT, Defaults.HDGL_REGION_PORT);
 	}
 	
 }
