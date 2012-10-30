@@ -1,0 +1,50 @@
+!SESSION 2012-10-28 09:09:47.312 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_35
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product -data E:\Project\hdgl -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:09:50.338
+!MESSAGE System property http.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:09:50.338
+!MESSAGE System property http.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:09:50.338
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:09:50.338
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:09:50.338
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:09:50.338
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+!SESSION 2012-10-28 09:17:02.929 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_35
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:17:05.378
+!MESSAGE System property http.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:17:05.378
+!MESSAGE System property http.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:17:05.378
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:17:05.378
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:17:05.378
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-10-28 09:17:05.378
+!MESSAGE System property https.proxyPort is not set but should be 8000.
