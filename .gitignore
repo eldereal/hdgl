@@ -5,3 +5,5 @@
 /.metadata/.lock
 /.metadata/.plugins
 /hdgl.db/bin
+/hdgl.db.server/bin
+/hdgl.db.query/bin
