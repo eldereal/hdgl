@@ -5,14 +5,16 @@ import hdgl.db.query.visitor.Visitor;
 public class Query extends Expression {
 
 	Expression expression;
+	EOF eof;
 	
 	public Query() {
 		super();
 	}
 	
 	public Query(Expression expression) {
-		super();
+		this();
 		this.expression = expression;
+		this.eof = new EOF();
 	}
 
 	public Expression getExpression() {
@@ -22,7 +24,10 @@ public class Query extends Expression {
 	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
-
+	
+	public EOF getEOF(){
+		return eof;
+	}
 	
 	@Override
 	public String toString() {

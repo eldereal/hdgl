@@ -1,4 +1,4 @@
-// $ANTLR 3.4 E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g 2012-10-28 16:03:58
+// $ANTLR 3.4 E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g 2012-10-30 21:27:15
 
 package hdgl.db.query.parser;
 
@@ -178,7 +178,7 @@ public class QueryLexer extends Lexer {
         try {
             int _type = OP;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:4: ( '<' | '>' | '<=' | '>=' | '<>' | '=' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:4: ( '<' | '>' | '<=' | '>=' | '<>' | '=' )
             int alt1=6;
             switch ( input.LA(1) ) {
             case '<':
@@ -227,21 +227,21 @@ public class QueryLexer extends Lexer {
 
             switch (alt1) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:6: '<'
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:6: '<'
                     {
                     match('<'); 
 
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:10: '>'
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:10: '>'
                     {
                     match('>'); 
 
                     }
                     break;
                 case 3 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:14: '<='
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:14: '<='
                     {
                     match("<="); 
 
@@ -250,7 +250,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:19: '>='
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:19: '>='
                     {
                     match(">="); 
 
@@ -259,7 +259,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:24: '<>'
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:24: '<>'
                     {
                     match("<>"); 
 
@@ -268,7 +268,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 6 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:19:29: '='
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:21:29: '='
                     {
                     match('='); 
 
@@ -290,7 +290,7 @@ public class QueryLexer extends Lexer {
         try {
             int _type = QUANTIFIER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:22:2: ( '*' | '+' | '?' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:24:2: ( '*' | '+' | '?' )
             // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:
             {
             if ( (input.LA(1) >= '*' && input.LA(1) <= '+')||input.LA(1)=='?' ) {
@@ -319,8 +319,8 @@ public class QueryLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:25:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:25:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:27:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:27:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             {
             if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
                 input.consume();
@@ -332,7 +332,7 @@ public class QueryLexer extends Lexer {
             }
 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:25:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:27:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             loop2:
             do {
                 int alt2=2;
@@ -382,10 +382,10 @@ public class QueryLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:28:5: ( ( '0' .. '9' )+ )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:28:7: ( '0' .. '9' )+
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:30:5: ( ( '0' .. '9' )+ )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:30:7: ( '0' .. '9' )+
             {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:28:7: ( '0' .. '9' )+
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:30:7: ( '0' .. '9' )+
             int cnt3=0;
             loop3:
             do {
@@ -440,14 +440,14 @@ public class QueryLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:32:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
             int alt10=3;
             alt10 = dfa10.predict(input);
             switch (alt10) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:32:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
                     {
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:32:9: ( '0' .. '9' )+
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:9: ( '0' .. '9' )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -488,7 +488,7 @@ public class QueryLexer extends Lexer {
 
                     match('.'); 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:32:25: ( '0' .. '9' )*
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:25: ( '0' .. '9' )*
                     loop5:
                     do {
                         int alt5=2;
@@ -522,7 +522,7 @@ public class QueryLexer extends Lexer {
                     } while (true);
 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:32:37: ( EXPONENT )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:37: ( EXPONENT )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
 
@@ -531,7 +531,7 @@ public class QueryLexer extends Lexer {
                     }
                     switch (alt6) {
                         case 1 :
-                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:32:37: EXPONENT
+                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:37: EXPONENT
                             {
                             mEXPONENT(); 
 
@@ -545,11 +545,11 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:33:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:35:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
                     {
                     match('.'); 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:33:13: ( '0' .. '9' )+
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:35:13: ( '0' .. '9' )+
                     int cnt7=0;
                     loop7:
                     do {
@@ -588,7 +588,7 @@ public class QueryLexer extends Lexer {
                     } while (true);
 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:33:25: ( EXPONENT )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:35:25: ( EXPONENT )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
 
@@ -597,7 +597,7 @@ public class QueryLexer extends Lexer {
                     }
                     switch (alt8) {
                         case 1 :
-                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:33:25: EXPONENT
+                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:35:25: EXPONENT
                             {
                             mEXPONENT(); 
 
@@ -611,9 +611,9 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:9: ( '0' .. '9' )+ EXPONENT
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:36:9: ( '0' .. '9' )+ EXPONENT
                     {
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:34:9: ( '0' .. '9' )+
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:36:9: ( '0' .. '9' )+
                     int cnt9=0;
                     loop9:
                     do {
@@ -673,8 +673,8 @@ public class QueryLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:37:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:37:9: ( ' ' | '\\t' | '\\r' | '\\n' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:39:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:39:9: ( ' ' | '\\t' | '\\r' | '\\n' )
             {
             if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
                 input.consume();
@@ -704,12 +704,12 @@ public class QueryLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:45:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:45:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:47:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:47:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:45:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:47:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
             loop11:
             do {
                 int alt11=3;
@@ -725,7 +725,7 @@ public class QueryLexer extends Lexer {
 
                 switch (alt11) {
             	case 1 :
-            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:45:14: ESC_SEQ
+            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:47:14: ESC_SEQ
             	    {
             	    mESC_SEQ(); 
 
@@ -733,7 +733,7 @@ public class QueryLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:45:24: ~ ( '\\\\' | '\"' )
+            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:47:24: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
@@ -770,8 +770,8 @@ public class QueryLexer extends Lexer {
     // $ANTLR start "EXPONENT"
     public final void mEXPONENT() throws RecognitionException {
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:50:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:50:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:52:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:52:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -783,7 +783,7 @@ public class QueryLexer extends Lexer {
             }
 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:50:22: ( '+' | '-' )?
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:52:22: ( '+' | '-' )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -810,7 +810,7 @@ public class QueryLexer extends Lexer {
             }
 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:50:33: ( '0' .. '9' )+
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:52:33: ( '0' .. '9' )+
             int cnt13=0;
             loop13:
             do {
@@ -862,7 +862,7 @@ public class QueryLexer extends Lexer {
     // $ANTLR start "HEX_DIGIT"
     public final void mHEX_DIGIT() throws RecognitionException {
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:53:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:55:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
             // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
@@ -888,7 +888,7 @@ public class QueryLexer extends Lexer {
     // $ANTLR start "ESC_SEQ"
     public final void mESC_SEQ() throws RecognitionException {
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:57:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:59:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
             int alt14=3;
             int LA14_0 = input.LA(1);
 
@@ -941,7 +941,7 @@ public class QueryLexer extends Lexer {
             }
             switch (alt14) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:57:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:59:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
 
@@ -958,7 +958,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:58:9: UNICODE_ESC
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:60:9: UNICODE_ESC
                     {
                     mUNICODE_ESC(); 
 
@@ -966,7 +966,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:59:9: OCTAL_ESC
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:61:9: OCTAL_ESC
                     {
                     mOCTAL_ESC(); 
 
@@ -986,7 +986,7 @@ public class QueryLexer extends Lexer {
     // $ANTLR start "OCTAL_ESC"
     public final void mOCTAL_ESC() throws RecognitionException {
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:64:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:66:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt15=3;
             int LA15_0 = input.LA(1);
 
@@ -1037,7 +1037,7 @@ public class QueryLexer extends Lexer {
             }
             switch (alt15) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:64:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:66:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1074,7 +1074,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:65:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:67:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1101,7 +1101,7 @@ public class QueryLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:66:9: '\\\\' ( '0' .. '7' )
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:68:9: '\\\\' ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1130,8 +1130,8 @@ public class QueryLexer extends Lexer {
     // $ANTLR start "UNICODE_ESC"
     public final void mUNICODE_ESC() throws RecognitionException {
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:71:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:71:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:73:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:73:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
             {
             match('\\'); 
 
@@ -1164,8 +1164,8 @@ public class QueryLexer extends Lexer {
         try {
             int _type = LQUOTE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:73:8: ( '(' )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:73:10: '('
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:75:8: ( '(' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:75:10: '('
             {
             match('('); 
 
@@ -1185,8 +1185,8 @@ public class QueryLexer extends Lexer {
         try {
             int _type = RQUOTE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:74:8: ( ')' )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:74:10: ')'
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:76:8: ( ')' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:76:10: ')'
             {
             match(')'); 
 
@@ -1384,7 +1384,7 @@ public class QueryLexer extends Lexer {
             this.transition = DFA10_transition;
         }
         public String getDescription() {
-            return "31:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
+            return "33:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
         }
     }
     static final String DFA16_eotS =

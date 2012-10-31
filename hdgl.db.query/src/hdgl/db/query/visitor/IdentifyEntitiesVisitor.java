@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import hdgl.db.query.expression.AsteriskQuantifier;
 import hdgl.db.query.expression.Concat;
 import hdgl.db.query.expression.Condition;
@@ -16,7 +17,9 @@ import hdgl.db.query.expression.Query;
 import hdgl.db.query.expression.QuestionQuantifier;
 import hdgl.db.query.expression.Vertex;
 
-public class IdentifyEntitiesVisitor implements Visitor<Void, Void> {
+import hdgl.db.query.visitor.Visitor._void;
+
+public class IdentifyEntitiesVisitor implements Visitor<_void, _void> {
 
 	ArrayList<Entity> ids = new ArrayList<Entity>();
 	
@@ -37,63 +40,64 @@ public class IdentifyEntitiesVisitor implements Visitor<Void, Void> {
 	}
 	
 	@Override
-	public Void visitQuery(Query query, Void... arguments) {
+	public _void visitQuery(Query query, _void... arguments) {
 		query.getExpression().accept(this);
+		ids.add(query.getEOF());
 		return null;
 	}
 
 	@Override
-	public Void visitVertex(Vertex vertex, Void... arguments) {
+	public _void visitVertex(Vertex vertex, _void... arguments) {
 		ids.add(vertex);
 		return null;
 	}
 
 	@Override
-	public Void visitEdge(Edge edge, Void... arguments) {
+	public _void visitEdge(Edge edge, _void... arguments) {
 		ids.add(edge);
 		return null;
 	}
 
 	@Override
-	public Void visitAsteriskQuantifier(AsteriskQuantifier quantifier,
-			Void... arguments) {
+	public _void visitAsteriskQuantifier(AsteriskQuantifier quantifier,
+			_void... arguments) {
 		quantifier.getQuantified().accept(this);
 		return null;
 	}
 
 	@Override
-	public Void visitQuestionQuantifier(QuestionQuantifier quantifier,
-			Void... arguments) {
+	public _void visitQuestionQuantifier(QuestionQuantifier quantifier,
+			_void... arguments) {
 		quantifier.getQuantified().accept(this);
 		return null;
 	}
 
 	@Override
-	public Void visitPlusQuantifier(PlusQuantifier quantifier,
-			Void... arguments) {
+	public _void visitPlusQuantifier(PlusQuantifier quantifier,
+			_void... arguments) {
 		quantifier.getQuantified().accept(this);
 		return null;
 	}
 
 	@Override
-	public Void visitConcat(Concat concat, Void... arguments) {
+	public _void visitConcat(Concat concat, _void... arguments) {
 		concat.getFirst().accept(this);
 		concat.getSecond().accept(this);
 		return null;
 	}
 
 	@Override
-	public Void visitCondition(Condition cond, Void... arguments) {
+	public _void visitCondition(Condition cond, _void... arguments) {
 		return null;
 	}
 
 	@Override
-	public Void visitOrder(Order order, Void... arguments) {
+	public _void visitOrder(Order order, _void... arguments) {
 		return null;
 	}
 
 	@Override
-	public Void visitParallel(Parallel parallel, Void... arguments) {
+	public _void visitParallel(Parallel parallel, _void... arguments) {
 		parallel.getFirst().accept(this);
 		parallel.getSecond().accept(this);
 		return null;

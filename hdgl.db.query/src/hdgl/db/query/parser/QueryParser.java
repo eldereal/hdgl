@@ -1,10 +1,12 @@
-// $ANTLR 3.4 E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g 2012-10-28 16:03:57
+// $ANTLR 3.4 E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g 2012-10-30 21:27:14
 
 package hdgl.db.query.parser;
 
 import hdgl.db.query.expression.*;
 import hdgl.db.query.parser.*;
+import hdgl.db.query.condition.*;
 import java.util.ArrayList;
+
 
 
 import org.antlr.runtime.*;
@@ -61,7 +63,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "order"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:76:1: order returns [String val] : ( ID | OP );
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:78:1: order returns [String val] : ( ID | OP );
     public final String order() throws RecognitionException {
         String val = null;
 
@@ -70,7 +72,7 @@ public class QueryParser extends Parser {
         Token OP2=null;
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:77:2: ( ID | OP )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:79:2: ( ID | OP )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -89,7 +91,7 @@ public class QueryParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:77:4: ID
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:79:4: ID
                     {
                     ID1=(Token)match(input,ID,FOLLOW_ID_in_order542); 
 
@@ -98,7 +100,7 @@ public class QueryParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:78:4: OP
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:80:4: OP
                     {
                     OP2=(Token)match(input,OP,FOLLOW_OP_in_order549); 
 
@@ -124,9 +126,9 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "value"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:81:1: value returns [String val] : ( STRING | INT | FLOAT | ID );
-    public final String value() throws RecognitionException {
-        String val = null;
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:83:1: value returns [AbstractValue val] : ( STRING | INT | FLOAT | ID );
+    public final AbstractValue value() throws RecognitionException {
+        AbstractValue val = null;
 
 
         Token STRING3=null;
@@ -135,7 +137,7 @@ public class QueryParser extends Parser {
         Token ID6=null;
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:82:2: ( STRING | INT | FLOAT | ID )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:84:2: ( STRING | INT | FLOAT | ID )
             int alt2=4;
             switch ( input.LA(1) ) {
             case STRING:
@@ -168,38 +170,38 @@ public class QueryParser extends Parser {
 
             switch (alt2) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:82:4: STRING
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:84:4: STRING
                     {
                     STRING3=(Token)match(input,STRING,FOLLOW_STRING_in_value566); 
 
-                    val = (STRING3!=null?STRING3.getText():null);
+                    val = new StringValue((STRING3!=null?STRING3.getText():null));
 
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:83:4: INT
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:85:4: INT
                     {
                     INT4=(Token)match(input,INT,FOLLOW_INT_in_value574); 
 
-                    val = (INT4!=null?INT4.getText():null);
+                    val = new IntNumberValue((INT4!=null?INT4.getText():null));
 
                     }
                     break;
                 case 3 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:84:4: FLOAT
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:86:4: FLOAT
                     {
                     FLOAT5=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_value582); 
 
-                    val = (FLOAT5!=null?FLOAT5.getText():null);
+                    val = new FloatNumberValue((FLOAT5!=null?FLOAT5.getText():null));
 
                     }
                     break;
                 case 4 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:85:4: ID
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:87:4: ID
                     {
                     ID6=(Token)match(input,ID,FOLLOW_ID_in_value590); 
 
-                    val = (ID6!=null?ID6.getText():null);
+                    val = new StringValue((ID6!=null?ID6.getText():null));
 
                     }
                     break;
@@ -221,7 +223,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "entity"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:88:1: entity returns [Expression val] : ( '.' ( ID )? ( entityRestriction )* ( QUANTIFIER )? | '-' ( ID )? ( entityRestriction )* ( QUANTIFIER )? );
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:90:1: entity returns [Expression val] : ( '.' ( ID )? ( entityRestriction )* ( QUANTIFIER )? | '-' ( ID )? ( entityRestriction )* ( QUANTIFIER )? );
     public final Expression entity() throws RecognitionException {
         Expression val = null;
 
@@ -236,7 +238,7 @@ public class QueryParser extends Parser {
 
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:89:2: ( '.' ( ID )? ( entityRestriction )* ( QUANTIFIER )? | '-' ( ID )? ( entityRestriction )* ( QUANTIFIER )? )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:91:2: ( '.' ( ID )? ( entityRestriction )* ( QUANTIFIER )? | '-' ( ID )? ( entityRestriction )* ( QUANTIFIER )? )
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -255,13 +257,13 @@ public class QueryParser extends Parser {
             }
             switch (alt9) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:89:4: '.' ( ID )? ( entityRestriction )* ( QUANTIFIER )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:91:4: '.' ( ID )? ( entityRestriction )* ( QUANTIFIER )?
                     {
                      ArrayList<Util.OrderAndCondition> list = new ArrayList<Util.OrderAndCondition>();
 
                     match(input,19,FOLLOW_19_in_entity612); 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:90:7: ( ID )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:92:7: ( ID )?
                     int alt3=2;
                     int LA3_0 = input.LA(1);
 
@@ -270,7 +272,7 @@ public class QueryParser extends Parser {
                     }
                     switch (alt3) {
                         case 1 :
-                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:90:7: ID
+                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:92:7: ID
                             {
                             ID8=(Token)match(input,ID,FOLLOW_ID_in_entity614); 
 
@@ -280,7 +282,7 @@ public class QueryParser extends Parser {
                     }
 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:90:11: ( entityRestriction )*
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:92:11: ( entityRestriction )*
                     loop4:
                     do {
                         int alt4=2;
@@ -293,7 +295,7 @@ public class QueryParser extends Parser {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:90:12: entityRestriction
+                    	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:92:12: entityRestriction
                     	    {
                     	    pushFollow(FOLLOW_entityRestriction_in_entity618);
                     	    entityRestriction7=entityRestriction();
@@ -317,7 +319,7 @@ public class QueryParser extends Parser {
                     			val = Expression.buildEntity(".", ocs.getOrder(), ocs.getConditions(), (ID8!=null?ID8.getText():null));
                     		
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:95:3: ( QUANTIFIER )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:97:3: ( QUANTIFIER )?
                     int alt5=2;
                     int LA5_0 = input.LA(1);
 
@@ -326,7 +328,7 @@ public class QueryParser extends Parser {
                     }
                     switch (alt5) {
                         case 1 :
-                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:95:4: QUANTIFIER
+                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:97:4: QUANTIFIER
                             {
                             QUANTIFIER9=(Token)match(input,QUANTIFIER,FOLLOW_QUANTIFIER_in_entity631); 
 
@@ -341,13 +343,13 @@ public class QueryParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:96:4: '-' ( ID )? ( entityRestriction )* ( QUANTIFIER )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:98:4: '-' ( ID )? ( entityRestriction )* ( QUANTIFIER )?
                     {
                      ArrayList<Util.OrderAndCondition> list = new ArrayList<Util.OrderAndCondition>();
 
                     match(input,18,FOLLOW_18_in_entity644); 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:97:7: ( ID )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:99:7: ( ID )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
 
@@ -356,7 +358,7 @@ public class QueryParser extends Parser {
                     }
                     switch (alt6) {
                         case 1 :
-                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:97:7: ID
+                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:99:7: ID
                             {
                             ID11=(Token)match(input,ID,FOLLOW_ID_in_entity646); 
 
@@ -366,7 +368,7 @@ public class QueryParser extends Parser {
                     }
 
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:97:11: ( entityRestriction )*
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:99:11: ( entityRestriction )*
                     loop7:
                     do {
                         int alt7=2;
@@ -379,7 +381,7 @@ public class QueryParser extends Parser {
 
                         switch (alt7) {
                     	case 1 :
-                    	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:97:12: entityRestriction
+                    	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:99:12: entityRestriction
                     	    {
                     	    pushFollow(FOLLOW_entityRestriction_in_entity650);
                     	    entityRestriction10=entityRestriction();
@@ -403,7 +405,7 @@ public class QueryParser extends Parser {
                     			val = Expression.buildEntity("-", ocs.getOrder(), ocs.getConditions(), (ID11!=null?ID11.getText():null));
                     		
 
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:102:3: ( QUANTIFIER )?
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:104:3: ( QUANTIFIER )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
 
@@ -412,7 +414,7 @@ public class QueryParser extends Parser {
                     }
                     switch (alt8) {
                         case 1 :
-                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:102:4: QUANTIFIER
+                            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:104:4: QUANTIFIER
                             {
                             QUANTIFIER12=(Token)match(input,QUANTIFIER,FOLLOW_QUANTIFIER_in_entity664); 
 
@@ -444,7 +446,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "entityRestriction"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:105:1: entityRestriction returns [Util.OrderAndCondition val] : ( '[' ID OP value ']' | '[' order ':' ID ']' | '[' order ':' ID OP value ']' );
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:107:1: entityRestriction returns [Util.OrderAndCondition val] : ( '[' ID OP value ']' | '[' order ':' ID ']' | '[' order ':' ID OP value ']' );
     public final Util.OrderAndCondition entityRestriction() throws RecognitionException {
         Util.OrderAndCondition val = null;
 
@@ -454,17 +456,17 @@ public class QueryParser extends Parser {
         Token ID16=null;
         Token ID18=null;
         Token OP20=null;
-        String value15 =null;
+        AbstractValue value15 =null;
 
         String order17 =null;
 
         String order19 =null;
 
-        String value21 =null;
+        AbstractValue value21 =null;
 
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:106:2: ( '[' ID OP value ']' | '[' order ':' ID ']' | '[' order ':' ID OP value ']' )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:108:2: ( '[' ID OP value ']' | '[' order ':' ID ']' | '[' order ':' ID OP value ']' )
             int alt10=3;
             int LA10_0 = input.LA(1);
 
@@ -569,7 +571,7 @@ public class QueryParser extends Parser {
             }
             switch (alt10) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:106:4: '[' ID OP value ']'
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:108:4: '[' ID OP value ']'
                     {
                     match(input,21,FOLLOW_21_in_entityRestriction683); 
 
@@ -590,7 +592,7 @@ public class QueryParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:108:4: '[' order ':' ID ']'
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:110:4: '[' order ':' ID ']'
                     {
                     match(input,21,FOLLOW_21_in_entityRestriction701); 
 
@@ -611,7 +613,7 @@ public class QueryParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:110:4: '[' order ':' ID OP value ']'
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:112:4: '[' order ':' ID OP value ']'
                     {
                     match(input,21,FOLLOW_21_in_entityRestriction718); 
 
@@ -657,7 +659,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "group"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:114:1: group returns [Expression val] : LQUOTE (p1= parallel )+ RQUOTE ( QUANTIFIER )? ;
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:116:1: group returns [Expression val] : LQUOTE (p1= parallel )+ RQUOTE ( QUANTIFIER )? ;
     public final Expression group() throws RecognitionException {
         Expression val = null;
 
@@ -667,14 +669,14 @@ public class QueryParser extends Parser {
 
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:115:2: ( LQUOTE (p1= parallel )+ RQUOTE ( QUANTIFIER )? )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:115:4: LQUOTE (p1= parallel )+ RQUOTE ( QUANTIFIER )?
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:117:2: ( LQUOTE (p1= parallel )+ RQUOTE ( QUANTIFIER )? )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:117:4: LQUOTE (p1= parallel )+ RQUOTE ( QUANTIFIER )?
             {
              ArrayList<Expression> list = new ArrayList<Expression>(); 
 
             match(input,LQUOTE,FOLLOW_LQUOTE_in_group753); 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:116:10: (p1= parallel )+
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:118:10: (p1= parallel )+
             int cnt11=0;
             loop11:
             do {
@@ -688,7 +690,7 @@ public class QueryParser extends Parser {
 
                 switch (alt11) {
             	case 1 :
-            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:116:11: p1= parallel
+            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:118:11: p1= parallel
             	    {
             	    pushFollow(FOLLOW_parallel_in_group758);
             	    p1=parallel();
@@ -715,7 +717,7 @@ public class QueryParser extends Parser {
 
              val = Expression.buildConcat(list.toArray(new Expression[0])); 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:120:3: ( QUANTIFIER )?
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:122:3: ( QUANTIFIER )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -724,7 +726,7 @@ public class QueryParser extends Parser {
             }
             switch (alt12) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:120:4: QUANTIFIER
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:122:4: QUANTIFIER
                     {
                     QUANTIFIER22=(Token)match(input,QUANTIFIER,FOLLOW_QUANTIFIER_in_group779); 
 
@@ -754,7 +756,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "atom"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:126:1: fragment atom returns [Expression val] : ( entity | group );
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:128:1: fragment atom returns [Expression val] : ( entity | group );
     public final Expression atom() throws RecognitionException {
         Expression val = null;
 
@@ -765,7 +767,7 @@ public class QueryParser extends Parser {
 
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:127:2: ( entity | group )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:129:2: ( entity | group )
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -784,7 +786,7 @@ public class QueryParser extends Parser {
             }
             switch (alt13) {
                 case 1 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:127:4: entity
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:129:4: entity
                     {
                     pushFollow(FOLLOW_entity_in_atom805);
                     entity23=entity();
@@ -797,7 +799,7 @@ public class QueryParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:128:4: group
+                    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:130:4: group
                     {
                     pushFollow(FOLLOW_group_in_atom812);
                     group24=group();
@@ -827,7 +829,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "parallel"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:131:1: parallel returns [Expression val] :e1= atom ( '|' e2= atom )* ;
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:133:1: parallel returns [Expression val] :e1= atom ( '|' e2= atom )* ;
     public final Expression parallel() throws RecognitionException {
         Expression val = null;
 
@@ -838,8 +840,8 @@ public class QueryParser extends Parser {
 
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:132:2: (e1= atom ( '|' e2= atom )* )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:132:4: e1= atom ( '|' e2= atom )*
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:134:2: (e1= atom ( '|' e2= atom )* )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:134:4: e1= atom ( '|' e2= atom )*
             {
              ArrayList<Expression> list = new ArrayList<Expression>(); 
 
@@ -851,7 +853,7 @@ public class QueryParser extends Parser {
 
              list.add(e1); 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:135:3: ( '|' e2= atom )*
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:137:3: ( '|' e2= atom )*
             loop14:
             do {
                 int alt14=2;
@@ -864,7 +866,7 @@ public class QueryParser extends Parser {
 
                 switch (alt14) {
             	case 1 :
-            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:135:4: '|' e2= atom
+            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:137:4: '|' e2= atom
             	    {
             	    match(input,23,FOLLOW_23_in_parallel845); 
 
@@ -905,7 +907,7 @@ public class QueryParser extends Parser {
 
 
     // $ANTLR start "expression"
-    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:141:1: expression returns [Query val] : (p1= parallel )+ EOF ;
+    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:143:1: expression returns [Query val] : (p1= parallel )+ EOF ;
     public final Query expression() throws RecognitionException {
         Query val = null;
 
@@ -914,12 +916,12 @@ public class QueryParser extends Parser {
 
 
         try {
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:142:2: ( (p1= parallel )+ EOF )
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:142:5: (p1= parallel )+ EOF
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:144:2: ( (p1= parallel )+ EOF )
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:144:5: (p1= parallel )+ EOF
             {
              ArrayList<Expression> list = new ArrayList<Expression>(); 
 
-            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:143:3: (p1= parallel )+
+            // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:145:3: (p1= parallel )+
             int cnt15=0;
             loop15:
             do {
@@ -933,7 +935,7 @@ public class QueryParser extends Parser {
 
                 switch (alt15) {
             	case 1 :
-            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:143:4: p1= parallel
+            	    // E:\\Project\\hdgl\\hdgl.db.query\\src\\hdgl\\db\\query\\parser\\Query.g:145:4: p1= parallel
             	    {
             	    pushFollow(FOLLOW_parallel_in_expression886);
             	    p1=parallel();

@@ -1,9 +1,15 @@
 package hdgl.db.query.parser;
 
 import static org.junit.Assert.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import hdgl.db.query.convert.QueryCompletion;
 import hdgl.db.query.convert.QueryToStateMachine;
 import hdgl.db.query.expression.Expression;
+import hdgl.db.query.stm.SimpleStateMachine;
+import hdgl.db.query.stm.StateMachine;
 
 
 import org.antlr.runtime.ANTLRStringStream;
@@ -31,6 +37,31 @@ public class ParserTest {
 	}
 	
 	@Test
+	public void experiment(){
+		HashSet<Integer> set1 = new HashSet<Integer>();
+		HashSet<Integer> set2 = new HashSet<Integer>();
+		assertEquals(set1, set2);
+		set1.add(1);
+		set2.add(1);
+		assertEquals(set1, set2);
+		set1.add(2);
+		assertTrue(!set1.equals(set2));
+		set2.add(2);
+		assertEquals(set1, set2);
+		assertNotSame(set1, set2);
+		set1.add(10003);
+		set2.add(10003);
+		assertEquals(set1, set2);
+		set1.add(new Integer(50));
+		set2.add(new Integer(50));
+		assertEquals(set1, set2);
+		Set<Set<Integer>> set3 = new HashSet<Set<Integer>>();
+		set3.add(set1);
+		assertFalse(set3.add(set2));
+		assertEquals(set3.size(), 1);
+	}
+	
+	@Test
 	public void test() throws RecognitionException {
 		assertEquals(parser(".[desc:label<=val]*").expression().toString(), parser(".[DESC:label][label<=val]*").expression().toString());
 		assertEquals(parser(".-.[<:price]").expression().toString(), parser("((. -) .[ASC:price])").expression().toString());
@@ -43,7 +74,10 @@ public class ParserTest {
 		assertEquals("((. -[price<10])|(.[id=1] -) ((. -)* .))", QueryCompletion.complete(parser("-[price<10]|.[id=1](.)*").expression()).toString());
 		
 		Expression q = QueryCompletion.complete(parser(".[id=1]|-[price<10](.)*").expression());
-		QueryToStateMachine.convert(q);
+		SimpleStateMachine stm = QueryToStateMachine.convert(q);
+		stm.print(System.out);
+		StateMachine fstm = stm.buildStateMachine();
+		fstm.print(System.out);
 	}
 
 }

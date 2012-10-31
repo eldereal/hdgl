@@ -5,11 +5,13 @@ options {
 }
 
 @header{
-package hdgl.db.query.parser.output;
+package hdgl.db.query.parser;
 
 import hdgl.db.query.expression.*;
 import hdgl.db.query.parser.*;
+import hdgl.db.query.condition.*;
 import java.util.ArrayList;
+
 }
 
 @lexer::header {
@@ -78,11 +80,11 @@ order	returns [String val]
 	|	OP	{$val = $OP.text;}
 	;
 
-value	returns [String val]
-	:	STRING		{$val = $STRING.text;}
-	|	INT		{$val = $INT.text;}
-	|	FLOAT		{$val = $FLOAT.text;}
-	|	ID		{$val = $ID.text;}
+value	returns [AbstractValue val]
+	:	STRING		{$val = new StringValue($STRING.text);}
+	|	INT		{$val = new IntNumberValue($INT.text);}
+	|	FLOAT		{$val = new FloatNumberValue($FLOAT.text);}
+	|	ID		{$val = new StringValue($ID.text);}
 	;
 
 entity	returns [Expression val]

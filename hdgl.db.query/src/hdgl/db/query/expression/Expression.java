@@ -1,5 +1,6 @@
 package hdgl.db.query.expression;
 
+import hdgl.db.query.condition.AbstractValue;
 import hdgl.db.query.visitor.CloneVisitor;
 import hdgl.db.query.visitor.Visitor;
 
@@ -70,8 +71,8 @@ public abstract class Expression implements Cloneable {
 		return q;
 	}
 	
-	public static Condition buildCondition(String label, String op, String value){
-		Condition condition=new Condition();
+	public static Condition buildCondition(String label, String op, AbstractValue value){
+		Condition condition = new Condition();
 		condition.setLabel(label);
 		condition.setOp(op);
 		condition.setValue(value);
