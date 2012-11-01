@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import hdgl.db.graph.HdglException;
-import hdgl.db.graph.LabelContainer;
-import hdgl.db.graph.MutableGraph;
-import hdgl.db.graph.Node;
-import hdgl.db.graph.Relationship;
+import hdgl.db.graph.deprecated.HdglException;
+import hdgl.db.graph.deprecated.LabelContainer;
+import hdgl.db.graph.deprecated.MutableGraph;
+import hdgl.db.graph.deprecated.Node;
+import hdgl.db.graph.deprecated.Relationship;
 import hdgl.db.task.AsyncResult;
 import hdgl.db.task.CallableAsyncResult;
 import hdgl.db.task.DefiniteAsyncResult;

@@ -1,9 +1,9 @@
 package hdgl.db.impl.memory;
 
-import hdgl.db.graph.Relationship;
-import hdgl.db.graph.RelationshipType;
-import hdgl.db.graph.Vertex;
-import hdgl.db.graph.query.RelationshipQuery;
+import hdgl.db.graph.deprecated.Relationship;
+import hdgl.db.graph.deprecated.RelationshipType;
+import hdgl.db.graph.deprecated.Vertex;
+import hdgl.db.graph.query.deprecated.RelationshipQuery;
 
 public class MemNode implements Vertex {
 

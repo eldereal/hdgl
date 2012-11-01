@@ -14,12 +14,14 @@ public class HConf {
 	public static final String HDGL_GRAPH_NS="hdgl.graph.namespace";
 	public static final String HDGL_STORE_RECORD_SIZE="hdgl.store.recordsize";
 	public static final String HDGL_REGION_PORT="hdgl.regionserver.port";
+	public static final String HDGL_REGION_HOST="hdgl.regionserver.host";
 	public static class Defaults{
 		public static final String ZK_SERVER="localhost:2181";
 		public static final int ZK_SESSION_TIMEOUT = 60000;
 		public static final String HDGL_GRAPH_NS="graph";
 		public static final String HDGL_STORE_RECORD_SIZE = "4k";
 		public static final int HDGL_REGION_PORT = 5367;
+		public static final String HDGL_REGION_HOST = "localhost";
 		
 	}
 	
@@ -53,8 +55,12 @@ public class HConf {
 		}
 	}
 	
-	public static int getDefaultRegionServerPort(Configuration conf){
+	public static int getRegionServerPort(Configuration conf){
 		return conf.getInt(HDGL_REGION_PORT, Defaults.HDGL_REGION_PORT);
+	}
+	
+	public static String getRegionServerHost(Configuration conf){
+		return conf.get(HDGL_REGION_HOST, Defaults.HDGL_REGION_HOST);
 	}
 	
 }

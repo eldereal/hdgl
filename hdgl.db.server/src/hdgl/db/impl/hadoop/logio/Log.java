@@ -1,6 +1,6 @@
 package hdgl.db.impl.hadoop.logio;
 
-import hdgl.db.graph.HdglException;
+import hdgl.db.graph.deprecated.HdglException;
 import hdgl.db.impl.hadoop.HConf;
 
 

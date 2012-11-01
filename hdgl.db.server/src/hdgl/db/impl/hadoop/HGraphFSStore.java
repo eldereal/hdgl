@@ -3,7 +3,7 @@ package hdgl.db.impl.hadoop;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import hdgl.db.graph.HdglException;
+import hdgl.db.graph.deprecated.HdglException;
 import hdgl.db.impl.hadoop.logio.Log;
 
 import org.apache.hadoop.conf.Configuration;

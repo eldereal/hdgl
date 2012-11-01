@@ -2,11 +2,11 @@ package hdgl.db.impl.hadoop;
 
 import static org.junit.Assert.*;
 
-import hdgl.db.graph.Graph;
-import hdgl.db.graph.LabelContainer;
-import hdgl.db.graph.MutableGraph;
-import hdgl.db.graph.Node;
-import hdgl.db.graph.Vertex;
+import hdgl.db.graph.deprecated.Graph;
+import hdgl.db.graph.deprecated.LabelContainer;
+import hdgl.db.graph.deprecated.MutableGraph;
+import hdgl.db.graph.deprecated.Node;
+import hdgl.db.graph.deprecated.Vertex;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;

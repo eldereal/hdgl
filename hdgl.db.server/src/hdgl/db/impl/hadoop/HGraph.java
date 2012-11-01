@@ -16,14 +16,14 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
 
-import hdgl.db.graph.Graph;
-import hdgl.db.graph.HdglException;
-import hdgl.db.graph.MutableGraph;
-import hdgl.db.graph.Node;
-import hdgl.db.graph.Relationship;
-import hdgl.db.graph.query.NodeQuery;
-import hdgl.db.graph.query.PathQuery;
-import hdgl.db.graph.query.RelationshipQuery;
+import hdgl.db.graph.deprecated.Graph;
+import hdgl.db.graph.deprecated.HdglException;
+import hdgl.db.graph.deprecated.MutableGraph;
+import hdgl.db.graph.deprecated.Node;
+import hdgl.db.graph.deprecated.Relationship;
+import hdgl.db.graph.query.deprecated.NodeQuery;
+import hdgl.db.graph.query.deprecated.PathQuery;
+import hdgl.db.graph.query.deprecated.RelationshipQuery;
 import hdgl.db.task.AsyncCallback;
 import hdgl.db.task.AsyncResult;
 
