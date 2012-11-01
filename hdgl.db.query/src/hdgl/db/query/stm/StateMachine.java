@@ -92,6 +92,10 @@ public class StateMachine {
 		public Condition getCondition(int condId){
 			return conditions.get(condId);
 		}
+		
+		public Iterable<Condition> getConditions(){
+			return conditions;
+		}
 
 		public int addCondition(Condition cond) {
 			this.conditions.add(cond);
@@ -111,6 +115,10 @@ public class StateMachine {
 	
 	public State getState(int stateId){
 		return states.get(stateId);
+	}
+	
+	public Iterable<State> getStates(){
+		return states.values();
 	}
 	
 	public void print(PrintStream out){

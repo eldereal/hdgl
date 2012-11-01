@@ -15,6 +15,7 @@ import java.util.Set;
 import hdgl.db.query.condition.AbstractCondition;
 import hdgl.db.query.condition.NoRestriction;
 import hdgl.db.query.stm.StateMachine.Condition;
+import hdgl.db.query.stm.StateMachine.State;
 import hdgl.db.query.stm.StateMachine.Transition;
 import hdgl.db.query.stm.StateMachine.TransitionType;
 
@@ -126,11 +127,13 @@ public class SimpleStateMachine {
 		StateMachine stm = new StateMachine();
 		Map<Integer, Integer> newStateIds = new HashMap<Integer, Integer>();
 		Queue<Integer> states =new LinkedList<Integer>();
+		Set<Integer> closedStateSet = new HashSet<Integer>();
 		states.offer(-1);
 		//newStateIds.put(-1, 1);
 		
 		while (states.size()>0) {
-			int stateId = states.peek();
+			int stateId = states.poll();
+			closedStateSet.add(stateId);
 			int newStateId;
 			StateMachine.State state = stm.getState(newStateId = stm.addState());
 			newStateIds.put(stateId, newStateId);
@@ -142,13 +145,24 @@ public class SimpleStateMachine {
 						next = newStateIds.get(next);
 						t.setToState(next);						
 					}
-					if(next<0 && !states.contains(next)){
+					if(next<0 && !states.contains(next) && !closedStateSet.contains(next)){
 						states.offer(next);
 					}
 				}
 				state.addCondition(cond);
 			}
-		}		
+		}	
+		for(State s:stm.getStates()){
+			for(Condition c:s.getConditions()){
+				for(Transition t:c.getTransitions()){
+					int next=t.getToState();
+					if(next<0){
+						t.setToState(newStateIds.get(next));
+					}
+				}
+			}
+		}
+		
 		return stm;
 	}
 	
@@ -161,7 +175,7 @@ public class SimpleStateMachine {
 		for(int i = 0;i < vertexAlphabet.length;i++){
 			if(trans[i] != prevTrans || 
 					!prevCondition.require(vertexAlphabet[i])){
-				if(prevCondition!=null){
+				if(prevCondition!=null && prevTrans!=0){
 					StateMachine.Condition cond= new StateMachine.Condition(prevCondition);
 					for(Transition t:buildTransitions(prevTrans)){
 						cond.addTransition(t);
@@ -174,7 +188,7 @@ public class SimpleStateMachine {
 				prevCondition = vertexAlphabet[i];
 			}
 		}
-		if(prevCondition!=null){
+		if(prevCondition!=null&&prevTrans!=0){
 			StateMachine.Condition cond= new StateMachine.Condition(prevCondition);
 			for(Transition t:buildTransitions(prevTrans)){
 				cond.addTransition(t);
@@ -198,7 +212,7 @@ public class SimpleStateMachine {
 		for(int i = 0;i < edgeAlphabet.length;i++){
 			if(trans[i+vertexAlphabet.length] != prevTrans || 
 					!prevCondition.require(edgeAlphabet[i])){
-				if(prevCondition!=null){
+				if(prevCondition!=null && prevTrans!=0){
 					StateMachine.Transition transition= new Transition(TransitionType.Out, prevCondition, -prevTrans);
 					transitions.add(transition);
 				}
@@ -208,7 +222,7 @@ public class SimpleStateMachine {
 				prevCondition = edgeAlphabet[i];
 			}
 		}
-		if(prevCondition != null){
+		if(prevCondition != null && prevTrans!=0){
 			StateMachine.Transition transition = new Transition(TransitionType.Out, prevCondition, -prevTrans);
 			transitions.add(transition);
 		}
