@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 
-import hdgl.db.graph.HdglError;
-import hdgl.db.graph.LabelContainer;
+import hdgl.db.graph.deprecated.HdglError;
+import hdgl.db.graph.deprecated.LabelContainer;
 import hdgl.db.task.AsyncResult;
 import hdgl.db.task.CallableAsyncResult;
 

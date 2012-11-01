@@ -1,9 +1,9 @@
 package hdgl.db.impl.hadoop;
 
-import hdgl.db.graph.HdglError;
-import hdgl.db.graph.HdglException;
-import hdgl.db.graph.Node;
-import hdgl.db.graph.Relationship;
+import hdgl.db.graph.deprecated.HdglError;
+import hdgl.db.graph.deprecated.HdglException;
+import hdgl.db.graph.deprecated.Node;
+import hdgl.db.graph.deprecated.Relationship;
 import hdgl.db.impl.hadoop.logio.Log;
 
 import java.io.IOException;
