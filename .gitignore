@@ -7,3 +7,5 @@
 /hdgl.db/bin
 /hdgl.db.server/bin
 /hdgl.db.query/bin
+/.metadata
+/hdgl.db.store/bin
