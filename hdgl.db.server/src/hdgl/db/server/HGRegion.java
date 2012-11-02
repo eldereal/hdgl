@@ -9,10 +9,8 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import hdgl.db.impl.hadoop.HConf;
-import hdgl.db.impl.hadoop.HGraph;
-import hdgl.db.protocol.ClientRegionProtocol;
-import hdgl.db.server.region.RegionServer;
+import hdgl.db.conf.RegionConf;
+import hdgl.db.server.protocol.ClientRegionProtocol;
 import hdgl.util.ParameterHelper;
 
 import org.apache.commons.logging.LogFactory;
@@ -23,26 +21,7 @@ import org.apache.hadoop.ipc.Server;
 
 public class HGRegion {
 
-	private static final org.apache.commons.logging.Log Log = LogFactory.getLog(HGraph.class);
-	
-	/**
-	 * 分析一个形如host:port的字符串，其中host与port部分都可以为空
-	 * @return
-	 * @throws UnknownHostException 
-	 * @throws NumberFormatException 
-	 */
-	private static InetSocketAddress parseHostPort(String str, int defaultPort) throws NumberFormatException, UnknownHostException{
-		if(str.contains(":")){
-			String[] parts=str.split(":", 2);
-			return new InetSocketAddress(parts[0], Integer.parseInt(parts[1]));
-		}else{
-			if(Pattern.matches("\\d+", str)){
-				return new InetSocketAddress(InetAddress.getLocalHost(), Integer.parseInt(str));
-			}else{
-				return new InetSocketAddress(str,defaultPort);
-			}
-		}
-	}
+	private static final org.apache.commons.logging.Log Log = LogFactory.getLog(HGRegion.class);
 	
 	RegionServer regionServer;
 	Server server;
@@ -53,10 +32,11 @@ public class HGRegion {
 	}
 	
 	public void start() throws IOException{
-		String host=HConf.getRegionServerHost(configuration);
-		int port = HConf.getRegionServerPort(configuration);
+		String host= RegionConf.getRegionServerHost(configuration);
+		int port = RegionConf.getRegionServerPort(configuration);
 		Log.info("Starting HGRegion at " + host+":" + port);
-		regionServer = new RegionServer(configuration);
+		regionServer = new RegionServer(host,port,configuration);
+		regionServer.start();
 		server = RPC.getServer(ClientRegionProtocol.class, regionServer, host, port, configuration);
 		server.start();
 	}
@@ -64,6 +44,9 @@ public class HGRegion {
 	public void stop(){
 		if(server!=null){
 			server.stop();
+		}
+		if(regionServer!=null){
+			regionServer.stop();
 		}
 	}
 	

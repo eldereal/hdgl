@@ -268,3 +268,122 @@ Java Model Exception: Java Model Status [Timed out while retrieving the attached
 	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:166)
 !SUBENTRY 1 org.eclipse.jdt.core 4 1012 2012-10-31 16:10:44.453
 !MESSAGE Timed out while retrieving the attached javadoc for Assert [in Assert.class [in org.junit [in D:\eclipse\plugins\org.junit_4.8.2.v4_8_2_v20110321-1705\junit.jar]]] 
+!SESSION 2012-11-01 21:37:33.033 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_35
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 21:37:40.834
+!MESSAGE System property http.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 21:37:40.901
+!MESSAGE System property http.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 21:37:40.907
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 21:37:40.912
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 21:37:40.919
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 21:37:40.924
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+!SESSION 2012-11-01 22:52:56.168 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_35
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -data E:\Project\hdgl -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 22:52:58.850
+!MESSAGE System property http.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 22:52:58.873
+!MESSAGE System property http.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 22:52:58.875
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 22:52:58.876
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 22:52:58.878
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-01 22:52:58.880
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.jface.text 4 0 2012-11-01 23:47:30.854
+!MESSAGE Unexpected runtime error while computing a text hover
+!STACK 0
+org.eclipse.jdt.internal.compiler.problem.AbortCompilation: Pb(324) The type org.apache.hadoop.classification.InterfaceAudience$Public cannot be resolved. It is indirectly referenced from required .class files
+	at org.eclipse.jdt.internal.compiler.problem.ProblemHandler.handle(ProblemHandler.java:121)
+	at org.eclipse.jdt.internal.compiler.problem.ProblemHandler.handle(ProblemHandler.java:179)
+	at org.eclipse.jdt.internal.compiler.problem.ProblemReporter.handle(ProblemReporter.java:2062)
+	at org.eclipse.jdt.internal.compiler.problem.ProblemReporter.isClassPathCorrect(ProblemReporter.java:4039)
+	at org.eclipse.jdt.internal.compiler.lookup.UnresolvedReferenceBinding.resolve(UnresolvedReferenceBinding.java:54)
+	at org.eclipse.jdt.internal.compiler.lookup.BinaryTypeBinding.resolveType(BinaryTypeBinding.java:122)
+	at org.eclipse.jdt.internal.compiler.lookup.UnresolvedAnnotationBinding.getAnnotationType(UnresolvedAnnotationBinding.java:24)
+	at org.eclipse.jdt.core.dom.DefaultBindingResolver.getAnnotationInstance(DefaultBindingResolver.java:504)
+	at org.eclipse.jdt.core.dom.TypeBinding.getAnnotations(TypeBinding.java:100)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.getAnnotations(JavadocHover.java:987)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.addAnnotations(JavadocHover.java:945)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.getHoverInfo(JavadocHover.java:616)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.internalGetHoverInfo(JavadocHover.java:567)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.getHoverInfo2(JavadocHover.java:559)
+	at org.eclipse.jdt.internal.ui.text.java.hover.BestMatchHover.getHoverInfo2(BestMatchHover.java:142)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavaEditorTextHoverProxy.getHoverInfo2(JavaEditorTextHoverProxy.java:85)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:166)
+
+!ENTRY org.eclipse.jface.text 4 0 2012-11-02 00:05:02.792
+!MESSAGE Unexpected runtime error while computing a text hover
+!STACK 0
+org.eclipse.jdt.internal.compiler.problem.AbortCompilation: Pb(324) The type org.apache.hadoop.classification.InterfaceAudience$Public cannot be resolved. It is indirectly referenced from required .class files
+	at org.eclipse.jdt.internal.compiler.problem.ProblemHandler.handle(ProblemHandler.java:121)
+	at org.eclipse.jdt.internal.compiler.problem.ProblemHandler.handle(ProblemHandler.java:179)
+	at org.eclipse.jdt.internal.compiler.problem.ProblemReporter.handle(ProblemReporter.java:2062)
+	at org.eclipse.jdt.internal.compiler.problem.ProblemReporter.isClassPathCorrect(ProblemReporter.java:4039)
+	at org.eclipse.jdt.internal.compiler.lookup.UnresolvedReferenceBinding.resolve(UnresolvedReferenceBinding.java:54)
+	at org.eclipse.jdt.internal.compiler.lookup.BinaryTypeBinding.resolveType(BinaryTypeBinding.java:122)
+	at org.eclipse.jdt.internal.compiler.lookup.UnresolvedAnnotationBinding.getAnnotationType(UnresolvedAnnotationBinding.java:24)
+	at org.eclipse.jdt.core.dom.DefaultBindingResolver.getAnnotationInstance(DefaultBindingResolver.java:504)
+	at org.eclipse.jdt.core.dom.TypeBinding.getAnnotations(TypeBinding.java:100)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.getAnnotations(JavadocHover.java:987)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.addAnnotations(JavadocHover.java:945)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.getHoverInfo(JavadocHover.java:616)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.internalGetHoverInfo(JavadocHover.java:567)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover.getHoverInfo2(JavadocHover.java:559)
+	at org.eclipse.jdt.internal.ui.text.java.hover.BestMatchHover.getHoverInfo2(BestMatchHover.java:142)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavaEditorTextHoverProxy.getHoverInfo2(JavaEditorTextHoverProxy.java:85)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:166)
+!SESSION 2012-11-02 01:57:12.310 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_35
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -data E:\Project\hdgl -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-02 01:57:14.887
+!MESSAGE System property http.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-02 01:57:14.956
+!MESSAGE System property http.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-02 01:57:14.961
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-02 01:57:14.964
+!MESSAGE System property https.proxyPort is not set but should be 8000.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-02 01:57:14.969
+!MESSAGE System property https.proxyHost is not set but should be localhost.
+
+!ENTRY org.eclipse.core.net 1 0 2012-11-02 01:57:14.972
+!MESSAGE System property https.proxyPort is not set but should be 8000.

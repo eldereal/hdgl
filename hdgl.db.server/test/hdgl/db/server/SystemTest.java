@@ -3,8 +3,12 @@ package hdgl.db.server;
 import static org.junit.Assert.*;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
-import hdgl.db.protocol.ClientRegionProtocol;
+import hdgl.db.server.protocol.ClientMasterProtocol;
+import hdgl.db.server.protocol.ClientRegionProtocol;
+import hdgl.db.server.protocol.InetSocketAddressWritable;
+import hdgl.db.server.protocol.Protocol;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RPC;
@@ -12,24 +16,36 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class RegionTest {
+public class SystemTest {
 
 	static HGRegion region;
+	static HGMaster master;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		Configuration conf = new Configuration();
+		master = new HGMaster(conf);
+		master.start();
 		region = new HGRegion(conf);
 		region.start();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		region.stop();		
+		region.stop();
+		master.stop();
 	}
 
 	@Test
-	public void test() throws Exception {
+	public void forMaster() throws Exception {
+		Configuration conf = new Configuration();
+		ClientMasterProtocol master = Protocol.master(conf);
+		assertArrayEquals(new InetSocketAddressWritable[]{new InetSocketAddressWritable("localhost",5367)}, 
+				master.getRegions());
+	}
+	
+	@Test
+	public void forRegion() throws Exception {
 		Configuration conf = new Configuration();
 		ClientRegionProtocol region = RPC.getProxy(ClientRegionProtocol.class, 1, new InetSocketAddress("localhost", 5367), conf);
 		assertEquals("abcde", region.echo("abcde"));
