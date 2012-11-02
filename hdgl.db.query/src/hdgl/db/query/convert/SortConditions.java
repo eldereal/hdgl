@@ -1,9 +1,7 @@
 package hdgl.db.query.convert;
 
 import java.lang.reflect.Array;
-import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,13 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.antlr.misc.MultiMap;
-
-import antlr.collections.List;
-
 import hdgl.db.query.condition.AbstractCondition;
-import hdgl.db.query.condition.Conjunction;
-import hdgl.db.query.condition.AbstractCondition.ConditionRelationship;;
+import hdgl.db.query.condition.Conjunction;;
 
 public class SortConditions {
 	

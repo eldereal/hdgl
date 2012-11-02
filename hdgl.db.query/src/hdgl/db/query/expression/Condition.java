@@ -8,7 +8,6 @@ import hdgl.db.query.condition.LargerThanOrEqualTo;
 import hdgl.db.query.condition.LessThan;
 import hdgl.db.query.condition.LessThanOrEqualTo;
 import hdgl.db.query.condition.NotEqualTo;
-import hdgl.db.query.condition.UniaryCondition;
 import hdgl.db.query.visitor.Visitor;
 
 public class Condition extends Expression {

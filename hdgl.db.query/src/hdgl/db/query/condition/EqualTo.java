@@ -1,7 +1,5 @@
 package hdgl.db.query.condition;
 
-import java.util.Iterator;
-
 public class EqualTo extends UniaryCondition {
 
 	public EqualTo(String label, AbstractValue value) {

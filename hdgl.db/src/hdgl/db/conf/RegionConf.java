@@ -1,7 +1,5 @@
 package hdgl.db.conf;
 
-import java.net.InetSocketAddress;
-
 import org.apache.hadoop.conf.Configuration;
 
 public final class RegionConf {

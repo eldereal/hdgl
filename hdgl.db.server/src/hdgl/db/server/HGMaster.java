@@ -1,10 +1,8 @@
 package hdgl.db.server;
 
 import hdgl.db.conf.MasterConf;
-import hdgl.db.conf.RegionConf;
-import hdgl.db.server.protocol.ClientMasterProtocol;
-import hdgl.db.server.protocol.ClientRegionProtocol;
-import hdgl.db.server.protocol.RegionMasterProtocol;
+import hdgl.db.protocol.ClientMasterProtocol;
+import hdgl.db.protocol.RegionMasterProtocol;
 
 import java.io.IOException;
 
@@ -27,17 +25,21 @@ public class HGMaster {
 	}
 	
 	public void start() throws IOException{
-		String host= MasterConf.getMasterHost(configuration);
-		int cport = MasterConf.getClientMasterPort(configuration);
-		int rport = MasterConf.getRegionMasterPort(configuration);
-		Log.info("Starting HGMaster for client at " + host+":" + cport);
-		Log.info("Starting HGMaster for region at " + host+":" + rport);
-		masterServer = new MasterServer(host, cport, configuration);
-		masterServer.start();
-		clientServer = RPC.getServer(ClientMasterProtocol.class, masterServer, host, cport, configuration);
-		clientServer.start();		
-		regionServer = RPC.getServer(RegionMasterProtocol.class, masterServer, host, rport, configuration);
-		regionServer.start();
+		try{
+			String host= MasterConf.getMasterHost(configuration);
+			int cport = MasterConf.getClientMasterPort(configuration);
+			int rport = MasterConf.getRegionMasterPort(configuration);
+			Log.info("Starting HGMaster for client at " + host+":" + cport);
+			Log.info("Starting HGMaster for region at " + host+":" + rport);
+			masterServer = new MasterServer(host, cport, configuration);
+			masterServer.start();
+			clientServer = RPC.getServer(ClientMasterProtocol.class, masterServer, host, cport, configuration);
+			clientServer.start();		
+			regionServer = RPC.getServer(RegionMasterProtocol.class, masterServer, host, rport, configuration);
+			regionServer.start();
+		}catch (Exception e) {
+			Log.error("Unhandled exception", e);
+		}
 	}
 	
 	public void stop(){

@@ -14,8 +14,6 @@ import hdgl.db.query.condition.NoRestriction;
 import hdgl.db.query.condition.NotEqualTo;
 import hdgl.db.query.condition.OfType;
 import hdgl.db.query.convert.SortConditions;
-import hdgl.db.query.expression.Condition;
-
 import org.junit.Test;
 
 public class ConditionTest {

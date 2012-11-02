@@ -1,17 +1,8 @@
 package hdgl.db.server;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import hdgl.db.conf.RegionConf;
-import hdgl.db.server.protocol.ClientRegionProtocol;
-import hdgl.util.ParameterHelper;
+import hdgl.db.protocol.ClientRegionProtocol;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -32,13 +23,17 @@ public class HGRegion {
 	}
 	
 	public void start() throws IOException{
-		String host= RegionConf.getRegionServerHost(configuration);
-		int port = RegionConf.getRegionServerPort(configuration);
-		Log.info("Starting HGRegion at " + host+":" + port);
-		regionServer = new RegionServer(host,port,configuration);
-		regionServer.start();
-		server = RPC.getServer(ClientRegionProtocol.class, regionServer, host, port, configuration);
-		server.start();
+		try{
+			String host= RegionConf.getRegionServerHost(configuration);
+			int port = RegionConf.getRegionServerPort(configuration);
+			Log.info("Starting HGRegion at " + host+":" + port);
+			regionServer = new RegionServer(host,port,configuration);
+			regionServer.start();
+			server = RPC.getServer(ClientRegionProtocol.class, regionServer, host, port, configuration);
+			server.start();
+		}catch (Exception e) {
+			Log.error("Unhandled exception", e);
+		}
 	}
 	
 	public void stop(){

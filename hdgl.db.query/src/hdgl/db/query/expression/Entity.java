@@ -1,7 +1,6 @@
 package hdgl.db.query.expression;
 
 import hdgl.db.query.condition.AbstractCondition;
-import hdgl.db.query.condition.NoRestriction;
 import hdgl.db.query.condition.OfType;
 
 public abstract class Entity extends Expression {

@@ -3,6 +3,8 @@
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 字符串的辅助方法
@@ -54,6 +56,23 @@ public class StringHelper {
     public static String formatTimestamp(long timestamp){
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         return format.format(new Date(timestamp));
+    }
+    
+    public static String makePath(String part1, String part2){
+    	if(part1.endsWith("/")){
+    		part1 = part1.substring(0, part1.length() - 1);
+    	}
+    	if(part2.startsWith("/")){
+    		part2 = part2.substring(1);
+    	}
+    	return part1+"/"+part2;
+    }
+    
+    static final Pattern NUM_PATTERN = Pattern.compile(".*?(\\d+)");
+	
+    public static int getLastInt(String str){
+    	Matcher matcher = NUM_PATTERN.matcher(str);
+    	return Integer.parseInt(matcher.group(1));
     }
     
 }

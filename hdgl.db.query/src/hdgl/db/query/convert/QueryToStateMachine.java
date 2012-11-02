@@ -3,12 +3,10 @@ package hdgl.db.query.convert;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import hdgl.db.query.condition.AbstractCondition;
 import hdgl.db.query.condition.NoRestriction;
-import hdgl.db.query.expression.Condition;
 import hdgl.db.query.expression.Edge;
 import hdgl.db.query.expression.Entity;
 import hdgl.db.query.expression.Expression;

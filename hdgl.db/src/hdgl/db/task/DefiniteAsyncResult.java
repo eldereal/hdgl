@@ -1,9 +1,7 @@
 package hdgl.db.task;
 
 import java.util.Vector;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * 该类用于将一个确定的值包装为AsyncResult
