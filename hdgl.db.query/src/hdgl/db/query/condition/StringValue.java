@@ -1,12 +1,22 @@
 package hdgl.db.query.condition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class StringValue extends AbstractValue {
 
+	public static final byte FLAG_BYTE=-23;
+	
 	private String value;
 
 	public StringValue(String value) {
 		super();
 		this.value = value;
+	}
+
+	public StringValue() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public String getValue() {
@@ -55,5 +65,16 @@ public class StringValue extends AbstractValue {
 	@Override
 	public boolean largerThan(AbstractValue obj) {
 		throw new ArithmeticException("Not comparable");
+	}
+
+	@Override
+	public void write(DataOutput arg0) throws IOException {
+		arg0.writeByte(FLAG_BYTE);
+		arg0.writeUTF(value);
+	}
+
+	@Override
+	public void readTail(DataInput in) throws IOException {
+		value = in.readUTF();
 	}
 }

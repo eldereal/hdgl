@@ -1,10 +1,22 @@
 package hdgl.db.query.condition;
 
-public class LessThan extends UniaryCondition {
+public class LessThan extends BinaryCondition {
 
+	public static final byte FLAG_BYTE=-5;
+	
+	@Override
+	byte getFlagByte() {
+		return FLAG_BYTE;
+	}
+	
+	public LessThan() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public LessThan(String label, AbstractValue value) {
 		super(label, value);		
 	}
+
 	@Override
 	public String toString() {
 		return getLabel()+"<"+getValue();
@@ -13,7 +25,7 @@ public class LessThan extends UniaryCondition {
 	public boolean require(AbstractCondition other) {
 		if(other instanceof NoRestriction){
 			return true;
-		}else if(other instanceof UniaryCondition){
+		}else if(other instanceof BinaryCondition){
 			if(other instanceof LessThan){
 				return ((LessThan) other).getValue().largerThanOrEqualTo(getValue());
 			}else if(other instanceof LessThanOrEqualTo){

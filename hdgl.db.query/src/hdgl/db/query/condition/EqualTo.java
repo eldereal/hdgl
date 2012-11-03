@@ -1,7 +1,14 @@
 package hdgl.db.query.condition;
 
-public class EqualTo extends UniaryCondition {
 
+public class EqualTo extends BinaryCondition {
+
+	public static final byte FLAG_BYTE=-2;
+	
+	public EqualTo(){
+		
+	}
+	
 	public EqualTo(String label, AbstractValue value) {
 		super(label, value);		
 	}
@@ -15,7 +22,7 @@ public class EqualTo extends UniaryCondition {
 	public boolean require(AbstractCondition other) {
 		if(other instanceof NoRestriction){
 			return true;
-		}else if(other instanceof UniaryCondition){
+		}else if(other instanceof BinaryCondition){
 			if (other instanceof LessThan){		
 				return ((LessThan) other).getValue().largerThan(getValue());
 			}else if(other instanceof LessThanOrEqualTo){
@@ -60,6 +67,11 @@ public class EqualTo extends UniaryCondition {
 		}else{
 			return true;
 		}
+	}
+
+	@Override
+	byte getFlagByte() {
+		return FLAG_BYTE;
 	}
 	
 }

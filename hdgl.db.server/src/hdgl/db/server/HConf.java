@@ -25,6 +25,10 @@ public class HConf {
 		return StringHelper.makePath(GraphConf.getZookeeperRoot(conf),"sessions");
 	}
 	
+	public static String getZKQuerySessionRoot(Configuration conf){
+		return StringHelper.makePath(GraphConf.getZookeeperRoot(conf),"qsessions");
+	}
+	
 	public static ZooKeeper getZooKeeper(Configuration conf, Watcher watcher) throws IOException{
 		final ZooKeeper zk = new ZooKeeper(conf.get(GraphConf.ZK_SERVER, GraphConf.Defaults.ZK_SERVER),conf.getInt(GraphConf.ZK_SESSION_TIMEOUT, GraphConf.Defaults.ZK_SESSION_TIMEOUT),watcher);
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

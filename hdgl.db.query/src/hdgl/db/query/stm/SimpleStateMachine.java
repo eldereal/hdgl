@@ -154,7 +154,7 @@ public class SimpleStateMachine {
 		for(State s:stm.getStates()){
 			for(Condition c:s.getConditions()){
 				for(Transition t:c.getTransitions()){
-					int next=t.getToState();
+					int next = t.getToState();
 					if(next<0){
 						t.setToState(newStateIds.get(next));
 					}

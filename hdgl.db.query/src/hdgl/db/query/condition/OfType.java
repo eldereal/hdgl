@@ -1,9 +1,19 @@
 package hdgl.db.query.condition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class OfType extends AbstractCondition {
 
+	public static final byte FLAG_BYTE=-9;
+	
 	String type;
 
+	public OfType() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public OfType(String type) {
 		super();
 		this.type = type;
@@ -68,6 +78,17 @@ public class OfType extends AbstractCondition {
 		}else{
 			return true;
 		}
+	}
+
+	@Override
+	public void write(DataOutput arg0) throws IOException {
+		arg0.write(FLAG_BYTE);
+		arg0.writeUTF(type);
+	}
+
+	@Override
+	public void readTail(DataInput input) throws IOException {
+		type = input.readUTF();
 	}
 	
 	

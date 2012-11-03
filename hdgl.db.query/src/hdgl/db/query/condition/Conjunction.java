@@ -1,11 +1,22 @@
 package hdgl.db.query.condition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class Conjunction extends AbstractCondition {
 
+	public static final byte FLAG_BYTE=-1;
+	
 	AbstractCondition[] conditions;
 
+	
+	
+	public Conjunction(){
+		
+	}
+	
 	public Conjunction(AbstractCondition[] conditions) {
 		super();
 		this.conditions = conditions;
@@ -54,6 +65,24 @@ public class Conjunction extends AbstractCondition {
 	@Override
 	public String toString() {
 		return Arrays.toString(conditions);
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeByte(FLAG_BYTE);
+		out.writeInt(conditions.length);
+		for(AbstractCondition cond:conditions){
+			cond.write(out);
+		}
+	}
+
+	@Override
+	public void readTail(DataInput input) throws IOException {
+		int len = input.readInt();
+		conditions = new AbstractCondition[len];
+		for (int i = 0; i < conditions.length; i++) {
+			conditions[i] = AbstractCondition.readAbstractCondition(input);
+		}
 	}
 	
 }

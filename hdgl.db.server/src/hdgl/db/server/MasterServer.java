@@ -2,7 +2,11 @@ package hdgl.db.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +30,7 @@ import org.apache.zookeeper.data.Stat;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.exception.BadQueryException;
 import hdgl.db.exception.HdglException;
+import hdgl.db.impl.HGraphIds;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.RegionMasterProtocol;
@@ -36,6 +41,8 @@ import hdgl.db.query.parser.QueryLexer;
 import hdgl.db.query.parser.QueryParser;
 import hdgl.db.query.stm.SimpleStateMachine;
 import hdgl.db.query.stm.StateMachine;
+import hdgl.db.store.GraphStore;
+import hdgl.db.store.StoreFactory;
 import hdgl.util.StringHelper;
 import hdgl.util.WritableHelper;
 
@@ -50,6 +57,8 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	int port;
 	ZooKeeper zk; 
 	int masterId;
+	GraphStore store;
+	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
 	
 	public ZooKeeper zk() throws IOException, InterruptedException, KeeperException{
 		if(this.zk == null){
@@ -74,7 +83,15 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		if(zk().exists(masterZkNode, false)==null){
 			zk().create(masterZkNode, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		}
+		if(zk().exists(HConf.getZKQuerySessionRoot(conf), false)==null){
+			zk().create(HConf.getZKQuerySessionRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+		}
 		String path = zk().create(StringHelper.makePath(masterZkNode,"master"), WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+		if(zk().exists(HConf.getZKRegionRoot(conf), false) == null){
+			zk().create(HConf.getZKRegionRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			zk().getChildren(HConf.getZKRegionRoot(conf), this);
+		}
+		store = StoreFactory.createGraphStore(conf);
 		masterId = StringHelper.getLastInt(path);
 	}
 	
@@ -82,35 +99,54 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		
 	}
 
+	void updateRegions() throws KeeperException, InterruptedException, IOException{
+		List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), false);
+		regions.clear();
+		for (int i = 0; i < paths.size(); i++) {
+			String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
+			Stat s = zk().exists(path, false);
+			byte[] addr = zk().getData(path, false, s);
+			int regionId = StringHelper.getLastInt(path);
+			regions.put(regionId, WritableHelper.parse(addr, InetSocketAddressWritable.class));
+		}
+	}
+	
 	@Override
 	public MapWritable getRegions() {
 		MapWritable mapWritable = new MapWritable();
-		try {
-			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), false);
-			for (int i = 0; i < paths.size(); i++) {
-				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
-				Stat s = zk().exists(path, false);
-				byte[] addr = zk().getData(path, false, s);
-				int regionId = StringHelper.getLastInt(path);
-				mapWritable.put(new IntWritable(regionId), WritableHelper.parse(addr, InetSocketAddressWritable.class));
-			}
-			return mapWritable;
-		} catch (KeeperException e) {
-			Log.error("Internal error", e);
-			throw new HdglException(e);
-		} catch (InterruptedException e) {
-			Log.error("Internal error", e);
-			throw new HdglException(e);
-		} catch (IOException e) {
-			Log.error("Internal error", e);
-			throw new HdglException(e);
+		for(Map.Entry<Integer, InetSocketAddressWritable> region:regions.entrySet()){
+			mapWritable.put(new IntWritable(region.getKey()), region.getValue());
 		}
+		return mapWritable;
 	}
 
 	@Override
-	public InetSocketAddressWritable findEntity(long id) {
-		// TODO Auto-generated method stub
-		return null;
+	public IntWritable[] findEntity(long id) {
+		try{
+			Set<IntWritable> addresses = new HashSet<IntWritable>();
+			String[] hosts;
+			Set<String> hostSet = new HashSet<String>();
+			if(HGraphIds.isVertexId(id)){
+				long vid = HGraphIds.extractEntityId(id);
+				hosts = store.bestPlacesForVertex(vid);
+			}else if(HGraphIds.isEdgeId(id)){
+				long eid = HGraphIds.extractEntityId(id);
+				hosts = store.bestPlacesForVertex(eid);
+			}else{
+				throw new HdglException("Invalid id");
+			}
+			for(String str:hosts){
+				hostSet.add(str);
+			}
+			for(Map.Entry<Integer, InetSocketAddressWritable> map:regions.entrySet()){
+				if(hostSet.contains(map.getValue().getHost())){
+					addresses.add(new IntWritable(map.getKey()));
+				}
+			}
+			return addresses.toArray(new IntWritable[0]);
+		}catch (IOException e) {
+			throw new HdglException(host);
+		}
 	}
 
 	StateMachine parse(String query) throws BadQueryException{
@@ -128,19 +164,33 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	
 	@Override
 	public int prepareQuery(String query) throws BadQueryException {
-		StateMachine stm = parse(query);
-		return 0;
+		try{
+			StateMachine stm = parse(query);	
+			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), WritableHelper.toBytes(stm), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+			int id = StringHelper.getLastInt(idPath);
+			return id;
+		}catch (Exception e) {
+			throw new HdglException(e);
+		}
 	}
 
 	@Override
-	public InetSocketAddressWritable[] query(int queryId) {
+	public IntWritable[] query(int queryId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void process(WatchedEvent arg0) {
-		
+	public void process(WatchedEvent event) {
+		try {
+			updateRegions();
+		} catch (KeeperException e) {
+			Log.error(e);
+		} catch (InterruptedException e) {
+			Log.error(e);
+		} catch (IOException e) {
+			Log.error(e);
+		}
 	}
 	
 }

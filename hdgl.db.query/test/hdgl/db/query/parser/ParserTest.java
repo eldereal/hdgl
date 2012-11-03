@@ -2,6 +2,13 @@ package hdgl.db.query.parser;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,9 +82,22 @@ public class ParserTest {
 		
 		Expression q = QueryCompletion.complete(parser(".[id=1]|-[price<10](.)*").expression());
 		SimpleStateMachine stm = QueryToStateMachine.convert(q);
-		stm.print(System.out);
+		//stm.print(System.out);
 		StateMachine fstm = stm.buildStateMachine();
-		fstm.print(System.out);
+		//fstm.print(System.out);
+		System.out.print(fstm);
+		try{
+			ByteArrayOutputStream out=new ByteArrayOutputStream();
+			DataOutput d = new DataOutputStream(out);
+			fstm.write(d);
+			ByteArrayInputStream in=new ByteArrayInputStream(out.toByteArray());
+			DataInput input = new DataInputStream(in);
+			StateMachine nstm = new StateMachine();
+			nstm.readFields(input);
+			assertEquals(fstm.toString(), nstm.toString());
+		}catch (IOException e) {
+			fail(e.getMessage());
+		}
 	}
 
 }

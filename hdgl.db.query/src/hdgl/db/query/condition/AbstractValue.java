@@ -1,6 +1,14 @@
 package hdgl.db.query.condition;
 
-public abstract class AbstractValue {
+import hdgl.db.exception.HdglException;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+import org.apache.hadoop.io.Writable;
+
+public abstract class AbstractValue implements Writable {
 
 	@Override
 	public abstract int hashCode();
@@ -20,4 +28,35 @@ public abstract class AbstractValue {
 		return largerThan(value)||equals(value);
 	}
 	
+	public abstract void readTail(DataInput in) throws IOException;
+	
+	public static void writeValue(DataOutput out, AbstractValue value) throws IOException{
+		value.write(out);
+	}
+	
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		in.readByte();
+		readTail(in);
+	}
+	
+	public static AbstractValue readValue(DataInput in) throws IOException{
+		byte flag = in.readByte();
+		AbstractValue value;
+		switch (flag) {
+		case FloatNumberValue.FLAG_BYTE:
+			value = new FloatNumberValue();
+			break;
+		case IntNumberValue.FLAG_BYTE:
+			value = new IntNumberValue();
+			break;
+		case StringValue.FLAG_BYTE:
+			value = new StringValue();
+			break;
+		default:
+			throw new HdglException("Unsupported value type: " + flag);
+		}
+		value.readTail(in);
+		return value;
+	}
 }

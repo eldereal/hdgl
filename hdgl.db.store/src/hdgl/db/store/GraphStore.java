@@ -10,7 +10,7 @@ public interface GraphStore {
 	
 	public InputStream getEdgeData(long id) throws IOException;
 	
-	public InetSocketAddress[] bestPlacesForVertex(long entityId) throws IOException;
+	public String[] bestPlacesForVertex(long entityId) throws IOException;
 	
-	public InetSocketAddress[] bestPlacesForEdge(long entityId) throws IOException;
+	public String[] bestPlacesForEdge(long entityId) throws IOException;
 }

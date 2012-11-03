@@ -1,7 +1,18 @@
 package hdgl.db.query.condition;
 
-public class NotEqualTo extends UniaryCondition {
+public class NotEqualTo extends BinaryCondition {
 
+	public static final byte FLAG_BYTE=-8;
+	
+	@Override
+	byte getFlagByte() {
+		return FLAG_BYTE;
+	}
+	
+	public NotEqualTo() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public NotEqualTo(String label, AbstractValue value) {
 		super(label, value);
 	}

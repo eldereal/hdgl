@@ -2,6 +2,7 @@ package hdgl.db.protocol;
 
 import hdgl.db.exception.BadQueryException;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.ipc.ProtocolInfo;
 
@@ -10,9 +11,19 @@ public interface ClientMasterProtocol{
 
 	public MapWritable getRegions();
 	
-	public InetSocketAddressWritable findEntity(long id);
+	/**
+	 * Find best places for given entity
+	 * @param id
+	 * @return an array contains region id
+	 */
+	public IntWritable[] findEntity(long id);
 	
 	public int prepareQuery(String query) throws BadQueryException;
 	
-	public InetSocketAddressWritable[] query(int queryId);
+	/**
+	 * start a query 
+	 * @param queryId
+	 * @return a group of region ids 
+	 */
+	public IntWritable[] query(int queryId);
 }

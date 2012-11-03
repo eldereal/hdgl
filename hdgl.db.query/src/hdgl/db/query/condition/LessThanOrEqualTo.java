@@ -1,7 +1,18 @@
 package hdgl.db.query.condition;
 
-public class LessThanOrEqualTo extends UniaryCondition {
+public class LessThanOrEqualTo extends BinaryCondition {
 
+	public static final byte FLAG_BYTE=-6;
+	
+	@Override
+	byte getFlagByte() {
+		return FLAG_BYTE;
+	}
+	
+	public LessThanOrEqualTo() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public LessThanOrEqualTo(String label, AbstractValue value) {
 		super(label, value);
 	}
@@ -15,7 +26,7 @@ public class LessThanOrEqualTo extends UniaryCondition {
 	public boolean require(AbstractCondition other) {
 		if(other instanceof NoRestriction){
 			return true;
-		}else if(other instanceof UniaryCondition){
+		}else if(other instanceof BinaryCondition){
 			if(other instanceof LessThan){
 				return ((LessThan) other).getValue().largerThan(getValue());
 			}else if(other instanceof LessThanOrEqualTo){

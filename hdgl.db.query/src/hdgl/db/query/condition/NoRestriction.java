@@ -1,8 +1,18 @@
 package hdgl.db.query.condition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public final class NoRestriction extends AbstractCondition {
 
+	public static final byte FLAG_BYTE=-7;
+	
 	public static final NoRestriction I = new NoRestriction();
+	
+	public NoRestriction() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	@Override
 	public boolean require(AbstractCondition other) {
@@ -27,5 +37,15 @@ public final class NoRestriction extends AbstractCondition {
 	@Override
 	public String toString() {
 		return "*";
+	}
+
+	@Override
+	public void write(DataOutput arg0) throws IOException {
+		arg0.writeByte(FLAG_BYTE);
+	}
+
+	@Override
+	public void readTail(DataInput input) throws IOException {
+		
 	}
 }

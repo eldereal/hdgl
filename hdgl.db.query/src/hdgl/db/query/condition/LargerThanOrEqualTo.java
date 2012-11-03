@@ -1,7 +1,17 @@
 package hdgl.db.query.condition;
 
-public class LargerThanOrEqualTo extends UniaryCondition {
-
+public class LargerThanOrEqualTo extends BinaryCondition {
+	public static final byte FLAG_BYTE=-4;
+	
+	@Override
+	byte getFlagByte() {
+		return FLAG_BYTE;
+	}
+	
+	public LargerThanOrEqualTo() {
+	
+	}
+	
 	public LargerThanOrEqualTo(String label, AbstractValue value) {
 		super(label, value);
 	}
@@ -15,7 +25,7 @@ public class LargerThanOrEqualTo extends UniaryCondition {
 	public boolean require(AbstractCondition other) {
 		if(other instanceof NoRestriction){
 			return true;
-		}else if(other instanceof UniaryCondition){
+		}else if(other instanceof BinaryCondition){
 			if(other instanceof LargerThan){
 				return ((LargerThan) other).getValue().lessThan(getValue());
 			}else if(other instanceof LargerThanOrEqualTo){

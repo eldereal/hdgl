@@ -1,7 +1,15 @@
 package hdgl.db.query.condition;
 
-public abstract class UniaryCondition extends AbstractCondition {
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+public abstract class BinaryCondition extends AbstractCondition {
+
+	public BinaryCondition() {
+		
+	}
+	
 	public String getLabel() {
 		return label;
 	}
@@ -14,7 +22,7 @@ public abstract class UniaryCondition extends AbstractCondition {
 	
 	private AbstractValue value;
 
-	public UniaryCondition(String label, AbstractValue value) {
+	public BinaryCondition(String label, AbstractValue value) {
 		super();
 		this.label = label;
 		this.value = value;
@@ -37,7 +45,7 @@ public abstract class UniaryCondition extends AbstractCondition {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UniaryCondition other = (UniaryCondition) obj;
+		BinaryCondition other = (BinaryCondition) obj;
 		if (label == null) {
 			if (other.label != null)
 				return false;
@@ -51,6 +59,19 @@ public abstract class UniaryCondition extends AbstractCondition {
 		return true;
 	}
 	
+	abstract byte getFlagByte();
 	
+	@Override
+	public void readTail(DataInput input) throws IOException {
+		label = input.readUTF();
+		value = AbstractValue.readValue(input);
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeByte(getFlagByte());
+		out.writeUTF(getLabel());
+		getValue().write(out);
+	}
 	
 }

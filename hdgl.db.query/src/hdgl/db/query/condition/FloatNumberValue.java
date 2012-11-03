@@ -1,7 +1,13 @@
 package hdgl.db.query.condition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class FloatNumberValue extends AbstractValue {
 
+	public static final byte FLAG_BYTE=-21;
+	
 	private double value;
 
 	public double getValue() {
@@ -14,6 +20,10 @@ public class FloatNumberValue extends AbstractValue {
 	
 	public FloatNumberValue(String string) {
 		this.value = Double.parseDouble(string);
+	}
+
+	public FloatNumberValue() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public static FloatNumberValue parse(String value) {
@@ -70,5 +80,16 @@ public class FloatNumberValue extends AbstractValue {
 		}else{
 			throw new ArithmeticException("Not comparable");
 		}
+	}
+
+	@Override
+	public void write(DataOutput arg0) throws IOException {
+		arg0.writeByte(FLAG_BYTE);
+		arg0.writeDouble(value);
+	}
+
+	@Override
+	public void readTail(DataInput in) throws IOException {
+		value = in.readDouble();
 	}
 }
