@@ -84,7 +84,7 @@ public class RegionServer implements ClientRegionProtocol, Watcher {
 	}
 	
 	public void stop(){
-		
+		master.regionStop();
 	}
 
 	public void start() throws IOException, KeeperException, InterruptedException {
@@ -102,6 +102,7 @@ public class RegionServer implements ClientRegionProtocol, Watcher {
 			throw new IOException("Wrong path");
 		}
 		regionId = Integer.parseInt(m.group(1));
+		master.regionStart();
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class RegionServer implements ClientRegionProtocol, Watcher {
 	@Override
 	public boolean txTaskResult(int txId) {
 		if(taskResults.containsKey(txId)){
-			return true;
+			return taskResults.get(txId);
 		}else{
 			throw new HdglException("Task not complte yet");
 		}

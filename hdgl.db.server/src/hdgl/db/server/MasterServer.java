@@ -99,15 +99,19 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		
 	}
 
-	void updateRegions() throws KeeperException, InterruptedException, IOException{
-		List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), false);
-		regions.clear();
-		for (int i = 0; i < paths.size(); i++) {
-			String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
-			Stat s = zk().exists(path, false);
-			byte[] addr = zk().getData(path, false, s);
-			int regionId = StringHelper.getLastInt(path);
-			regions.put(regionId, WritableHelper.parse(addr, InetSocketAddressWritable.class));
+	void updateRegions(){
+		try{
+			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), false);
+			regions.clear();
+			for (int i = 0; i < paths.size(); i++) {
+				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
+				Stat s = zk().exists(path, false);
+				byte[] addr = zk().getData(path, false, s);
+				int regionId = StringHelper.getLastInt(path);
+				regions.put(regionId, WritableHelper.parse(addr, InetSocketAddressWritable.class));
+			}
+		}catch(Exception ex){
+			Log.error(ex);
 		}
 	}
 	
@@ -182,15 +186,19 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 
 	@Override
 	public void process(WatchedEvent event) {
-		try {
-			updateRegions();
-		} catch (KeeperException e) {
-			Log.error(e);
-		} catch (InterruptedException e) {
-			Log.error(e);
-		} catch (IOException e) {
-			Log.error(e);
+		if(event.getPath()!=null && event.getPath().startsWith(HConf.getZKRegionRoot(conf))){
+			updateRegions();			
 		}
+	}
+
+	@Override
+	public void regionStart() {
+		updateRegions();
+	}
+
+	@Override
+	public void regionStop() {
+		updateRegions();
 	}
 	
 }

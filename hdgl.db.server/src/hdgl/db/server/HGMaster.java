@@ -1,5 +1,6 @@
 package hdgl.db.server;
 
+import hdgl.db.conf.GraphConf;
 import hdgl.db.conf.MasterConf;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.RegionMasterProtocol;
@@ -55,7 +56,7 @@ public class HGMaster {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		HGMaster master = new HGMaster(new Configuration());
+		HGMaster master = new HGMaster(GraphConf.getDefault());
 		master.start();
 	}
 }

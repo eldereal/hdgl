@@ -23,7 +23,7 @@ public class Log implements Writable {
 	}
 	
 	public static Log setLabel(long entity, String name, byte[] value){
-		return new Log(SET_LABEL, entity, 0, 0, null, value);
+		return new Log(SET_LABEL, entity, 0, 0, name, value);
 	}
 	
 	byte type;
@@ -31,6 +31,54 @@ public class Log implements Writable {
 	String name;
 	byte[] data;
 	
+	public byte getType() {
+		return type;
+	}
+
+	public void setType(byte type) {
+		this.type = type;
+	}
+
+	public long getId1() {
+		return id1;
+	}
+
+	public void setId1(long id1) {
+		this.id1 = id1;
+	}
+
+	public long getId2() {
+		return id2;
+	}
+
+	public void setId2(long id2) {
+		this.id2 = id2;
+	}
+
+	public long getId3() {
+		return id3;
+	}
+
+	public void setId3(long id3) {
+		this.id3 = id3;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
+	}
+
 	public Log(){
 		
 	}
@@ -40,6 +88,7 @@ public class Log implements Writable {
 		this.type = type;
 		this.id1 = id1;
 		this.id2 = id2;
+		this.id3 = id3;
 		this.name = name;
 		this.data = data;
 	}
@@ -57,12 +106,18 @@ public class Log implements Writable {
 			id2 = in.readLong();
 			id3 = in.readLong();
 			name = in.readUTF();
+			break;
 		case SET_LABEL:
 			id1 = in.readLong();
 			name = in.readUTF();
 			int len=in.readInt();
-			data = new byte[len];
-			in.readFully(data);
+			if(len>0){
+				data = new byte[len];
+				in.readFully(data);
+			}else{
+				data=null;
+			}
+			break;
 		default:
 			throw new IllegalArgumentException("Illegal log type: "+ type);
 		}
@@ -79,12 +134,18 @@ public class Log implements Writable {
 			out.writeLong(id1);
 			out.writeLong(id2);
 			out.writeLong(id3);
-			out.writeUTF(name);			
+			out.writeUTF(name);	
+			break;
 		case SET_LABEL:
 			out.writeLong(id1);
 			out.writeUTF(name);
-			out.writeInt(data.length);
-			out.write(data);			
+			if(data!=null){
+				out.writeInt(data.length);
+				out.write(data);
+			}else{
+				out.writeInt(0);
+			}
+			break;
 		default:
 			throw new IllegalArgumentException("Illegal log type: "+ type);
 		}

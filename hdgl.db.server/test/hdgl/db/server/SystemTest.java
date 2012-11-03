@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.net.InetSocketAddress;
 
+import hdgl.db.conf.GraphConf;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.ClientRegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
@@ -22,7 +23,7 @@ public class SystemTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		Configuration conf = new Configuration();
+		Configuration conf = GraphConf.getDefault();
 		master = new HGMaster(conf);
 		master.start();
 		region = new HGRegion(conf);
@@ -37,14 +38,14 @@ public class SystemTest {
 
 	@Test
 	public void forMaster() throws Exception {
-		Configuration conf = new Configuration();
+		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		System.out.println(master.getRegions());
+		System.out.println(master.getRegions().entrySet());
 	}
 	
 	@Test
 	public void forRegion() throws Exception {
-		Configuration conf = new Configuration();
+		Configuration conf = GraphConf.getDefault();
 		ClientRegionProtocol region = RPC.getProxy(ClientRegionProtocol.class, 1, new InetSocketAddress("localhost", 5367), conf);
 		assertEquals("abcde", region.echo("abcde"));
 	}

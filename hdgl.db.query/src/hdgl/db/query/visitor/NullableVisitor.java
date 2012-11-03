@@ -84,13 +84,11 @@ public class NullableVisitor implements Visitor<Boolean, _void> {
 
 	@Override
 	public Boolean visitCondition(Condition cond, _void... arguments) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Boolean visitOrder(Order order, _void... arguments) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -29,7 +29,10 @@ public class HdfsLogStore implements LogStore {
 		this.fs = HConf.getFileSystem(configuration);
 		Path sessionRoot = new Path(GraphConf.getGraphRoot(configuration),"s"+sessionId);
 		Path logPath = new Path(sessionRoot, "log");
-		outputStream = fs.append(logPath);
+		if(fs.exists(logPath)){
+			fs.delete(logPath, false);
+		}
+		outputStream = fs.create(logPath);
 	}
 
 	@Override

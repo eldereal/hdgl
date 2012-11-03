@@ -16,7 +16,6 @@ public class StringValue extends AbstractValue {
 	}
 
 	public StringValue() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getValue() {

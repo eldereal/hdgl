@@ -10,7 +10,6 @@ public class LessThan extends BinaryCondition {
 	}
 	
 	public LessThan() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public LessThan(String label, AbstractValue value) {

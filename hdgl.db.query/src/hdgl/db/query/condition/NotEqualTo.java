@@ -10,7 +10,6 @@ public class NotEqualTo extends BinaryCondition {
 	}
 	
 	public NotEqualTo() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public NotEqualTo(String label, AbstractValue value) {

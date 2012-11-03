@@ -1,6 +1,8 @@
 package hdgl.db.server;
 
 import java.io.IOException;
+
+import hdgl.db.conf.GraphConf;
 import hdgl.db.conf.RegionConf;
 import hdgl.db.protocol.ClientRegionProtocol;
 
@@ -46,7 +48,7 @@ public class HGRegion {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		HGRegion region = new HGRegion(new Configuration());
+		HGRegion region = new HGRegion(GraphConf.getDefault());
 		region.start();
 	}
 	

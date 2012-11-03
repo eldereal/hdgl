@@ -10,7 +10,6 @@ public class LessThanOrEqualTo extends BinaryCondition {
 	}
 	
 	public LessThanOrEqualTo() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public LessThanOrEqualTo(String label, AbstractValue value) {

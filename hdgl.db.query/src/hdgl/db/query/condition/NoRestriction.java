@@ -11,7 +11,6 @@ public final class NoRestriction extends AbstractCondition {
 	public static final NoRestriction I = new NoRestriction();
 	
 	public NoRestriction() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

@@ -23,7 +23,6 @@ public class IntNumberValue extends AbstractValue {
 	}
 
 	public IntNumberValue() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public static IntNumberValue parse(String value) {

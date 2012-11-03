@@ -6,7 +6,7 @@ public final class GraphConf {
 	
 	public static final String GRAPH_ROOT = "hdgl.graph.root";
 	public static final String GRAPH_TRUNK_SIZE = "hdgl.graph.trunk.size";
-	public static final String DEFAULT_FS = "default.fs";
+	public static final String DEFAULT_FS = "fs.defaultFS";
 	public static final String ZK_SERVER = "hdgl.zookeeper.servers";
 	public static final String ZK_ROOT = "hdgl.zookeeper.root";
 	public static final String ZK_SESSION_TIMEOUT = "hdgl.zookeeper.timeout";
@@ -19,6 +19,12 @@ public final class GraphConf {
 		public static final String ZK_ROOT = "/hdgl";
 		public static final int GRAPH_TRUNK_SIZE = 4 * 1024;
 		
+	}
+	
+	public static Configuration getDefault(){
+		Configuration conf = new Configuration();
+		conf.set(DEFAULT_FS, Defaults.DEFAULT_FS);
+		return conf;
 	}
 	
 	public static String getZookeeperRoot(Configuration conf){

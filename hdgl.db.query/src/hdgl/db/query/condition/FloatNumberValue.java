@@ -23,7 +23,7 @@ public class FloatNumberValue extends AbstractValue {
 	}
 
 	public FloatNumberValue() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public static FloatNumberValue parse(String value) {

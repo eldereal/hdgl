@@ -151,14 +151,12 @@ public class FollowPosVisitor implements Visitor<_void, _void> {
 	@Override
 	public _void visitCondition(Condition cond,
 			_void... arguments) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public _void visitOrder(Order order,
 			_void... arguments) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

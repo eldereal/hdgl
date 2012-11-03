@@ -11,7 +11,6 @@ public class OfType extends AbstractCondition {
 	String type;
 
 	public OfType() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public OfType(String type) {

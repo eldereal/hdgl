@@ -42,6 +42,9 @@ public class HConn {
 		if(!regions.isEmpty()){
 			return regions.get(IterableHelper.randomSelect(regions.keySet()));
 		}else{
+			if(regionAddrs == null){
+				regionAddrs = master().getRegions();
+			}
 			return region(((IntWritable)IterableHelper.randomSelect(regionAddrs.keySet())).get());
 		}
 	}

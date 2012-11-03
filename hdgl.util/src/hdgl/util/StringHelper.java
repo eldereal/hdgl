@@ -69,10 +69,14 @@ public class StringHelper {
     }
     
     static final Pattern NUM_PATTERN = Pattern.compile(".*?(\\d+)");
-	
+
     public static int getLastInt(String str){
     	Matcher matcher = NUM_PATTERN.matcher(str);
-    	return Integer.parseInt(matcher.group(1));
+    	if(matcher.matches()){
+			return Integer.parseInt(matcher.group(1));
+		}else{
+			throw new NumberFormatException();
+		}
     }
     
 }
