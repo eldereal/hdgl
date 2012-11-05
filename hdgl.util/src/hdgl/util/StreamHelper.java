@@ -2,6 +2,7 @@
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,5 +50,11 @@ public class StreamHelper {
     
     public static void transfer(InputStream in, OutputStream out) throws IOException{
         transfer(in, out, false);
+    }
+    
+    public static byte[] toBytes(InputStream in)throws IOException{
+    	ByteArrayOutputStream buf = new ByteArrayOutputStream();
+    	transfer(in, buf, true);
+    	return buf.toByteArray();
     }
 }
