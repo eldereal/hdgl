@@ -1,4 +1,5 @@
-package hdgl.db.store;
+package hdgl.db.store.impl.hdfs.mapreduce;
+
 import java.util.ArrayList;
 
 public class Vertex extends GraphWritable{

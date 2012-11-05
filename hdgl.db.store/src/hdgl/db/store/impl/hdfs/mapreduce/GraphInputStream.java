@@ -1,4 +1,6 @@
-package hdgl.db.store;
+package hdgl.db.store.impl.hdfs.mapreduce;
+
+import hdgl.util.StringHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +34,7 @@ public class GraphInputStream extends InputStream{
 		Path path = null;
 		for (int i = 0; i < Parameter.REDUCER_NUMBER; i++)
 		{
-			path = new Path(file + "-r-" + Common.fillToLength(i));
+			path = new Path(file + "-r-" + StringHelper.fillToLength(i));
 			long temp = hdfs.getFileStatus(path).getLen() / Parameter.REGULAR_BLOCK_SIZE;
 			if (count + temp > id)
 			{

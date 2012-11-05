@@ -1,4 +1,5 @@
-package hdgl.db.store;
+package hdgl.db.store.impl.hdfs.mapreduce;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

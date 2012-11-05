@@ -1,4 +1,6 @@
-package hdgl.db.store;
+package hdgl.db.store.impl.hdfs.mapreduce;
+
+
 public class Edge extends GraphWritable{
 	private int vertex1;
 	private int vertex2;

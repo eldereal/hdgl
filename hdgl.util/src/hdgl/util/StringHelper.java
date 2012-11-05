@@ -78,5 +78,11 @@ public class StringHelper {
 			throw new NumberFormatException();
 		}
     }
+
+	public static String fillToLength(int number)
+	{
+		String str = String.format("%05d", number);
+		return str;
+	}
     
 }

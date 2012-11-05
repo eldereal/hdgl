@@ -1,4 +1,5 @@
-package hdgl.db.store;
+package hdgl.db.store.impl.hdfs.mapreduce;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;

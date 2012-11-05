@@ -2,8 +2,6 @@
 /hdgl.store/bin
 /hdgl.store/data
 /hdgl.util/bin
-/.metadata/.lock
-/.metadata/.plugins
 /hdgl.db/bin
 /hdgl.db.server/bin
 /hdgl.db.query/bin

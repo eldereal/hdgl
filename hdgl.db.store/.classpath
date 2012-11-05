@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/hdgl.util"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/hadoop-2.0"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/hdgl.db"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/hadoop-mapreduce-2.0"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
