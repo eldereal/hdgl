@@ -18,6 +18,9 @@ public class StreamHelper {
     
     public static int BUFFER_SIZE=256*256;
     
+   
+	
+    
     /**
      * 从InputStream中读取全部数据，并输出到OutputStream中
      */

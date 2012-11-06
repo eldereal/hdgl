@@ -10,12 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -26,17 +28,24 @@ import hdgl.db.conf.MasterConf;
 import hdgl.db.exception.HdglException;
 import hdgl.db.protocol.ClientRegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
+import hdgl.db.protocol.MessagePackWritable;
+import hdgl.db.protocol.BSPProtocol;
 import hdgl.db.protocol.RegionMasterProtocol;
+import hdgl.db.query.QueryContext;
+import hdgl.db.store.GraphStore;
 import hdgl.db.store.Log;
 import hdgl.db.store.LogStore;
 import hdgl.db.store.StoreFactory;
+import hdgl.util.NetHelper;
 import hdgl.util.StringHelper;
 import hdgl.util.WritableHelper;
 
 
-public class RegionServer implements ClientRegionProtocol, Watcher {
+public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher {
 
 	static final Pattern ZK_ID_PATTERN = Pattern.compile(".*?(\\d+)");
+	
+	private static final org.apache.commons.logging.Log log = LogFactory.getLog(HGRegion.class);
 	
 	Configuration conf;
 	RegionMasterProtocol master;
@@ -45,10 +54,12 @@ public class RegionServer implements ClientRegionProtocol, Watcher {
 	int regionId;
 	ZooKeeper zk; 
 	FileSystem fs;
+	GraphStore graph;
 	
 	Map<Integer, LogStore> logStores = new ConcurrentHashMap<Integer, LogStore>();
 	
 	Map<Integer, Boolean> taskResults =  new ConcurrentHashMap<Integer, Boolean>();
+	
 	
 	public ZooKeeper zk() throws IOException, InterruptedException, KeeperException{
 		if(this.zk == null){
@@ -103,6 +114,23 @@ public class RegionServer implements ClientRegionProtocol, Watcher {
 		}
 		regionId = Integer.parseInt(m.group(1));
 		master.regionStart();
+//		long step = graph.getVertexCountPerBlock();
+//		long max = graph.getVertexCount();
+//		String localhost = NetHelper.getMyHostName();
+//		for(int id=0;id<max;id+=step){
+//			String[] hosts = graph.bestPlacesForVertex(id);
+//			for(String host:hosts){
+//				if(host.equals(localhost)){
+//					log.info("try starting bfs host id=(" + id + "-" + (id + step - 1) + ") on " + host);
+//					try{
+//						zk().create(StringHelper.makePath(HConf.getZKBSPRoot(conf), Long.toString(id/step)), WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+//					}catch(NodeExistsException ex){
+//						log.info("another bfs host already started id=(" + id + "-" + (id + step - 1) + ")");						
+//					}
+//					break;
+//				}
+//			}
+//		}		
 	}
 
 	@Override
@@ -211,6 +239,25 @@ public class RegionServer implements ClientRegionProtocol, Watcher {
 	}
 	@Override
 	public void process(WatchedEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void broadcastMessage(int querySession, MessagePackWritable msg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendMessage(int querySession, int vertexId,
+			MessagePackWritable msg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void initBSP(int querySession, String zkRoot, QueryContext ctx) {
 		// TODO Auto-generated method stub
 		
 	}

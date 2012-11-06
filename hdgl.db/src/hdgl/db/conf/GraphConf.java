@@ -35,7 +35,11 @@ public final class GraphConf {
 		return conf.get(GRAPH_ROOT, Defaults.GRAPH_ROOT);
 	}
 	
-	public static int getGraphTrunkSize(Configuration conf){
+	public static int getVertexTrunkSize(Configuration conf){
+		return conf.getInt(GRAPH_TRUNK_SIZE, Defaults.GRAPH_TRUNK_SIZE);
+	}
+	
+	public static int getEdgeTrunkSize(Configuration conf){
 		return conf.getInt(GRAPH_TRUNK_SIZE, Defaults.GRAPH_TRUNK_SIZE);
 	}
 }

@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.ipc.RPC;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -30,10 +31,12 @@ import org.apache.zookeeper.data.Stat;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.exception.BadQueryException;
 import hdgl.db.exception.HdglException;
-import hdgl.db.impl.HGraphIds;
+import hdgl.db.graph.HGraphIds;
+import hdgl.db.protocol.BSPProtocol;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.RegionMasterProtocol;
+import hdgl.db.query.QueryContext;
 import hdgl.db.query.convert.QueryCompletion;
 import hdgl.db.query.convert.QueryToStateMachine;
 import hdgl.db.query.expression.Expression;
@@ -43,6 +46,7 @@ import hdgl.db.query.stm.SimpleStateMachine;
 import hdgl.db.query.stm.StateMachine;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.StoreFactory;
+import hdgl.util.NetHelper;
 import hdgl.util.StringHelper;
 import hdgl.util.WritableHelper;
 
@@ -59,6 +63,9 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	int masterId;
 	GraphStore store;
 	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
+	Map<Integer, BSPProtocol> bspRegions = new HashMap<Integer, BSPProtocol>();
+	
+	Map<Integer, String> queryZKRoots = new HashMap<Integer, String>();
 	
 	public ZooKeeper zk() throws IOException, InterruptedException, KeeperException{
 		if(this.zk == null){
@@ -86,6 +93,9 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		if(zk().exists(HConf.getZKQuerySessionRoot(conf), false)==null){
 			zk().create(HConf.getZKQuerySessionRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		}
+		if(zk().exists(HConf.getZKBSPRoot(conf), false)==null){
+			zk().create(HConf.getZKBSPRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+		}
 		String path = zk().create(StringHelper.makePath(masterZkNode,"master"), WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
 		if(zk().exists(HConf.getZKRegionRoot(conf), false) == null){
 			zk().create(HConf.getZKRegionRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
@@ -103,12 +113,15 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		try{
 			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), false);
 			regions.clear();
+			bspRegions.clear();
 			for (int i = 0; i < paths.size(); i++) {
 				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
 				Stat s = zk().exists(path, false);
-				byte[] addr = zk().getData(path, false, s);
+				byte[] addrData = zk().getData(path, false, s);
 				int regionId = StringHelper.getLastInt(path);
-				regions.put(regionId, WritableHelper.parse(addr, InetSocketAddressWritable.class));
+				InetSocketAddressWritable addr=WritableHelper.parse(addrData, InetSocketAddressWritable.class);
+				regions.put(regionId, addr);
+				bspRegions.put(regionId, RPC.getProxy(BSPProtocol.class, 1, addr.toAddress(), conf));
 			}
 		}catch(Exception ex){
 			Log.error(ex);
@@ -170,8 +183,25 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	public int prepareQuery(String query) throws BadQueryException {
 		try{
 			StateMachine stm = parse(query);	
-			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), WritableHelper.toBytes(stm), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+			QueryContext ctx = new QueryContext();
+			ctx.setStateMachine(stm);
+			long step = store.getVertexCountPerBlock();
+			long max = store.getVertexCount();
+			for(long id=0;id<max;id+=step){
+				String[] hosts = store.bestPlacesForVertex(id);
+				String usehost = hosts[(int) (Math.random()*hosts.length)];
+				for(Map.Entry<Integer, InetSocketAddressWritable> map:regions.entrySet()){
+					if(usehost.equals(map.getValue().getHost())){
+						ctx.put(id, map.getValue());
+						break;
+					}
+				}
+			}
+			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), WritableHelper.toBytes(ctx), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
 			int id = StringHelper.getLastInt(idPath);
+			queryZKRoots.put(id, idPath);
+//			String step0 = zk().create(StringHelper.makePath(idPath, "0"), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+//			zk().getChildren(step0, this);
 			return id;
 		}catch (Exception e) {
 			throw new HdglException(e);
@@ -180,7 +210,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 
 	@Override
 	public IntWritable[] query(int queryId) {
-		// TODO Auto-generated method stub
+		String queryZKRoot = queryZKRoots.get(queryId);
 		return null;
 	}
 

@@ -29,6 +29,14 @@ public class HConf {
 		return StringHelper.makePath(GraphConf.getZookeeperRoot(conf),"qsessions");
 	}
 	
+	public static String getZKQuerySessionDir(Configuration conf, int sessionId){
+		return StringHelper.makePath(getZKQuerySessionRoot(conf), "q" + String.format("%10d",	sessionId));
+	}
+	
+	public static String getZKBSPRoot(Configuration conf){
+		return StringHelper.makePath(GraphConf.getZookeeperRoot(conf),"bfs");
+	}
+	
 	public static ZooKeeper getZooKeeper(Configuration conf, Watcher watcher) throws IOException{
 		final ZooKeeper zk = new ZooKeeper(conf.get(GraphConf.ZK_SERVER, GraphConf.Defaults.ZK_SERVER),conf.getInt(GraphConf.ZK_SESSION_TIMEOUT, GraphConf.Defaults.ZK_SESSION_TIMEOUT),watcher);
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -45,6 +53,17 @@ public class HConf {
 	}
 	
 	public static FileSystem getFileSystem(Configuration conf) throws IOException{
-		return FileSystem.get(conf);
+		final FileSystem fs =  FileSystem.get(conf);
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					fs.close();
+				} catch (IOException e) {
+					
+				}
+			}
+		}));
+		return fs;
 	}
 }

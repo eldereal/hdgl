@@ -1,4 +1,4 @@
-package hdgl.db.impl;
+package hdgl.db.graph;
 
 public class HGraphIds {
 

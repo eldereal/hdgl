@@ -19,4 +19,12 @@ public interface GraphStore {
 	public String[] bestPlacesForVertex(long entityId) throws IOException ;
 	
 	public String[] bestPlacesForEdge(long entityId) throws IOException ;
+	
+	public long getVertexCount() throws IOException;
+	
+	public long getVertexCountPerBlock() throws IOException;
+	
+	public long getEdgeCount() throws IOException;
+	
+	public long getEdgeCountPerBlock() throws IOException;
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.conf.RegionConf;
 import hdgl.db.protocol.ClientRegionProtocol;
+import hdgl.util.NetHelper;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -26,7 +27,7 @@ public class HGRegion {
 	
 	public void start() throws IOException{
 		try{
-			String host= RegionConf.getRegionServerHost(configuration);
+			String host= NetHelper.getMyHostName();
 			int port = RegionConf.getRegionServerPort(configuration);
 			Log.info("Starting HGRegion at " + host+":" + port);
 			regionServer = new RegionServer(host,port,configuration);
