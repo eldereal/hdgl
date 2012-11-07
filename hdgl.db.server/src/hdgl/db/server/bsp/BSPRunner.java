@@ -32,6 +32,8 @@ public class BSPRunner extends Thread implements Watcher{
 	Object mutex = new Object();
 	Configuration conf;
 	String lockPath;
+	int nodeId;
+	boolean IamPivot = false;
 	
 	private static final org.apache.commons.logging.Log Log = LogFactory.getLog(BSPRunner.class);
 	
@@ -44,7 +46,8 @@ public class BSPRunner extends Thread implements Watcher{
 		this.zkRoot = zkRoot;
 		this.runnerCount = runnerCount;
 		this.conf = conf;
-		this.myname = NetHelper.getMyHostName()+"-"+clientId;
+		this.myname = "bsp";
+		this.nodeId = clientId;
 		this.setDaemon(false);
 		Log.info("init bsp node " + myname);
 	}
@@ -60,27 +63,35 @@ public class BSPRunner extends Thread implements Watcher{
     boolean enter() throws KeeperException, InterruptedException{
     	lockPath = zk.create(StringHelper.makePath(zkRoot, myname), new byte[0], Ids.OPEN_ACL_UNSAFE,
                 CreateMode.EPHEMERAL_SEQUENTIAL);
-        Log.info("bsp node " + myname +" entering barrier " + superStep);
+        int lockNumber = StringHelper.getLastInt(lockPath); 
+    	Log.info("bsp node " + nodeId +" entering barrier " + superStep);
         List<String> list = zk.getChildren(zkRoot, false);
-        if (list.size() < runnerCount) {
+        int maxId = -1;
+        for(String cn : list){
+        	int theirNumber=StringHelper.getLastInt(cn);
+        	if(theirNumber>maxId) maxId = theirNumber;
+        }
+        if (list.size() < runnerCount|| maxId != lockNumber) {
+        	IamPivot = false;
 	        while (true) {
 	            synchronized (mutex) {
 	                if(zk.exists(StringHelper.makePath(zkRoot, "ready"), this) == null){
 	                	mutex.wait();
 	                }else{
-	                	Log.info("bsp node " + myname +" has entered barrier " + superStep);
+	                	Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
 	                    return true;
 	                }
 	            }
 	        }
 	    }else{	   
+	    	IamPivot = true;
 	    	try{
 	    		zk.create(StringHelper.makePath(zkRoot, "ready"), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 	    	}catch(NodeExistsException ex){
 	    		
 	    	}
-	    	Log.info("bsp node " + myname +" has entered barrier " + superStep);
-        	Log.info("== all bsp nodes has entered barrier " + superStep+" ==");
+	    	Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
+        	Log.info("== all bsp nodes has entered barrier " + superStep+", pivot: "+nodeId+" ==");
             return true;
         }
     }
@@ -94,15 +105,15 @@ public class BSPRunner extends Thread implements Watcher{
      */
     boolean leave() throws KeeperException, InterruptedException{
         zk.delete(lockPath, 0);
-        Log.info("bsp node " + myname +" leaving barrier " + superStep);
+        Log.info("bsp node " + nodeId +" leaving barrier " + superStep);
         List<String> list = zk.getChildren(zkRoot, false);
-        if (list.size() > 1) {
+        if (list.size() > 1 || !IamPivot) {
 	        while (true) {
 	            synchronized (mutex) {
 	            	if(zk.exists(StringHelper.makePath(zkRoot, "ready"), this) != null){
 	                	mutex.wait();
 	                }else{
-	                	Log.info("bsp node " + myname +" has left barrier " + superStep);
+	                	Log.info("bsp node " + nodeId +" has left barrier " + superStep);
 	                    return true;
 	                }
 	            }
@@ -113,8 +124,8 @@ public class BSPRunner extends Thread implements Watcher{
             }catch(NoNodeException ex){
 	    		
 	    	}
-        	Log.info("bsp node " + myname +" has left barrier " + superStep);
-        	Log.info("== all bsp nodes has left barrier " + superStep+" ==");
+        	Log.info("bsp node " + nodeId +" has left barrier " + superStep);
+        	Log.info("== all bsp nodes has left barrier " + superStep+ ", pivot: "+nodeId+" ==");
             return true;
         }
     }
@@ -123,7 +134,7 @@ public class BSPRunner extends Thread implements Watcher{
 	public void run() {
 		try{
 			while(true){
-				Log.info("node " + myname +" working in step " + superStep);			
+				Log.info("node " + nodeId +" working in step " + superStep);			
 				try {
 					if(superStep > 10){
 						break;
