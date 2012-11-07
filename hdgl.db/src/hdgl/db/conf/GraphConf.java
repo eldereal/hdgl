@@ -1,10 +1,13 @@
 package hdgl.db.conf;
 
+import hdgl.util.StringHelper;
+
 import org.apache.hadoop.conf.Configuration;
 
 public final class GraphConf {
 	
 	public static final String GRAPH_ROOT = "hdgl.graph.root";
+	public static final String GRAPH_SESSION_ROOT="hdgl.graph.session.root";
 	public static final String GRAPH_TRUNK_SIZE = "hdgl.graph.trunk.size";
 	public static final String DEFAULT_FS = "fs.defaultFS";
 	public static final String ZK_SERVER = "hdgl.zookeeper.servers";
@@ -12,6 +15,7 @@ public final class GraphConf {
 	public static final String ZK_SESSION_TIMEOUT = "hdgl.zookeeper.timeout";
 	
 	public class Defaults{
+		public static final String GRAPH_SESSION_ROOT="session";
 		public static final String ZK_SERVER="localhost:2181";
 		public static final int ZK_SESSION_TIMEOUT = 60000;
 		public static final String GRAPH_ROOT = "/hdgl/graph/";
@@ -33,6 +37,11 @@ public final class GraphConf {
 	
 	public static String getGraphRoot(Configuration conf){
 		return conf.get(GRAPH_ROOT, Defaults.GRAPH_ROOT);
+	}
+	
+	public static String getGraphSessionRoot(Configuration conf, int sessionId){
+		String sessionRoot= StringHelper.makePath(conf.get(GRAPH_ROOT, Defaults.GRAPH_ROOT), conf.get(GRAPH_SESSION_ROOT, Defaults.GRAPH_SESSION_ROOT));
+		return StringHelper.makePath(sessionRoot, Integer.toString(sessionId));
 	}
 	
 	public static int getVertexTrunkSize(Configuration conf){

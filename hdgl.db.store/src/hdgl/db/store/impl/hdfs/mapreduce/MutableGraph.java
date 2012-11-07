@@ -6,13 +6,19 @@ import org.apache.hadoop.fs.Path;
 
 
 
+import hdgl.db.graph.Entity;
+import hdgl.db.graph.HGraphIds;
+import hdgl.db.task.AsyncResult;
+
 import java.io.IOException;
 
-public class MutableGraph {
+public class MutableGraph implements hdgl.db.graph.MutableGraph {
+	
 	private FSDataOutputStream outputStream;
 	private FileSystem hdfs;
-	private long vertex = -1;
-	private long edge = -1;
+	private long vertex = 0;
+	private long edge = 0;
+	
 	public MutableGraph(String name)
 	{
 		try
@@ -39,7 +45,7 @@ public class MutableGraph {
 			e.printStackTrace();
 		}
 	}
-	public long addVertex()
+	public long createVertex()
 	{
 		vertex++;
 		StringBuffer line = new StringBuffer("[add vertex ");
@@ -56,9 +62,9 @@ public class MutableGraph {
 		}
 		return vertex;
 	}
-	public long addEdge(long vertex1, long vertex2)
+	public long createEdge(long vertex1, long vertex2)
 	{
-		edge++;
+		edge--;
 		StringBuffer line = new StringBuffer("[add edge ");
 		line.append(edge);
 		line.append(":");
@@ -148,5 +154,47 @@ public class MutableGraph {
 		mg.setEdgeLabel(5, "试试", "可不可以");
 		mg.setEdgeLabel(6, "belong", "Yes");
 		mg.close();
+	}
+	
+	@Override
+	public AsyncResult<Boolean> commit() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public AsyncResult<Boolean> abort() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public long createVertex(String type) {
+		long id = createVertex();
+		setVertexLabel(id, "type", type);
+		return id;
+	}
+	@Override
+	public long createEdge(String type, long start, long end) {
+		long id=createEdge(start, end);
+		setEdgeLabel(id, "type", type);
+		return id;
+	}
+	@Override
+	public void setLabel(long entity, String name, byte[] value) {
+		if(HGraphIds.isEdgeId(entity)){
+			setEdgeLabel(entity, name, value);
+		}else{
+			setVertexLabel(entity, name, value);
+		}		
+	}
+	@Override
+	public void deleteEntity(Entity e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void deleteLabel(Entity e, String name) {
+		// TODO Auto-generated method stub
+		
 	}
 }

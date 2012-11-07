@@ -9,6 +9,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
 
 import hdgl.db.server.HGRegion;
 import hdgl.db.store.GraphStore;
@@ -51,18 +52,26 @@ public class BSPRunner extends Thread implements Watcher{
         zk.create(StringHelper.makePath(zkRoot, myname), new byte[0], Ids.OPEN_ACL_UNSAFE,
                 CreateMode.EPHEMERAL_SEQUENTIAL);
         Log.info("bsp node " + myname +" entering barrier " + superStep);
-        while (true) {
-            synchronized (mutex) {
-                List<String> list = zk.getChildren(zkRoot, this);
-                if (list.size() < runnerCount) {
-                    mutex.wait();
-                } else {
-                	Log.info("bsp node " + myname +" has entered barrier " + superStep);
-                    return true;
-                }
-            }
+        List<String> list = zk.getChildren(zkRoot, false);
+        if (list.size() < runnerCount) {
+	        while (true) {
+	            synchronized (mutex) {
+	                Stat stat = zk.exists(StringHelper.makePath(zkRoot, "ready"), this);
+	                if(stat==null){
+	                	mutex.wait();
+	                }else{
+	                	Log.info("bsp node " + myname +" has entered barrier " + superStep);
+	                    return true;
+	                }
+	            }
+	        }
+	    }else{	   
+	    	zk.create(StringHelper.makePath(zkRoot, "ready"), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+        	Log.info("bsp node " + myname +" has entered barrier " + superStep);
+        	Log.info("== all bsp node " + myname +" has entered barrier " + superStep+" ==");
+            return true;
         }
-    }
+	}
     
     /**
      * Wait until all reach barrier

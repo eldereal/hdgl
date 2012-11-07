@@ -63,7 +63,7 @@ public class HdfsGraphStore implements GraphStore {
 		return eis;
 	}
 	
-	public Vertex parseVertex(long id) throws IOException
+	public hdgl.db.graph.Vertex parseVertex(long id) throws IOException
 	{
 		VertexInputStream vis = (VertexInputStream) getVertexData(id);
 		Vertex v = new Vertex(vis.readInt());
@@ -107,7 +107,7 @@ public class HdfsGraphStore implements GraphStore {
 		return v;
 	}
 	
-	public Edge parseEdge(long id) throws IOException
+	public hdgl.db.graph.Edge parseEdge(long id) throws IOException
 	{
 		EdgeInputStream eis = (EdgeInputStream) getEdgeData(id);
 		Edge e = new Edge(eis.readInt());

@@ -7,10 +7,10 @@ public interface MutableGraph {
 	public AsyncResult<Boolean> commit();
 	public AsyncResult<Boolean> abort();
 	
-	public Vertex createVertex(String type);
-	public Edge createEdge(String type, Vertex start, Vertex end);
+	public long createVertex(String type);
+	public long createEdge(String type, long start, long end);
 	
-	public void setLabel(Entity entity, String name, byte[] value);
+	public void setLabel(long entity, String name, byte[] value);
 	
 	public void deleteEntity(Entity e);
 	public void deleteLabel(Entity e, String name);

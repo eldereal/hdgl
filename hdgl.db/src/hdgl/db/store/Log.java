@@ -11,8 +11,8 @@ public class Log implements Writable {
 	static final byte ADD_VERTEX = 0;
 	static final byte ADD_EDGE = 1;
 	static final byte SET_LABEL = 2;
-	static final byte DELETE_ENTITY = 3;
-	static final byte DELETE_LABEL = 4;
+	//static final byte DELETE_ENTITY = 3;
+	//static final byte DELETE_LABEL = 4;
 	
 	public static Log addVertex(long tempId, String oftype){
 		return new Log(ADD_VERTEX, tempId, 0, 0, oftype, null);

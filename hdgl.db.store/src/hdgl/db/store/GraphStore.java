@@ -12,9 +12,9 @@ public interface GraphStore {
 	
 	public InputStream getEdgeData(long id) throws IOException;
 	
-	public Vertex parseVertex(long id) throws IOException;	
+	public hdgl.db.graph.Vertex parseVertex(long id) throws IOException;	
 	
-	public Edge parseEdge(long id) throws IOException;
+	public hdgl.db.graph.Edge parseEdge(long id) throws IOException;
 	
 	public String[] bestPlacesForVertex(long entityId) throws IOException ;
 	
