@@ -66,24 +66,24 @@ public class HMutableGraph implements MutableGraph{
 	}
 
 	@Override
-	public Vertex createVertex(String type) {
+	public long createVertex(String type) {
 		long id = tempVId++;
 		Log log = Log.addVertex(id, type);
 		regionProtocol.writeLog(txId, log);
-		return new HVertex(id, type);
+		return id;
 	}
 
 	@Override
-	public Edge createEdge(String type, Vertex start, Vertex end) {
+	public long createEdge(String type, long start, long end) {
 		long id = tempEId--;
-		Log log = Log.addEdge(id, type, start.getId(), end.getId());
+		Log log = Log.addEdge(id, type, start, end);
 		regionProtocol.writeLog(txId, log);
-		return new HEdge(id, type, start, end);
+		return id;
 	}
 
 	@Override
-	public void setLabel(Entity entity, String name, byte[] value) {
-		Log log = Log.setLabel(entity.getId(), name, value);
+	public void setLabel(long entity, String name, byte[] value) {
+		Log log = Log.setLabel(entity, name, value);
 		regionProtocol.writeLog(txId, log);
 	}
 

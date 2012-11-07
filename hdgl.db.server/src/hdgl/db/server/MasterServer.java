@@ -210,8 +210,20 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 
 	@Override
 	public IntWritable[] query(int queryId) {
-		String queryZKRoot = queryZKRoots.get(queryId);
-		return null;
+		try{
+			String queryZKRoot = queryZKRoots.get(queryId);
+			Stat ctxdata=zk().exists(queryZKRoot, false);
+			if(ctxdata==null){
+				throw new HdglException("Bad query session id");
+			}
+			QueryContext ctx = WritableHelper.parse(zk().getData(queryZKRoot, false, ctxdata), QueryContext.class);
+			for(Map.Entry<Integer, BSPProtocol> bspnode : bspRegions.entrySet()){
+				bspnode.getValue().initBSP(queryId, queryZKRoot, ctx);
+			}
+			return null;
+		}catch(Exception ex){
+			throw new HdglException(ex);
+		}
 	}
 
 	@Override
