@@ -24,14 +24,14 @@ public class HdfsStoreTest {
 		
 		GraphStore gs = StoreFactory.createGraphStore(conf);
 		
-		for (int i = 0; i < 5; i++)
-		{
-			System.out.println(gs.parseVertex(i).getString());
-		}
-		for (int i = 0; i < 9; i++)
-		{
-			System.out.println(gs.parseEdge(i).getString());
-		}
+//		for (int i = 0; i < 5; i++)
+//		{
+//			System.out.println(gs.parseVertex(i).getString());
+//		}
+//		for (int i = 0; i < 9; i++)
+//		{
+//			System.out.println(gs.parseEdge(i).getString());
+//		}
 	}
 
 }

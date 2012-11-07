@@ -21,6 +21,7 @@ public class HdfsLogStore implements LogStore {
 	FileSystem fs;
 	FileStatus logfile;
 	FSDataOutputStream outputStream;
+	boolean closed=false;
 	
 	public HdfsLogStore(Configuration configuration, int sessionId) throws IOException {
 		super();
@@ -41,13 +42,44 @@ public class HdfsLogStore implements LogStore {
 	}
 
 	@Override
-	public FileStatus close() throws IOException {
+	public synchronized FileStatus complete() throws IOException {
+		if(closed){
+			throw new IOException("Illegal file state");
+		}
+		closed = true;
 		try{
-			outputStream.close();
-			return logfile;
+			outputStream.close();			
 		}finally{
 			fs.close();
 		}
+		return logfile;
+	}
+
+	@Override
+	public synchronized void abort() throws IOException {
+		if(closed){
+			throw new IOException("Illegal file state");
+		}
+		closed = true;
+		try{
+			outputStream.close();
+			fs.delete(logfile.getPath(), true);
+		}finally{
+			fs.close();
+		}
+	}
+
+	@Override
+	public synchronized void close() throws IOException {
+		if(closed){
+			return;
+		}
+		closed = true;
+		try{
+			outputStream.close();			
+		}finally{
+			fs.close();
+		}		
 	}
 
 }

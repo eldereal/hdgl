@@ -23,6 +23,8 @@ import hdgl.util.StringHelper;
 
 public class BSPRunner extends Thread implements Watcher{
 	
+	static final String readyFile="ready0";
+	
 	GraphStore graphStore;
 	ZooKeeper zk;
 	String zkRoot;
@@ -49,7 +51,7 @@ public class BSPRunner extends Thread implements Watcher{
 		this.myname = "bsp";
 		this.nodeId = clientId;
 		this.setDaemon(false);
-		Log.info("init bsp node " + myname);
+		//Log.info("init bsp node " + myname);
 	}
 
 	/**
@@ -64,7 +66,7 @@ public class BSPRunner extends Thread implements Watcher{
     	lockPath = zk.create(StringHelper.makePath(zkRoot, myname), new byte[0], Ids.OPEN_ACL_UNSAFE,
                 CreateMode.EPHEMERAL_SEQUENTIAL);
         int lockNumber = StringHelper.getLastInt(lockPath); 
-    	Log.info("bsp node " + nodeId +" entering barrier " + superStep);
+    	//Log.info("bsp node " + nodeId +" entering barrier " + superStep);
         List<String> list = zk.getChildren(zkRoot, false);
         int maxId = -1;
         for(String cn : list){
@@ -75,19 +77,19 @@ public class BSPRunner extends Thread implements Watcher{
         	IamPivot = false;
 	        while (true) {
 	            synchronized (mutex) {
-	                if(zk.exists(StringHelper.makePath(zkRoot, "ready"), this) == null){
+	                if(zk.exists(StringHelper.makePath(zkRoot, readyFile), this) == null){
 	                	mutex.wait();
 	                }else{
-	                	Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
+	                	//Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
 	                    return true;
 	                }
 	            }
 	        }
 	    }else{	   
 	    	IamPivot = true;
-	    	zk.create(StringHelper.makePath(zkRoot, "ready"), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-	    	Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
-        	Log.info("== all bsp nodes has entered barrier " + superStep+", pivot: "+nodeId+" ==");
+	    	zk.create(StringHelper.makePath(zkRoot, readyFile), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+	    	//Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
+        	//Log.info("== all bsp nodes has entered barrier " + superStep+", pivot: "+nodeId+" ==");
             return true;
         }
     }
@@ -101,16 +103,16 @@ public class BSPRunner extends Thread implements Watcher{
      */
     boolean leave() throws KeeperException, InterruptedException{
         zk.delete(lockPath, 0);
-        Log.info("bsp node " + nodeId +" leaving barrier " + superStep);
+        //Log.info("bsp node " + nodeId +" leaving barrier " + superStep);
         if(IamPivot){
         	while(true){
         		synchronized(mutex){
 		        	if(zk.getChildren(zkRoot, true).size()>1){
 		        		mutex.wait();
 		        	}else{
-		        		zk.delete(StringHelper.makePath(zkRoot, "ready"), 0);
-		            	Log.info("bsp node " + nodeId +" has left barrier " + superStep);
-		            	Log.info("== all bsp nodes has left barrier " + superStep+ ", pivot: "+nodeId+" ==");
+		        		zk.delete(StringHelper.makePath(zkRoot, readyFile), 0);
+		            	//Log.info("bsp node " + nodeId +" has left barrier " + superStep);
+		            	//Log.info("== all bsp nodes has left barrier " + superStep+ ", pivot: "+nodeId+" ==");
 		                return true;
 		        	}
         		}
@@ -118,10 +120,10 @@ public class BSPRunner extends Thread implements Watcher{
         } else {
 	        while (true) {
 	            synchronized (mutex) {
-	            	if(zk.exists(StringHelper.makePath(zkRoot, "ready"), this) != null){
+	            	if(zk.exists(StringHelper.makePath(zkRoot, readyFile), this) != null){
 	                	mutex.wait();
 	                }else{
-	                	Log.info("bsp node " + nodeId +" has left barrier " + superStep);
+	                	//Log.info("bsp node " + nodeId +" has left barrier " + superStep);
 	                    return true;
 	                }
 	            }
@@ -133,7 +135,9 @@ public class BSPRunner extends Thread implements Watcher{
 	public void run() {
 		try{
 			while(true){
-				Log.info("node " + nodeId +" working in step " + superStep);			
+				synchronized(Log){
+					Log.info("node " + nodeId +" working in step " + superStep);
+				}
 				try {
 					if(superStep > 10){
 						break;

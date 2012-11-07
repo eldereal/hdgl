@@ -9,8 +9,11 @@ import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.ClientRegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.Protocol;
+import hdgl.util.NetHelper;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.ipc.RPC;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,14 +43,30 @@ public class SystemTest {
 	public void forMaster() throws Exception {
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		System.out.println(master.getRegions().entrySet());
+		assertEquals(1, master.getRegions().entrySet().size());
 	}
 	
 	@Test
 	public void forRegion() throws Exception {
 		Configuration conf = GraphConf.getDefault();
-		ClientRegionProtocol region = RPC.getProxy(ClientRegionProtocol.class, 1, new InetSocketAddress("localhost", 5367), conf);
-		assertEquals("abcde", region.echo("abcde"));
+		ClientMasterProtocol master = Protocol.master(conf);
+		MapWritable regions = master.getRegions();
+		int count=0;
+		for(Writable region:regions.values()){
+			InetSocketAddress addr = ((InetSocketAddressWritable)region).toAddress();
+			ClientRegionProtocol r = Protocol.region(addr, conf);
+			assertEquals("abcde", r.echo("abcde"));
+			count++;
+		}
+		assertTrue("at least one region is tested", count>0);
+	}
+	
+	@Test
+	public void queryTest() throws Exception{
+		Configuration conf = GraphConf.getDefault();
+		ClientMasterProtocol master = Protocol.master(conf);
+		int queryId = master.prepareQuery(".[id=1]|-[price<10](.)*");
+		System.out.println("query id: "+queryId);
 	}
 
 }

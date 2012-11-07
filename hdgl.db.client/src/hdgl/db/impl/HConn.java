@@ -40,12 +40,12 @@ public class HConn {
 	
 	public ClientRegionProtocol region() throws IOException{
 		if(!regions.isEmpty()){
-			return regions.get(IterableHelper.randomSelect(regions.keySet()));
+			return regions.get(IterableHelper.first(IterableHelper.randomTake(regions.keySet(),1)));
 		}else{
 			if(regionAddrs == null){
 				regionAddrs = master().getRegions();
 			}
-			return region(((IntWritable)IterableHelper.randomSelect(regionAddrs.keySet())).get());
+			return region(((IntWritable)IterableHelper.first(IterableHelper.randomTake(regionAddrs.keySet(),1))).get());
 		}
 	}
 	

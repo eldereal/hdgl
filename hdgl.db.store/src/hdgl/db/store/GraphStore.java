@@ -27,4 +27,6 @@ public interface GraphStore {
 	public long getEdgeCount() throws IOException;
 	
 	public long getEdgeCountPerBlock() throws IOException;
+	
+	public void close();
 }

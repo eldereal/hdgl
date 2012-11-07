@@ -18,4 +18,11 @@ public class Protocol{
 		return RPC.getProxy(ClientMasterProtocol.class, 1, new InetSocketAddress(host, port), conf);
 	}
 	
+	public static ClientRegionProtocol region(String host, int port, Configuration conf) throws IOException{
+		return RPC.getProxy(ClientRegionProtocol.class, 1, new InetSocketAddress(host, port), conf);
+	}
+	
+	public static ClientRegionProtocol region(InetSocketAddress addr, Configuration conf) throws IOException{
+		return RPC.getProxy(ClientRegionProtocol.class, 1, addr, conf);
+	}
 }
