@@ -1,5 +1,7 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
+import hdgl.db.conf.GraphConf;
+
 import java.io.IOException;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -15,6 +17,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 
 public class PersistentGraph {
+	static protected Configuration conf;
+	static protected int VertexNumber;
+	static protected int EdgeNumber;
+	Path inPath;
+	Path outPath;
 	public static class PersistentGraphMapper1 extends 
 		Mapper<LongWritable, Text, Text, Text>
 	{
@@ -64,15 +71,21 @@ public class PersistentGraph {
 			if (type == 'v') str = key.toString().substring(7);
 			else str = key.toString().substring(5);
 			int id = Integer.parseInt(str);
-			int contain_v = Parameter.VertexNumber / numReduceTasks + 1;
-			int contain_e = Parameter.EdgeNumber / numReduceTasks + 1;
+			if (id < 0) 
+			{
+				id = 0 - id;
+			}
+			int contain_v = VertexNumber / numReduceTasks + 1;
+			int contain_e = EdgeNumber / numReduceTasks + 1;
 			if (type == 'v')
 			{
-				return (id / contain_v);
+				if (id / contain_v >= numReduceTasks) return (numReduceTasks - 1);
+				else return (id / contain_v);
 			}
 			else
 			{
-				return (id / contain_e);
+				if (id / contain_e >= numReduceTasks) return (numReduceTasks - 1);
+				else return (id / contain_e);
 			}
 		}
 	}
@@ -106,7 +119,7 @@ public class PersistentGraph {
 			
 			if (typeVE == 'v')
 			{
-				Vertex vertex = new Vertex(id);
+				Vertex vertex = new Vertex(id, conf);
 				for (Text val : values)
 				{
 					type = val.toString().charAt(0);
@@ -135,7 +148,7 @@ public class PersistentGraph {
 			}
 			else if(typeVE == 'e')
 			{
-				Edge edge = new Edge(id);
+				Edge edge = new Edge(id, conf);
 				for (Text val : values)
 				{
 					type = val.toString().charAt(0);
@@ -162,12 +175,17 @@ public class PersistentGraph {
 		}
 	}
 	
-	public static void main(String[] args) throws Exception
+	public PersistentGraph(Configuration conf, int sessionId, int vNum, int eNum)
 	{
-		Configuration conf = new Configuration();
-		conf.set(Parameter.CONF_ARG1, Parameter.CONF_ARG2);
-		Path inPath = new Path(Parameter.IN_PATH);
-		Path outPath = new Path(Parameter.OUT_PATH);
+		this.conf = conf;
+		inPath = new Path(GraphConf.getGraphSessionRoot(conf, sessionId));
+		outPath = new Path(GraphConf.getGraphRoot(conf));
+		VertexNumber = vNum;
+		EdgeNumber = eNum;
+	}
+	
+	public void runMapReduce() throws IOException, ClassNotFoundException, InterruptedException
+	{
 		Job job1 = new Job(conf, "PersistentGraph");
 		job1.setJarByClass(PersistentGraph.class);
 		

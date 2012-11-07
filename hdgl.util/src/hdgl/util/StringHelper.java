@@ -84,5 +84,28 @@ public class StringHelper {
 		String str = String.format("%05d", number);
 		return str;
 	}
+	
+	public static String bytesToString(byte[] value)
+	{
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i < value.length; i++)
+		{
+			int tmp = (int)value[i];
+			String str = String.format("%03d", tmp);
+			result.append(str);
+		}
+		return result.toString();
+	}
+	
+	public static byte[] stringToBytes(String value)
+	{
+		int len = value.length() / 3;
+		byte[] result = new byte[len];
+		for (int i = 0; i < len; i++)
+		{
+			result[i] = (byte)Integer.parseInt(value.substring(i*3, i*3+3));
+		}
+		return result;
+	}
     
 }

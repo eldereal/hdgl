@@ -1,13 +1,17 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
+import org.apache.hadoop.conf.Configuration;
+
+import hdgl.db.conf.GraphConf;
+
 
 public class Edge extends GraphWritable{
 	private int vertex1;
 	private int vertex2;
 	
-	public Edge(int id)
+	public Edge(int id, Configuration conf)
 	{
-		super(id);
+		super(id, GraphConf.getEdgeTrunkSize(conf));
 		vertex1 = 0;
 		vertex2 = 0;
 	}

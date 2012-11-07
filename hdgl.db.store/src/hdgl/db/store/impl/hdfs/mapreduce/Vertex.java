@@ -1,6 +1,10 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
+import hdgl.db.conf.GraphConf;
+
 import java.util.ArrayList;
+
+import org.apache.hadoop.conf.Configuration;
 
 public class Vertex extends GraphWritable{
 	private ArrayList<EdgePart> outEdges;
@@ -24,9 +28,9 @@ public class Vertex extends GraphWritable{
 		}
 	}
 	
-	public Vertex(int id)
+	public Vertex(int id, Configuration conf)
 	{
-		super(id);
+		super(id, GraphConf.getVertexTrunkSize(conf));
 		outEdges = new ArrayList<EdgePart>();
 		inEdges = new ArrayList<EdgePart>();
 	}

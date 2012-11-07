@@ -18,9 +18,11 @@ public class GraphWritable implements WritableComparable<GraphWritable>{
 	protected boolean needIrr = false;
 	protected boolean isIrr = false;
 	protected long offset = -1;
+	private int REGULAR_BLOCK_SIZE = 0;
 	
-	public GraphWritable(int id)
+	public GraphWritable(int id, int blockSize)
 	{
+		REGULAR_BLOCK_SIZE = blockSize;
 		this.id = id;
 		labels = new ArrayList<Label>();
 	}
@@ -35,9 +37,9 @@ public class GraphWritable implements WritableComparable<GraphWritable>{
 		long ret = 0;
 		
 		this.offset = offset;
-		if (count > Parameter.REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN) 
+		if (count > REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN) 
 		{
-			ret = count - Parameter.REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN;
+			ret = count - REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN;
 			needIrr = true;
 		}
 		ret = ret + 4;
@@ -59,9 +61,9 @@ public class GraphWritable implements WritableComparable<GraphWritable>{
 	{
 		if (isIrr)
 		{
-			byte[] dst = new byte[count - Parameter.REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN];
-			bb.position(Parameter.REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN);
-			bb.get(dst, 0, count - Parameter.REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN);
+			byte[] dst = new byte[count - REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN];
+			bb.position(REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN);
+			bb.get(dst, 0, count - REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN);
 			output.writeInt(dst.length);
 			output.write(dst);
 		}
@@ -69,9 +71,9 @@ public class GraphWritable implements WritableComparable<GraphWritable>{
 		{
 			int temp;
 			byte[] dst;
-			if (Parameter.REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN > count) temp = count + Parameter.OFFSET_MAX_LEN;
-			else temp = Parameter.REGULAR_BLOCK_SIZE;
-			dst = new byte[Parameter.REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN];
+			if (REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN > count) temp = count + Parameter.OFFSET_MAX_LEN;
+			else temp = REGULAR_BLOCK_SIZE;
+			dst = new byte[REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN];
 			bb.position(0);
 			bb.get(dst, 0, temp - Parameter.OFFSET_MAX_LEN);
 			output.write(dst);

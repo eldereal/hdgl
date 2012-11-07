@@ -17,11 +17,14 @@ import hdgl.db.conf.GraphConf;
 import hdgl.db.graph.HGraphIds;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.HConf;
+import hdgl.db.store.HEdge;
+import hdgl.db.store.HVertex;
 import hdgl.db.store.impl.hdfs.mapreduce.Edge;
 import hdgl.db.store.impl.hdfs.mapreduce.EdgeInputStream;
 import hdgl.db.store.impl.hdfs.mapreduce.Parameter;
 import hdgl.db.store.impl.hdfs.mapreduce.Vertex;
 import hdgl.db.store.impl.hdfs.mapreduce.VertexInputStream;
+import hdgl.util.StringHelper;
 
 public class HdfsGraphStore implements GraphStore {
 	
@@ -36,10 +39,13 @@ public class HdfsGraphStore implements GraphStore {
 	
 	FileSystem fs;
 	
+	Configuration conf;
+	
 	int vtrunkSize;
 	int etrunkSize;
 	
 	public HdfsGraphStore(Configuration conf) throws IOException{
+		this.conf = conf;
 		String root = GraphConf.getGraphRoot(conf);
 		fs = HConf.getFileSystem(conf);
 		vtrunkSize = GraphConf.getVertexTrunkSize(conf);
@@ -53,20 +59,20 @@ public class HdfsGraphStore implements GraphStore {
 	
 	public InputStream getVertexData(long id) throws IOException
 	{
-		VertexInputStream vis = new VertexInputStream(id);
+		VertexInputStream vis = new VertexInputStream(id, conf);
 		return vis;
 	}
 	
 	public InputStream getEdgeData(long id) throws IOException
 	{
-		EdgeInputStream eis = new EdgeInputStream(id);
+		EdgeInputStream eis = new EdgeInputStream(id, conf);
 		return eis;
 	}
 	
 	public hdgl.db.graph.Vertex parseVertex(long id) throws IOException
 	{
 		VertexInputStream vis = (VertexInputStream) getVertexData(id);
-		Vertex v = new Vertex(vis.readInt());
+		HVertex v = new HVertex(vis.readInt(), "");
 		int outNum, edge, vertex, inNum, num;
 		outNum = vis.readInt();
 		inNum = vis.readInt();
@@ -74,13 +80,13 @@ public class HdfsGraphStore implements GraphStore {
 		{
 			edge = vis.readInt();
 			vertex = vis.readInt();
-			v.addEdges(-1, edge, vertex);
+			v.addOutEdge(edge, vertex);
 		}
 		for (int i = 0; i < inNum; i++)
 		{
 			edge = vis.readInt();
 			vertex = vis.readInt();
-			v.addEdges(1, edge, vertex);
+			v.addInEdge(edge, vertex);
 		}
 		num = vis.readInt();
 		int len;
@@ -99,9 +105,13 @@ public class HdfsGraphStore implements GraphStore {
 			{
 				value = new String(b);
 			}
-			if (!((key.length() == 0) && (value.length() == 0)))
+			if (!(key.length() == 0))
 			{
-				v.addLabel(key, value);
+				v.addLabel(key, StringHelper.stringToBytes(value));
+				if (key.compareTo("type") == 0)
+				{
+					v.setType(new String(StringHelper.stringToBytes(value)));
+				}
 			}
 		}
 		return v;
@@ -110,9 +120,11 @@ public class HdfsGraphStore implements GraphStore {
 	public hdgl.db.graph.Edge parseEdge(long id) throws IOException
 	{
 		EdgeInputStream eis = (EdgeInputStream) getEdgeData(id);
-		Edge e = new Edge(eis.readInt());
-		e.setVertex1(eis.readInt());
-		e.setVertex2(eis.readInt());
+		int eid, v1, v2;
+		eid = eis.readInt();
+		v1 = eis.readInt();
+		v2 = eis.readInt();
+		HEdge e = new HEdge(eid, "", new HVertex(v1, ""), new HVertex(v2, ""));
 		int num;
 		num = eis.readInt();
 		int len;
@@ -131,7 +143,14 @@ public class HdfsGraphStore implements GraphStore {
 			{
 				value = new String(b);
 			}
-			e.addLabel(key, value);
+			if (!(key.length() == 0))
+			{
+				e.addLabel(key, StringHelper.stringToBytes(value));
+				if (key.compareTo("type") == 0)
+				{
+					e.setType(new String(StringHelper.stringToBytes(value)));
+				}
+			}
 		}
 		return e;
 	}

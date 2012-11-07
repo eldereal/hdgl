@@ -15,16 +15,17 @@ public class GraphInputStream extends InputStream{
 	private FileSystem hdfs;
 	private long id;
 	private long position = 0;
-	private long limit = Parameter.REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN;
+	private long limit;
 	protected String fileIrr = null;
 	private long offset = -1;
+	private int REGULAR_BLOCK_SIZE;
 	
-	public GraphInputStream(long id) throws IOException
+	public GraphInputStream(long id, Configuration conf, int blockSize) throws IOException
 	{
 		this.id = id;
-		Configuration conf = new Configuration();
-		conf.set(Parameter.CONF_ARG1, Parameter.CONF_ARG2);
+		REGULAR_BLOCK_SIZE = blockSize;
 		hdfs = FileSystem.get(conf);
+		limit = REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN;
 	}
 	
 	public int locate(String file) throws IOException
@@ -35,7 +36,7 @@ public class GraphInputStream extends InputStream{
 		for (int i = 0; i < Parameter.REDUCER_NUMBER; i++)
 		{
 			path = new Path(file + "-r-" + StringHelper.fillToLength(i));
-			long temp = hdfs.getFileStatus(path).getLen() / Parameter.REGULAR_BLOCK_SIZE;
+			long temp = hdfs.getFileStatus(path).getLen() / REGULAR_BLOCK_SIZE;
 			if (count + temp > id)
 			{
 				ret = i;
@@ -44,9 +45,9 @@ public class GraphInputStream extends InputStream{
 			count = count + temp;
 		}
 		inputStream = hdfs.open(path);
-		inputStream.seek((id - count + 1)*Parameter.REGULAR_BLOCK_SIZE - 8);
+		inputStream.seek((id - count + 1)*REGULAR_BLOCK_SIZE - 8);
 		offset = inputStream.readLong();
-		inputStream.seek((id - count)*Parameter.REGULAR_BLOCK_SIZE);
+		inputStream.seek((id - count)*REGULAR_BLOCK_SIZE);
 		return ret;
 	}
 	
@@ -168,7 +169,8 @@ public class GraphInputStream extends InputStream{
 		}
 		if (bs[0] >= 128)
 		{
-			
+			long tmp = (bs[0] << 24) + (bs[1] << 16) + (bs[2] << 8) + bs[3];
+			ret = (int) (tmp - (1 << 32));
 		}
 		else
 		{

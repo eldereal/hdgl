@@ -1,32 +1,26 @@
-package hdgl.db.impl;
+package hdgl.db.store;
 
 import hdgl.db.graph.Edge;
 import hdgl.db.graph.LabelValue;
 import hdgl.db.graph.Vertex;
 
-public class HVertex implements Vertex {
-
+public class HEdge implements Edge {
+	
 	long id;
 	String type;
+	Vertex start;
+	Vertex end;
 	
-	public HVertex(long id, String type){
+	public HEdge(long id, String type, Vertex start, Vertex end){
 		this.id = id;
 		this.type = type;
+		this.start = start;
+		this.end = end;
 	}
 	
 	public void setType(String type)
 	{
 		this.type = type;
-	}
-	
-	public void addInEdge(long edgeId, long anotherVertex)
-	{
-		
-	}
-	
-	public void addOutEdge(long edgeId, long anotherVertex)
-	{
-		
 	}
 	
 	public void addLabel(String key, byte[] value)
@@ -51,21 +45,23 @@ public class HVertex implements Vertex {
 	}
 
 	@Override
-	public Iterable<Edge> getOutEdges() {
-		// TODO Auto-generated method stub
-		return null;
+	public Vertex getInVertex() {
+		return start;
 	}
 
 	@Override
-	public Iterable<Edge> getInEdges() {
-		// TODO Auto-generated method stub
-		return null;
+	public Vertex getOutVertex() {
+		return end;
 	}
 
 	@Override
-	public Iterable<Edge> getEdges() {
-		// TODO Auto-generated method stub
-		return null;
+	public Vertex getOtherVertex(Vertex one) {
+		if(one==start){
+			return end;
+		}else if(one == end){
+			return start;
+		}else{
+			return null;
+		}
 	}
-
 }

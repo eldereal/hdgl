@@ -18,6 +18,16 @@ public class HEdge implements Edge {
 		this.end = end;
 	}
 	
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+	
+	public void addLabel(String key, byte[] value)
+	{
+		
+	}
+	
 	@Override
 	public long getId() {
 		return id;

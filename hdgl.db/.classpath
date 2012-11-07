@@ -6,5 +6,13 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/hdgl.util"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/hadoop-2.0"/>
+	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha-sources.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha-tests.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha-test-sources.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha-sources.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha-tests.jar"/>
+	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha-test-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

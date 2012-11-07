@@ -1,4 +1,4 @@
-package hdgl.db.impl;
+package hdgl.db.store;
 
 import hdgl.db.graph.Edge;
 import hdgl.db.graph.LabelValue;
