@@ -39,16 +39,6 @@ public class HConf {
 	
 	public static ZooKeeper getZooKeeper(Configuration conf, Watcher watcher) throws IOException{
 		final ZooKeeper zk = new ZooKeeper(conf.get(GraphConf.ZK_SERVER, GraphConf.Defaults.ZK_SERVER),conf.getInt(GraphConf.ZK_SESSION_TIMEOUT, GraphConf.Defaults.ZK_SESSION_TIMEOUT),watcher);
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					zk.close();
-				} catch (InterruptedException e) {
-					
-				}
-			}
-		}));
 		return zk;
 	}
 	
