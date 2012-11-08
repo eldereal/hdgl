@@ -14,7 +14,7 @@ public interface ClientRegionProtocol{
 	
 	public InetSocketAddressWritable[] doQuery(int queryId);
 	
-	public long[][] fetchResult(int queryId);
+	public long[][] fetchResult(int queryId, int pathLen);
 	
 	public int beginTx();
 	
@@ -27,4 +27,6 @@ public interface ClientRegionProtocol{
 	public boolean txTaskStatus(int txId, int waitMilliseconds);
 	
 	public boolean txTaskResult(int txId);
+
+	
 }

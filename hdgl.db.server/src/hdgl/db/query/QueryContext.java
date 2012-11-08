@@ -7,7 +7,10 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.apache.commons.collections.SequencedHashMap;
 import org.apache.hadoop.io.Writable;
 
 import hdgl.db.protocol.InetSocketAddressWritable;
@@ -16,7 +19,7 @@ import hdgl.db.query.stm.StateMachine;
 public class QueryContext implements Writable {
 
 	StateMachine stm;
-	Map<Long, InetSocketAddressWritable> idMap = new HashMap<Long, InetSocketAddressWritable>();
+	SortedMap<Long, Integer> idMap = new TreeMap<Long, Integer>();
 	String zkRoot;
 	
 	
@@ -28,8 +31,8 @@ public class QueryContext implements Writable {
 		this.zkRoot = zkRoot;
 	}
 
-	public void put(Long blockId, InetSocketAddressWritable addr){
-		idMap.put(blockId, addr);
+	public void put(Long blockId, Integer regionId){
+		idMap.put(blockId, regionId);
 	}
 
 	public StateMachine getStateMachine() {
@@ -40,7 +43,7 @@ public class QueryContext implements Writable {
 		this.stm = stm;
 	}
 
-	public Map<Long, InetSocketAddressWritable> getIdMap() {
+	public SortedMap<Long, Integer> getIdMap() {
 		return idMap;
 	}
 
@@ -53,9 +56,8 @@ public class QueryContext implements Writable {
 		idMap.clear();
 		for(int i = 0;i<len;i++){
 			long id = in.readLong();
-			InetSocketAddressWritable addr=new InetSocketAddressWritable();
-			addr.readFields(in);
-			idMap.put(id, addr);
+			int regionId = in.readInt();
+			idMap.put(id, regionId);
 		}
 	}
 
@@ -63,11 +65,11 @@ public class QueryContext implements Writable {
 	public void write(DataOutput out) throws IOException {
 		stm.write(out);
 		out.writeUTF(zkRoot);
-		Set<Map.Entry<Long, InetSocketAddressWritable>> idset = idMap.entrySet();
+		Set<Map.Entry<Long, Integer>> idset = idMap.entrySet();
 		out.writeInt(idset.size());
-		for(Map.Entry<Long, InetSocketAddressWritable> pair:idset){
+		for(Map.Entry<Long, Integer> pair:idset){
 			out.writeLong(pair.getKey());
-			pair.getValue().write(out);
+			out.writeInt(pair.getValue());
 		}
 	}
 	

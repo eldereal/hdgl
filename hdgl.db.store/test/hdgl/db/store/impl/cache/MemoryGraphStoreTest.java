@@ -1,19 +1,14 @@
-package hdgl.db.store;
+package hdgl.db.store.impl.cache;
 
-import java.io.IOException;
-
-import hdgl.db.store.impl.cache.MemoryEdgeImpl;
-import hdgl.db.store.impl.cache.MemoryGraphStore;
-import hdgl.db.store.impl.cache.MemoryVertexImpl;
-import hdgl.db.store.impl.hdfs.HdfsGraphStore;
-import hdgl.db.store.impl.hdfs.HdfsLogStore;
+import static org.junit.Assert.*;
+import hdgl.db.graph.Vertex;
 import hdgl.util.IterableHelper;
 
-import org.apache.hadoop.conf.Configuration;
+import org.junit.Test;
 
-public class StoreFactory {
+public class MemoryGraphStoreTest {
 	
-	static byte[] data(Object obj){
+	public byte[] data(Object obj){
 		byte[] data=new byte[4];
 		int code=obj.hashCode();
 		data[0]=(byte) (code>>>24&0xff);
@@ -23,8 +18,8 @@ public class StoreFactory {
 		return data;
 	}
 	
-	public static GraphStore createGraphStore(Configuration conf) throws IOException{
-		
+	@Test
+	public void test() throws Exception{
 		MemoryGraphStore g = new MemoryGraphStore();
 		MemoryVertexImpl v1 = new MemoryVertexImpl(1l, "t1", 
 				IterableHelper.<String, byte[]>makeMap("name", data("one"), "price", data(100)), 
@@ -78,10 +73,12 @@ public class StoreFactory {
 		g.addEdge(e7);
 		g.addEdge(e8);
 		g.addEdge(e9);
-		return g;
+		
+		assertEquals(5, g.getVertexCount());
+		assertEquals(9, g.getEdgeCount());
+		assertEquals("back", g.getEdge(-5).getType());
+		assertEquals("forward", g.getEdge(-1).getType());
+		assertEquals("jump", g.getEdge(-8).getType());
 	}
-	
-	public static LogStore createLogStore(Configuration conf, int sessionId) throws IOException{
-		return new HdfsLogStore(conf, sessionId);
-	}
+
 }

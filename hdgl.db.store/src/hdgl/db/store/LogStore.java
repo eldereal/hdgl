@@ -10,6 +10,10 @@ public interface LogStore{
 
 	public void writeLog(Log log) throws IOException;
 	
-	public FileStatus close() throws IOException;
+	public FileStatus complete() throws IOException;
+	
+	public void abort() throws IOException;
+	
+	public void close() throws IOException;
 	
 }

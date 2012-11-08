@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +23,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.data.Stat;
 
 import hdgl.db.conf.GraphConf;
 import hdgl.db.conf.MasterConf;
@@ -53,12 +55,14 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 	int port;
 	int regionId;
 	ZooKeeper zk; 
-	FileSystem fs;
 	GraphStore graph;
 	
 	Map<Integer, LogStore> logStores = new ConcurrentHashMap<Integer, LogStore>();
 	
 	Map<Integer, Boolean> taskResults =  new ConcurrentHashMap<Integer, Boolean>();
+	
+	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
+	Map<Integer, BSPProtocol> bspRegions = new HashMap<Integer, BSPProtocol>();
 	
 	
 	public ZooKeeper zk() throws IOException, InterruptedException, KeeperException{
@@ -71,19 +75,31 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 		return zk;
 	}
 	
-	public FileSystem fs() throws IOException{
-		if(this.fs == null){
-			this.fs = HConf.getFileSystem(conf);
-		}
-		return fs;
-	}
-	
 	public RegionServer(String host, int port, Configuration conf){
 		this.host = host;
 		this.port = port;
 		this.conf = conf;
 	}
 
+	void updateRegions(){
+		try{
+			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), true);
+			regions.clear();
+			bspRegions.clear();
+			for (int i = 0; i < paths.size(); i++) {
+				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
+				Stat s = zk().exists(path, false);
+				byte[] addrData = zk().getData(path, false, s);
+				int regionId = StringHelper.getLastInt(path);
+				InetSocketAddressWritable addr=WritableHelper.parse(addrData, InetSocketAddressWritable.class);
+				regions.put(regionId, addr);
+				bspRegions.put(regionId, RPC.getProxy(BSPProtocol.class, 1, addr.toAddress(), conf));
+			}
+		}catch(Exception ex){
+			log.error(ex);
+		}
+	}
+	
 	@Override
 	public String echo(String value) {
 		return value;
@@ -95,7 +111,22 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 	}
 	
 	public void stop(){
-		master.regionStop();
+		//master.regionStop();
+		try{
+			zk.close();			
+		}catch(Exception ex){
+			
+		}
+		if(graph!=null){
+			graph.close();
+		}
+		for(LogStore stores:logStores.values()){
+			try{
+				stores.close();
+			}catch(Exception ex){
+				
+			}
+		}
 	}
 
 	public void start() throws IOException, KeeperException, InterruptedException {
@@ -113,7 +144,8 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 			throw new IOException("Wrong path");
 		}
 		regionId = Integer.parseInt(m.group(1));
-		master.regionStart();
+		//master.regionStart();
+		updateRegions();
 //		long step = graph.getVertexCountPerBlock();
 //		long max = graph.getVertexCount();
 //		String localhost = NetHelper.getMyHostName();
@@ -140,7 +172,7 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 	}
 
 	@Override
-	public long[][] fetchResult(int queryId) {
+	public long[][] fetchResult(int queryId, int pathLen) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -180,18 +212,9 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 
 	@Override
 	public int commit(int txId) {
-		try {
-			LogStore store = logStores.get(txId);
-			if(store==null){
-				throw new HdglException("Bad Transaction Id");
-			}
-			FileStatus logfile = store.close();
-			taskResults.put(txId, false);
-			logStores.remove(txId);
-			return txId;
-		}catch (Exception e) {
-			throw new HdglException(e);
-		}
+		abort(txId);
+		taskResults.put(txId, false);
+		return txId;
 	}
 
 	@Override
@@ -201,8 +224,8 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 			if(store==null){
 				throw new HdglException("Bad Transaction Id");
 			}
-			FileStatus logfile = store.close();
-			fs.delete(logfile.getPath(), false);
+			store.abort();
+			store.close();
 			logStores.remove(txId);
 			taskResults.put(txId, true);
 			return txId;
@@ -237,6 +260,7 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 			throw new HdglException("Task not complte yet");
 		}
 	}
+	
 	@Override
 	public void process(WatchedEvent arg0) {
 		// TODO Auto-generated method stub

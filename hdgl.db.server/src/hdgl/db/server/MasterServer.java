@@ -99,19 +99,28 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		String path = zk().create(StringHelper.makePath(masterZkNode,"master"), WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
 		if(zk().exists(HConf.getZKRegionRoot(conf), false) == null){
 			zk().create(HConf.getZKRegionRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-			zk().getChildren(HConf.getZKRegionRoot(conf), this);
 		}
+		updateRegions();
 		store = StoreFactory.createGraphStore(conf);
 		masterId = StringHelper.getLastInt(path);
 	}
 	
 	public void stop(){
-		
+		if(zk!=null){
+			try{
+				zk.close();			
+			}catch(Exception ex){
+				
+			}
+		}
+		if(store!=null){
+			store.close();
+		}
 	}
 
 	void updateRegions(){
 		try{
-			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), false);
+			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), true);
 			regions.clear();
 			bspRegions.clear();
 			for (int i = 0; i < paths.size(); i++) {
@@ -192,7 +201,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				String usehost = hosts[(int) (Math.random()*hosts.length)];
 				for(Map.Entry<Integer, InetSocketAddressWritable> map:regions.entrySet()){
 					if(usehost.equals(map.getValue().getHost())){
-						ctx.put(id, map.getValue());
+						ctx.put(id, map.getKey());
 						break;
 					}
 				}
@@ -217,10 +226,12 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				throw new HdglException("Bad query session id");
 			}
 			QueryContext ctx = WritableHelper.parse(zk().getData(queryZKRoot, false, ctxdata), QueryContext.class);
+			ArrayList<IntWritable> regions=new ArrayList<>();
 			for(Map.Entry<Integer, BSPProtocol> bspnode : bspRegions.entrySet()){
 				bspnode.getValue().initBSP(queryId, queryZKRoot, ctx);
+				regions.add(new IntWritable(bspnode.getKey()));
 			}
-			return null;
+			return regions.toArray(new IntWritable[0]);			
 		}catch(Exception ex){
 			throw new HdglException(ex);
 		}
@@ -228,19 +239,20 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 
 	@Override
 	public void process(WatchedEvent event) {
-		if(event.getPath()!=null && event.getPath().startsWith(HConf.getZKRegionRoot(conf))){
+		if(event.getType()==Watcher.Event.EventType.NodeChildrenChanged &&
+		   event.getPath()!=null && event.getPath().startsWith(HConf.getZKRegionRoot(conf))){
 			updateRegions();			
 		}
 	}
 
 	@Override
 	public void regionStart() {
-		updateRegions();
+		//updateRegions();
 	}
 
 	@Override
 	public void regionStop() {
-		updateRegions();
+		//updateRegions();
 	}
 	
 }
