@@ -200,5 +200,14 @@ public class HdfsGraphStore implements GraphStore {
 	public long getEdgeCountPerBlock() throws IOException {
 		return e_f.getBlockSize()/etrunkSize;
 	}
+
+	@Override
+	public void close() {
+		try{
+			fs.close();
+		}catch(Exception ex){
+			
+		}
+	}
 	
 }

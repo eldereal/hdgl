@@ -3,11 +3,13 @@ package hdgl.db.server.bsp;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -15,6 +17,7 @@ import org.antlr.grammar.v3.ANTLRParser.defaultNodeOption_return;
 import org.antlr.works.editor.navigation.GoToHistory;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec.Dir;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -45,13 +48,15 @@ public class BSPRunner extends Thread implements Watcher{
 	
 	GraphStore graphStore;
 	ZooKeeper zk;
-	String zkRoot;
+	String barrierZkRoot;
+	String dieZkRoot;
 	int runnerCount;
 	int superStep = 0;
 	String myname;
 	Object mutex = new Object();
 	Configuration conf;
 	String lockPath;
+	String diePath;
 	int nodeId;
 	QueryContext ctx;
 	boolean IamPivot = false;
@@ -68,7 +73,8 @@ public class BSPRunner extends Thread implements Watcher{
 		super();
 		this.graphStore = graphStore;
 		this.zk = HConf.getZooKeeper(conf, this);
-		this.zkRoot = zkRoot;
+		this.barrierZkRoot = StringHelper.makePath(zkRoot, "b");
+		this.dieZkRoot = StringHelper.makePath(zkRoot, "d");
 		this.runnerCount = runnerCount;
 		this.conf = conf;
 		this.myname = "bsp";
@@ -77,23 +83,38 @@ public class BSPRunner extends Thread implements Watcher{
 		this.sessionId = sessionId;
 		this.container = container;
 		this.setDaemon(false);
-		Log.info("init bsp node " + myname);
+		//Log.info("init bsp node " + myname);
 	}
 
 	public int getSuperStep(){
 		return superStep;
 	}
 	
-	void enterNoWait() throws KeeperException, InterruptedException{
-		lockPath = zk.create(StringHelper.makePath(zkRoot, myname), new byte[0], Ids.OPEN_ACL_UNSAFE,
+	boolean die() throws KeeperException, InterruptedException{
+		diePath = zk.create(StringHelper.makePath(dieZkRoot, myname), new byte[0], Ids.OPEN_ACL_UNSAFE,
                 CreateMode.EPHEMERAL_SEQUENTIAL);
-		Log.info("bsp node " + nodeId +" entering barrier " + superStep);
+		//Log.info("bsp node " + nodeId +" is dying");
+		return zk.getChildren(dieZkRoot, false).size() >= runnerCount;
+	}
+	
+	void alive() throws KeeperException, InterruptedException{
+		if(diePath!=null){
+			zk.delete(diePath, 0);
+		}
+		//Log.info("bsp node " + nodeId +" is alive");
+	}
+	
+	
+	void enterNoWait() throws KeeperException, InterruptedException{
+		lockPath = zk.create(StringHelper.makePath(barrierZkRoot, myname), new byte[0], Ids.OPEN_ACL_UNSAFE,
+                CreateMode.EPHEMERAL_SEQUENTIAL);
+		//Log.info("bsp node " + nodeId +" entering barrier " + superStep);
 	}
 
 	void enterWait() throws KeeperException, InterruptedException{
     	
         int lockNumber = StringHelper.getLastInt(lockPath); 
-    	List<String> list = zk.getChildren(zkRoot, false);
+    	List<String> list = zk.getChildren(barrierZkRoot, false);
         int maxId = -1;
         for(String cn : list){
         	int theirNumber=StringHelper.getLastInt(cn);
@@ -103,38 +124,38 @@ public class BSPRunner extends Thread implements Watcher{
         	IamPivot = false;
 	        while (true) {
 	            synchronized (mutex) {
-	                if(zk.exists(StringHelper.makePath(zkRoot, readyFile), this) == null){
+	                if(zk.exists(StringHelper.makePath(barrierZkRoot, readyFile), this) == null){
 	                	mutex.wait();
 	                }else{
-	                	Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
+	                	//Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
 	                    return;
 	                }
 	            }
 	        }
 	    }else{	   
 	    	IamPivot = true;
-	    	zk.create(StringHelper.makePath(zkRoot, readyFile), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-	    	Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
-        	Log.info("== all bsp nodes has entered barrier " + superStep+", pivot: "+nodeId+" ==");
+	    	zk.create(StringHelper.makePath(barrierZkRoot, readyFile), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+	    	//Log.info("bsp node " + nodeId +" has entered barrier " + superStep);
+        	//Log.info("== all bsp nodes has entered barrier " + superStep+", pivot: "+nodeId+" ==");
             return;
         }
     }
     
 	void leaveNoWait() throws InterruptedException, KeeperException{
 		zk.delete(lockPath, 0);
-		Log.info("bsp node " + nodeId +" leaving barrier " + superStep);
+		//Log.info("bsp node " + nodeId +" leaving barrier " + superStep);
 	}
 	
     boolean leaveWait() throws KeeperException, InterruptedException{
         if(IamPivot){
         	while(true){
         		synchronized(mutex){
-		        	if(zk.getChildren(zkRoot, true).size()>1){
+		        	if(zk.getChildren(barrierZkRoot, true).size()>1){
 		        		mutex.wait();
 		        	}else{
-		        		zk.delete(StringHelper.makePath(zkRoot, readyFile), 0);
-		            	Log.info("bsp node " + nodeId +" has left barrier " + superStep);
-		            	Log.info("== all bsp nodes has left barrier " + superStep+ ", pivot: "+nodeId+" ==");
+		        		zk.delete(StringHelper.makePath(barrierZkRoot, readyFile), 0);
+		            	//Log.info("bsp node " + nodeId +" has left barrier " + superStep);
+		            	//Log.info("== all bsp nodes has left barrier " + superStep+ ", pivot: "+nodeId+" ==");
 		                return true;
 		        	}
         		}
@@ -142,10 +163,10 @@ public class BSPRunner extends Thread implements Watcher{
         } else {
 	        while (true) {
 	            synchronized (mutex) {
-	            	if(zk.exists(StringHelper.makePath(zkRoot, readyFile), this) != null){
+	            	if(zk.exists(StringHelper.makePath(barrierZkRoot, readyFile), this) != null){
 	                	mutex.wait();
 	                }else{
-	                	Log.info("bsp node " + nodeId +" has left barrier " + superStep);
+	                	//Log.info("bsp node " + nodeId +" has left barrier " + superStep);
 	                    return true;
 	                }
 	            }
@@ -180,7 +201,7 @@ public class BSPRunner extends Thread implements Watcher{
     		}
     	}else{
     		for(Map.Entry<Long, MessageWritable> msg:received.entrySet()){
-    			Log.info(msg.getKey()+" received message");
+    			//Log.info(msg.getKey()+" received message");
     			doQueryForVertex(msg.getKey(), msg.getValue());
     		}
     	}
@@ -233,27 +254,39 @@ public class BSPRunner extends Thread implements Watcher{
     					switch(t.getType()){
     					case In:
     						if(v==null) v = graphStore.parseVertex(vid);
-    						for(Edge e:v.getInEdges()){
+    						e:for(Edge e:v.getInEdges()){
     							if(test(t.getTest(), e)){
+    								long ovid=e.getInVertex().getId();
+    								for(long p:path){
+    									if(ovid==p){
+    										continue e;
+    									}
+    								}
     								long[] newpath=new long[path.length+2];
     	    						System.arraycopy(newpath, 0, path, 0, path.length);
     	    						newpath[path.length] = vid;
     	    						newpath[path.length+1] = e.getId();
     	    						int newState = t.getToState();
-    	    						sendMessageToVertex(e.getInVertex().getId(), newState, newpath);
+    	    						sendMessageToVertex(ovid, newState, newpath);
     							}
     						}
     						break;
     					case Out:
     						if(v==null) v = graphStore.parseVertex(vid);
-    						for(Edge e:v.getOutEdges()){
+    						e:for(Edge e:v.getOutEdges()){
     							if(test(t.getTest(), e)){
+    								long ovid=e.getOutVertex().getId();
+    								for(long p:path){
+    									if(ovid==p){
+    										continue e;
+    									}
+    								}
     								long[] newpath=new long[path.length+2];
     	    						System.arraycopy(path, 0, newpath, 0, path.length);
     	    						newpath[path.length] = vid;
     	    						newpath[path.length+1] = e.getId();
     	    						int newState = t.getToState();
-    	    						sendMessageToVertex(e.getOutVertex().getId(), newState, newpath);
+    	    						sendMessageToVertex(ovid, newState, newpath);
     							}
     						}
     						break;
@@ -263,7 +296,7 @@ public class BSPRunner extends Thread implements Watcher{
     						long[] result=new long[path.length+1];
     						System.arraycopy(path, 0, result, 0, path.length);
     						result[path.length] = vid;
-    						Log.info("result: "+Arrays.toString(result));
+    						container.sendResult(sessionId, result);
     						break;
     					default:
     							
@@ -362,23 +395,43 @@ public class BSPRunner extends Thread implements Watcher{
 	@Override
 	public void run() {
 		try{
+			if(zk.exists(barrierZkRoot, false)==null){
+				zk.create(barrierZkRoot, new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			}
+			if(zk.exists(dieZkRoot, false)==null){
+				zk.create(dieZkRoot, new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			}
 			while(true){
-				Log.info("node " + nodeId +" working in step " + superStep);
+				//Log.info("node " + nodeId +" working in step " + superStep);
 				try {
 					doQuery();
 					received.clear();
 					enterNoWait();
 					packAndSendMessage();
 					enterWait();
+					if(!received.isEmpty()){
+						alive();
+					}
 					leaveNoWait();
 					leaveWait();
+					if(received.isEmpty()){
+						if(die()){
+							//Log.info("node " + nodeId +" has died");
+							container.finish(sessionId);
+							break;
+						}
+					}
 					superStep++;
-					container.superStepFinish(sessionId, superStep-1);					
+					container.superStepFinish(sessionId, superStep - 1);
 				} catch (Exception e) {
-					Log.error("error during barrier synchronize ", e);
+					//Log.error("error during barrier synchronize ", e);
 					throw new RuntimeException(e);
 				}
 			}
+		} catch (KeeperException e) {
+			throw new HdglException(e);
+		} catch (InterruptedException e) {
+			throw new HdglException(e);
 		}finally{
 			try {
 				zk.close();

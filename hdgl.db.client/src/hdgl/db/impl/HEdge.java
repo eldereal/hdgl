@@ -64,4 +64,10 @@ public class HEdge implements Edge {
 			return null;
 		}
 	}
+
+	@Override
+	public byte[] getLabel(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

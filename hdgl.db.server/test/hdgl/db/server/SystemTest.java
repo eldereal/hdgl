@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -48,7 +49,7 @@ public class SystemTest {
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
 		assertEquals(1, master.getRegions().entrySet().size());
-		for(Entry<Writable, Writable> v:master.getRegions().entrySet()){
+		for(Entry<Writable, Writable> v : master.getRegions().entrySet()){
 			System.out.println("region "+v.getKey()+" - "+v.getValue());
 		}
 	}
@@ -72,7 +73,7 @@ public class SystemTest {
 	public void queryTest() throws Exception{
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		int queryId = master.prepareQuery(".-.");
+		int queryId = master.prepareQuery(".(-.)+");
 		System.out.println("query id: "+queryId);
 		IntWritable[] regionIds=master.query(queryId);
 		MapWritable regions = master.getRegions();
@@ -87,10 +88,11 @@ public class SystemTest {
 			r.doQuery(queryId, 0);
 		}
 		for(RegionProtocol r:executeRegionConns){
-			r.fetchResult(queryId, 1);
+			long[][] res = r.fetchResult(queryId, 1);
+			System.out.println("result len 1:" + Arrays.toString());
 		}
 		for(RegionProtocol r:executeRegionConns){
-			r.fetchResult(queryId, 2);
+			System.out.println("result len 2:" + Arrays.toString(r.fetchResult(queryId, 2)));
 		}
 		for(RegionProtocol r:executeRegionConns){
 			r.fetchResult(queryId, 3);
