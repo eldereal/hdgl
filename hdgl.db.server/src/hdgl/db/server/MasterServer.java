@@ -226,7 +226,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				throw new HdglException("Bad query session id");
 			}
 			QueryContext ctx = WritableHelper.parse(zk().getData(queryZKRoot, false, ctxdata), QueryContext.class);
-			ArrayList<IntWritable> regions=new ArrayList<>();
+			ArrayList<IntWritable> regions=new ArrayList<IntWritable>();
 			for(Map.Entry<Integer, BSPProtocol> bspnode : bspRegions.entrySet()){
 				bspnode.getValue().initBSP(queryId, queryZKRoot, ctx);
 				regions.add(new IntWritable(bspnode.getKey()));

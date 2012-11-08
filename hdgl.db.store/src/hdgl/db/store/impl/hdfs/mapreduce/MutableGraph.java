@@ -8,6 +8,7 @@ import org.apache.hadoop.fs.Path;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.graph.Entity;
 import hdgl.db.graph.HGraphIds;
+import hdgl.db.store.impl.hdfs.HdfsGraphStore;
 import hdgl.db.task.AsyncResult;
 import hdgl.util.StringHelper;
 
@@ -33,6 +34,17 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 			e.printStackTrace();
 		}
 	}
+	
+	public int getVertexNum()
+	{
+		return (int) vertex;
+	}
+	
+	public int getEdgeNum()
+	{
+		return (int) edge;
+	}
+	
 	public void close() 
 	{
 		try 
@@ -46,7 +58,7 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 	}
 	private long createVertex()
 	{
-		vertex++;
+		vertex--;
 		StringBuffer line = new StringBuffer("[add vertex ");
 		line.append(vertex);
 		line.append(":]\n");
@@ -63,7 +75,7 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 	}
 	private long createEdge(long vertex1, long vertex2)
 	{
-		edge--;
+		edge++;
 		StringBuffer line = new StringBuffer("[add edge ");
 		line.append(edge);
 		line.append(":");
@@ -115,12 +127,6 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 		{
 			e.printStackTrace();
 		}
-	}
-	public static void main(String[] args) throws Exception
-	{
-		Configuration conf = new GraphConf().getDefault();
-		MutableGraph mg = new MutableGraph(conf, 0);
-		mg.close();
 	}
 	
 	@Override

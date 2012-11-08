@@ -107,10 +107,12 @@ public class HdfsGraphStore implements GraphStore {
 			}
 			if (!(key.length() == 0))
 			{
-				v.addLabel(key, StringHelper.stringToBytes(value));
 				if (key.compareTo("type") == 0)
 				{
 					v.setType(new String(StringHelper.stringToBytes(value)));
+				}
+				else {
+					v.addLabel(key, StringHelper.stringToBytes(value));
 				}
 			}
 		}
@@ -145,10 +147,12 @@ public class HdfsGraphStore implements GraphStore {
 			}
 			if (!(key.length() == 0))
 			{
-				e.addLabel(key, StringHelper.stringToBytes(value));
 				if (key.compareTo("type") == 0)
 				{
 					e.setType(new String(StringHelper.stringToBytes(value)));
+				}
+				else {
+					e.addLabel(key, StringHelper.stringToBytes(value));
 				}
 			}
 		}
@@ -199,6 +203,12 @@ public class HdfsGraphStore implements GraphStore {
 	@Override
 	public long getEdgeCountPerBlock() throws IOException {
 		return e_f.getBlockSize()/etrunkSize;
+	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

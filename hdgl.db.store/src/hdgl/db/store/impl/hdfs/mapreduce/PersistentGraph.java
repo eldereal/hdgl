@@ -179,7 +179,7 @@ public class PersistentGraph {
 	{
 		this.conf = conf;
 		inPath = new Path(GraphConf.getGraphSessionRoot(conf, sessionId));
-		outPath = new Path(GraphConf.getGraphRoot(conf));
+		outPath = new Path(GraphConf.getPersistentGraphRoot(conf));
 		VertexNumber = vNum;
 		EdgeNumber = eNum;
 	}

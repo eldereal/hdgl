@@ -68,4 +68,10 @@ public class HVertex implements Vertex {
 		return null;
 	}
 
+	@Override
+	public byte[] getLabel(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

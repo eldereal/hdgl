@@ -18,7 +18,7 @@ public final class GraphConf {
 		public static final String GRAPH_SESSION_ROOT="session";
 		public static final String ZK_SERVER="localhost:2181";
 		public static final int ZK_SESSION_TIMEOUT = 60000;
-		public static final String GRAPH_ROOT = "/hdgl/graph/";
+		public static final String GRAPH_ROOT = "hdgl/graph/";
 		public static final String DEFAULT_FS = "hdfs://localhost:9000/";
 		public static final String ZK_ROOT = "/hdgl";
 		public static final int GRAPH_TRUNK_SIZE = 4 * 1024;
@@ -42,6 +42,11 @@ public final class GraphConf {
 	public static String getGraphSessionRoot(Configuration conf, int sessionId){
 		String sessionRoot= StringHelper.makePath(conf.get(GRAPH_ROOT, Defaults.GRAPH_ROOT), conf.get(GRAPH_SESSION_ROOT, Defaults.GRAPH_SESSION_ROOT));
 		return StringHelper.makePath(sessionRoot, Integer.toString(sessionId));
+	}
+	
+	public static String getPersistentGraphRoot(Configuration conf)
+	{
+		return StringHelper.makePath(conf.get(GRAPH_ROOT, Defaults.GRAPH_ROOT), "persist");
 	}
 	
 	public static int getVertexTrunkSize(Configuration conf){

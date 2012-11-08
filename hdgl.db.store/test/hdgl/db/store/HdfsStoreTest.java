@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import hdgl.db.conf.GraphConf;
+import hdgl.db.store.impl.hdfs.HdfsGraphStore;
 import hdgl.db.store.impl.hdfs.mapreduce.MutableGraph;
+import hdgl.db.store.impl.hdfs.mapreduce.PersistentGraph;
 
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
@@ -19,19 +21,26 @@ public class HdfsStoreTest {
 	}
 	
 	@Test
-	public void readTest() throws IOException {
+	public void UseExampleTest() throws IOException, ClassNotFoundException, InterruptedException {
 		Configuration conf = GraphConf.getDefault();
-		
-		GraphStore gs = StoreFactory.createGraphStore(conf);
-		
-//		for (int i = 0; i < 5; i++)
-//		{
-//			System.out.println(gs.parseVertex(i).getString());
-//		}
-//		for (int i = 0; i < 9; i++)
-//		{
-//			System.out.println(gs.parseEdge(i).getString());
-//		}
+		MutableGraph mg = new MutableGraph(conf, 0);
+		mg.createVertex("wuhanzhao");
+		mg.createVertex("chenshi");
+		mg.createVertex("无定所");
+		mg.setLabel(-1, "name", new String("why").getBytes());
+		mg.setLabel(-1, "国家", new String("中国").getBytes());
+		mg.setLabel(-2, "姓名", new String("武汉着").getBytes());
+		mg.setLabel(-3, "姓名", new String("afds").getBytes());
+		mg.createEdge("边", -1, -2);
+		mg.createEdge("苏打粉", -2, -3);
+		mg.setLabel(1, "关系", new String("不知道").getBytes());
+		mg.setLabel(2, "关系", new String("知道").getBytes());
+		mg.close();
+		PersistentGraph p = new PersistentGraph(conf, 0, mg.getVertexNum(), mg.getEdgeNum());
+		p.runMapReduce();
+		HdfsGraphStore hg = new HdfsGraphStore(conf);
+		hg.parseVertex(-1);
+		hg.parseEdge(1);
 	}
 
 }
