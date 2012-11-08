@@ -3,15 +3,19 @@ package hdgl.db.server;
 import static org.junit.Assert.*;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import hdgl.db.conf.GraphConf;
 import hdgl.db.protocol.ClientMasterProtocol;
-import hdgl.db.protocol.ClientRegionProtocol;
+import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.Protocol;
 import hdgl.util.NetHelper;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.ipc.RPC;
@@ -44,6 +48,9 @@ public class SystemTest {
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
 		assertEquals(1, master.getRegions().entrySet().size());
+		for(Entry<Writable, Writable> v:master.getRegions().entrySet()){
+			System.out.println("region "+v.getKey()+" - "+v.getValue());
+		}
 	}
 	
 	@Test
@@ -54,7 +61,7 @@ public class SystemTest {
 		int count=0;
 		for(Writable region:regions.values()){
 			InetSocketAddress addr = ((InetSocketAddressWritable)region).toAddress();
-			ClientRegionProtocol r = Protocol.region(addr, conf);
+			RegionProtocol r = Protocol.region(addr, conf);
 			assertEquals("abcde", r.echo("abcde"));
 			count++;
 		}
@@ -65,8 +72,29 @@ public class SystemTest {
 	public void queryTest() throws Exception{
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		int queryId = master.prepareQuery(".[id=1]|-[price<10](.)*");
+		int queryId = master.prepareQuery(".-.");
 		System.out.println("query id: "+queryId);
+		IntWritable[] regionIds=master.query(queryId);
+		MapWritable regions = master.getRegions();
+		ArrayList<RegionProtocol> executeRegionConns=new ArrayList<RegionProtocol>();
+		for(IntWritable regionId:regionIds){
+			System.out.println("execute region: "+regionId.get()+" - "+regions.get(regionId));
+			InetSocketAddress regionAddress=((InetSocketAddressWritable)regions.get(regionId)).toAddress();
+			executeRegionConns.add(Protocol.region(regionAddress, conf));
+		}
+		
+		for(RegionProtocol r:executeRegionConns){
+			r.doQuery(queryId, 0);
+		}
+		for(RegionProtocol r:executeRegionConns){
+			r.fetchResult(queryId, 1);
+		}
+		for(RegionProtocol r:executeRegionConns){
+			r.fetchResult(queryId, 2);
+		}
+		for(RegionProtocol r:executeRegionConns){
+			r.fetchResult(queryId, 3);
+		}
 	}
 
 }

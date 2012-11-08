@@ -32,8 +32,8 @@ import hdgl.db.conf.GraphConf;
 import hdgl.db.exception.BadQueryException;
 import hdgl.db.exception.HdglException;
 import hdgl.db.graph.HGraphIds;
-import hdgl.db.protocol.BSPProtocol;
 import hdgl.db.protocol.ClientMasterProtocol;
+import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.RegionMasterProtocol;
 import hdgl.db.query.QueryContext;
@@ -63,7 +63,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	int masterId;
 	GraphStore store;
 	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
-	Map<Integer, BSPProtocol> bspRegions = new HashMap<Integer, BSPProtocol>();
+	Map<Integer, RegionProtocol> regionConns = new HashMap<Integer, RegionProtocol>();
 	
 	Map<Integer, String> queryZKRoots = new HashMap<Integer, String>();
 	
@@ -122,7 +122,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 		try{
 			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), true);
 			regions.clear();
-			bspRegions.clear();
+			regionConns.clear();
 			for (int i = 0; i < paths.size(); i++) {
 				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
 				Stat s = zk().exists(path, false);
@@ -130,7 +130,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				int regionId = StringHelper.getLastInt(path);
 				InetSocketAddressWritable addr=WritableHelper.parse(addrData, InetSocketAddressWritable.class);
 				regions.put(regionId, addr);
-				bspRegions.put(regionId, RPC.getProxy(BSPProtocol.class, 1, addr.toAddress(), conf));
+				regionConns.put(regionId, RPC.getProxy(RegionProtocol.class, 1, addr.toAddress(), conf));
 			}
 		}catch(Exception ex){
 			Log.error(ex);
@@ -196,7 +196,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 			ctx.setStateMachine(stm);
 			long step = store.getVertexCountPerBlock();
 			long max = store.getVertexCount();
-			for(long id=0;id<max;id+=step){
+			for(long id=1;id<max;id+=step){
 				String[] hosts = store.bestPlacesForVertex(id);
 				String usehost = hosts[(int) (Math.random()*hosts.length)];
 				for(Map.Entry<Integer, InetSocketAddressWritable> map:regions.entrySet()){
@@ -205,10 +205,12 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 						break;
 					}
 				}
-			}
-			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), WritableHelper.toBytes(ctx), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+			}			
+			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
 			int id = StringHelper.getLastInt(idPath);
 			queryZKRoots.put(id, idPath);
+			ctx.setZkRoot(idPath);
+			zk().setData(idPath, WritableHelper.toBytes(ctx), 0);
 //			String step0 = zk().create(StringHelper.makePath(idPath, "0"), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 //			zk().getChildren(step0, this);
 			return id;
@@ -226,10 +228,10 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				throw new HdglException("Bad query session id");
 			}
 			QueryContext ctx = WritableHelper.parse(zk().getData(queryZKRoot, false, ctxdata), QueryContext.class);
-			ArrayList<IntWritable> regions=new ArrayList<>();
-			for(Map.Entry<Integer, BSPProtocol> bspnode : bspRegions.entrySet()){
-				bspnode.getValue().initBSP(queryId, queryZKRoot, ctx);
-				regions.add(new IntWritable(bspnode.getKey()));
+			Set<IntWritable> regions=new HashSet<IntWritable>();
+			for(Map.Entry<Long, Integer> map : ctx.getIdMap().entrySet()){
+				//bspnode.getValue().initBSP(queryId, queryZKRoot, ctx);
+				regions.add(new IntWritable(map.getValue()));
 			}
 			return regions.toArray(new IntWritable[0]);			
 		}catch(Exception ex){

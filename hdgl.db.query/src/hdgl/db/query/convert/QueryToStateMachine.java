@@ -193,7 +193,7 @@ public class QueryToStateMachine {
 						}
 					}
 				}
-				if(next.size()>0){
+				if(next.size()>0||isSuccess){
 					SimpleState nextState = new SimpleState(next, !one.isVertex(), isSuccess);
 					int n;
 					if((n=stm.findState(nextState))<0){

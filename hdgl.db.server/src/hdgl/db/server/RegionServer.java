@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -15,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -28,22 +31,25 @@ import org.apache.zookeeper.data.Stat;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.conf.MasterConf;
 import hdgl.db.exception.HdglException;
-import hdgl.db.protocol.ClientRegionProtocol;
-import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.MessagePackWritable;
-import hdgl.db.protocol.BSPProtocol;
+import hdgl.db.protocol.RegionProtocol;
+import hdgl.db.protocol.InetSocketAddressWritable;
+import hdgl.db.protocol.MessageWritable;
 import hdgl.db.protocol.RegionMasterProtocol;
 import hdgl.db.query.QueryContext;
+import hdgl.db.server.bsp.BSPContainer;
+import hdgl.db.server.bsp.BSPRunner;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.Log;
 import hdgl.db.store.LogStore;
 import hdgl.db.store.StoreFactory;
+import hdgl.util.IterableHelper;
 import hdgl.util.NetHelper;
 import hdgl.util.StringHelper;
 import hdgl.util.WritableHelper;
 
 
-public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher {
+public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 
 	static final Pattern ZK_ID_PATTERN = Pattern.compile(".*?(\\d+)");
 	
@@ -62,8 +68,9 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 	Map<Integer, Boolean> taskResults =  new ConcurrentHashMap<Integer, Boolean>();
 	
 	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
-	Map<Integer, BSPProtocol> bspRegions = new HashMap<Integer, BSPProtocol>();
-	
+	Map<Integer, RegionProtocol> regionConns = new HashMap<Integer, RegionProtocol>();
+	Map<Integer, QueryContext> queries = new HashMap<Integer, QueryContext>();
+	Map<Integer, BSPRunner> bspRunners = new HashMap<Integer, BSPRunner>();
 	
 	public ZooKeeper zk() throws IOException, InterruptedException, KeeperException{
 		if(this.zk == null){
@@ -85,7 +92,7 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 		try{
 			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), true);
 			regions.clear();
-			bspRegions.clear();
+			regionConns.clear();
 			for (int i = 0; i < paths.size(); i++) {
 				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
 				Stat s = zk().exists(path, false);
@@ -93,7 +100,7 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 				int regionId = StringHelper.getLastInt(path);
 				InetSocketAddressWritable addr=WritableHelper.parse(addrData, InetSocketAddressWritable.class);
 				regions.put(regionId, addr);
-				bspRegions.put(regionId, RPC.getProxy(BSPProtocol.class, 1, addr.toAddress(), conf));
+				regionConns.put(regionId, RPC.getProxy(RegionProtocol.class, 1, addr.toAddress(), conf));
 			}
 		}catch(Exception ex){
 			log.error(ex);
@@ -144,6 +151,7 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 			throw new IOException("Wrong path");
 		}
 		regionId = Integer.parseInt(m.group(1));
+		graph=StoreFactory.createGraphStore(conf);
 		//master.regionStart();
 		updateRegions();
 //		long step = graph.getVertexCountPerBlock();
@@ -166,15 +174,58 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 	}
 
 	@Override
-	public InetSocketAddressWritable[] doQuery(int queryId) {
-		// TODO Auto-generated method stub
-		return null;
+	public int doQuery(int queryId, int pathlen) {
+		try{
+			if(pathlen==0){
+				List<String> ids = zk().getChildren(HConf.getZKQuerySessionRoot(conf), false);
+				for(int i=ids.size()-1;i>=0;i--){
+					String id=ids.get(i);
+					if(StringHelper.getLastInt(id)==queryId){
+						QueryContext ctx = WritableHelper.parse(
+								zk().getData(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), id), false, null),
+								QueryContext.class);
+						queries.put(queryId, ctx);
+						Set<Integer> regions = new HashSet<Integer>();
+						for(Map.Entry<Long, Integer> map : ctx.getIdMap().entrySet()){
+							regions.add(map.getValue());
+						}
+						int regionCount = regions.size();
+						BSPRunner bspRunner = new BSPRunner(graph,ctx, ctx.getZkRoot(), regionCount, regionId, queryId, this, conf);
+						bspRunners.put(queryId, bspRunner);
+						bspRunner.start();
+						return 1;
+					}
+				}
+				throw new HdglException("Bad query id");
+			}else{
+				throw new HdglException("Unsupported");
+			}
+		}catch(IOException ex){
+			throw new HdglException(ex);
+		} catch (KeeperException ex) {
+			throw new HdglException(ex);
+		} catch (InterruptedException ex) {
+			throw new HdglException(ex);
+		}
 	}
 
 	@Override
 	public long[][] fetchResult(int queryId, int pathLen) {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			BSPRunner runner=bspRunners.get(queryId);
+			if(runner==null){
+				throw new HdglException("Bad query id");
+			}
+			Object mutex = queries.get(queryId);
+			while(runner.getSuperStep() < pathLen){
+				synchronized(mutex){
+					mutex.wait();
+				}
+			}
+			return null;
+		}catch(InterruptedException ex){
+			throw new HdglException(ex);
+		}
 	}
 
 	@Override
@@ -268,22 +319,30 @@ public class RegionServer implements ClientRegionProtocol, BSPProtocol, Watcher 
 	}
 
 	@Override
-	public void broadcastMessage(int querySession, MessagePackWritable msg) {
-		// TODO Auto-generated method stub
-		
+	public void sendMessage(int querySession, MessagePackWritable msg) {
+		BSPRunner bspRunner = bspRunners.get(querySession);
+		if(bspRunner==null){
+			throw new HdglException("Bad query id");
+		}
+		bspRunner.receiveMessages(msg);		
 	}
 
 	@Override
-	public void sendMessage(int querySession, int vertexId,
-			MessagePackWritable msg) {
-		// TODO Auto-generated method stub
-		
+	public void sendMessagePack(int querySession, int regionId, MessagePackWritable pack) {
+		if(regionId==this.regionId||!regionConns.containsKey(regionId)){
+			sendMessage(querySession, pack);
+		}else{
+			RegionProtocol connProtocol=regionConns.get(regionId);
+			connProtocol.sendMessage(querySession, pack);
+		}
 	}
 
 	@Override
-	public void initBSP(int querySession, String zkRoot, QueryContext ctx) {
-		// TODO Auto-generated method stub
-		
+	public void superStepFinish(int sessionId, int superstep) {
+		Object mutex = queries.get(sessionId);
+		synchronized(mutex){
+			mutex.notifyAll();
+		}
 	}
 	
 }

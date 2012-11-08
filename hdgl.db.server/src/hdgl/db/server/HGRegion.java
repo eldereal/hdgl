@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import hdgl.db.conf.GraphConf;
 import hdgl.db.conf.RegionConf;
-import hdgl.db.protocol.ClientRegionProtocol;
+import hdgl.db.protocol.RegionProtocol;
 import hdgl.util.NetHelper;
 
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +32,7 @@ public class HGRegion {
 			Log.info("Starting HGRegion at " + host+":" + port);
 			regionServer = new RegionServer(host,port,configuration);
 			regionServer.start();
-			server = RPC.getServer(ClientRegionProtocol.class, regionServer, host, port, configuration);
+			server = RPC.getServer(RegionProtocol.class, regionServer, host, port, configuration);
 			server.start();
 		}catch (Exception e) {
 			Log.error("Unhandled exception", e);

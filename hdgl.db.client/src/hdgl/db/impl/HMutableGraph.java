@@ -8,7 +8,7 @@ import hdgl.db.graph.Edge;
 import hdgl.db.graph.Entity;
 import hdgl.db.graph.MutableGraph;
 import hdgl.db.graph.Vertex;
-import hdgl.db.protocol.ClientRegionProtocol;
+import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.store.Log;
 import hdgl.db.task.AsyncResult;
 import hdgl.db.task.CallableAsyncResult;
@@ -39,7 +39,7 @@ public class HMutableGraph implements MutableGraph{
 	HConn conn;
 	long tempVId = 1;
 	long tempEId = -1;
-	ClientRegionProtocol regionProtocol;
+	RegionProtocol regionProtocol;
 	int txId;
 	
 	public HMutableGraph(Configuration conf, HConn conn){

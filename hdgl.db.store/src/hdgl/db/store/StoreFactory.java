@@ -37,7 +37,7 @@ public class StoreFactory {
 		MemoryVertexImpl v3 = new MemoryVertexImpl(3l, "t1", 
 				IterableHelper.<String, byte[]>makeMap("name", data("three"), "price", data(500)), 
 				IterableHelper.<Long>makeSet(-2l, -6l), 
-				IterableHelper.<Long>makeSet(-3l), g);
+				IterableHelper.<Long>makeSet(-3l, -9l), g);
 		MemoryVertexImpl v4 = new MemoryVertexImpl(4l, "t2", 
 				IterableHelper.<String, byte[]>makeMap("name", data("four"), "price", data(10)), 
 				IterableHelper.<Long>makeSet(-3l, -7l), 

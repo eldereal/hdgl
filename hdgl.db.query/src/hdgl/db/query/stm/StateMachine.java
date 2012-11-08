@@ -127,7 +127,7 @@ public class StateMachine implements Writable {
 			return transitions.get(transId);
 		}
 		
-		Iterable<Transition> getTransitions(){
+		public Iterable<Transition> getTransitions(){
 			return transitions;
 		}
 		
@@ -205,6 +205,10 @@ public class StateMachine implements Writable {
 				c.write(out);
 			}
 		}
+	}
+	
+	public int getStartState(){
+		return 1;
 	}
 	
 	int maxState = 1;

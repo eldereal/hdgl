@@ -43,7 +43,7 @@ public class BSPTest implements Watcher{
            
         } 
 		for(int i=0;i<10;i++){
-			new BSPRunner(null, root, 10, i, conf).start();
+			new BSPRunner(null,null, root, 10, i, conf).start();
 		}
 	}
 

@@ -86,5 +86,10 @@ public class InetSocketAddressWritable implements Writable {
 		arg0.writeUTF(host);
 		arg0.writeInt(port);
 	}
+	
+	@Override
+	public String toString() {
+		return host+":"+port;
+	}
 
 }
