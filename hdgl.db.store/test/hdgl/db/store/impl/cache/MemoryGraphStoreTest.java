@@ -2,24 +2,23 @@ package hdgl.db.store.impl.cache;
 
 import static org.junit.Assert.*;
 import hdgl.db.graph.Vertex;
+import hdgl.util.ByteArrayHelper;
 import hdgl.util.IterableHelper;
 
 import org.junit.Test;
 
 public class MemoryGraphStoreTest {
 	
-	public byte[] data(Object obj){
-		byte[] data=new byte[4];
-		int code=obj.hashCode();
-		data[0]=(byte) (code>>>24&0xff);
-		data[1]=(byte) (code>>>16&0xff);
-		data[2]=(byte) (code>>>8&0xff);
-		data[3]=(byte) (code&0xff);
-		return data;
+	public byte[] data(int i){
+		return ByteArrayHelper.toBytes(i);
+	}
+	
+	public byte[] data(String i){
+		return ByteArrayHelper.toBytes(i);
 	}
 	
 	@Test
-	public void test() throws Exception{
+	public MemoryGraphStore test() throws Exception{
 		MemoryGraphStore g = new MemoryGraphStore();
 		MemoryVertexImpl v1 = new MemoryVertexImpl(1l, "t1", 
 				IterableHelper.<String, byte[]>makeMap("name", data("one"), "price", data(100)), 
@@ -32,7 +31,7 @@ public class MemoryGraphStoreTest {
 		MemoryVertexImpl v3 = new MemoryVertexImpl(3l, "t1", 
 				IterableHelper.<String, byte[]>makeMap("name", data("three"), "price", data(500)), 
 				IterableHelper.<Long>makeSet(-2l, -6l), 
-				IterableHelper.<Long>makeSet(-3l), g);
+				IterableHelper.<Long>makeSet(-3l, -9l), g);
 		MemoryVertexImpl v4 = new MemoryVertexImpl(4l, "t2", 
 				IterableHelper.<String, byte[]>makeMap("name", data("four"), "price", data(10)), 
 				IterableHelper.<Long>makeSet(-3l, -7l), 
@@ -79,6 +78,7 @@ public class MemoryGraphStoreTest {
 		assertEquals("back", g.getEdge(-5).getType());
 		assertEquals("forward", g.getEdge(-1).getType());
 		assertEquals("jump", g.getEdge(-8).getType());
+		return g;
 	}
 
 }

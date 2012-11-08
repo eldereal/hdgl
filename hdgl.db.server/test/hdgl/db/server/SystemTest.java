@@ -2,6 +2,7 @@ package hdgl.db.server;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,10 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import hdgl.db.conf.GraphConf;
+import hdgl.db.exception.BadQueryException;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.Protocol;
+import hdgl.db.protocol.ResultPackWritable;
 import hdgl.util.NetHelper;
 
 import org.apache.hadoop.conf.Configuration;
@@ -69,11 +72,20 @@ public class SystemTest {
 		assertTrue("at least one region is tested", count>0);
 	}
 	
+	
 	@Test
 	public void queryTest() throws Exception{
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		int queryId = master.prepareQuery(".(-.)+");
+		query(".(-.)+", conf, master);
+		query(".", conf, master);
+		query(".-forward.", conf, master);
+		query(".-[len<0].", conf, master);
+	}
+
+	private void query(String query, Configuration conf, ClientMasterProtocol master)
+			throws BadQueryException, IOException {
+		int queryId = master.prepareQuery(query);
 		System.out.println("query id: "+queryId);
 		IntWritable[] regionIds=master.query(queryId);
 		MapWritable regions = master.getRegions();
@@ -87,16 +99,16 @@ public class SystemTest {
 		for(RegionProtocol r:executeRegionConns){
 			r.doQuery(queryId, 0);
 		}
-		for(RegionProtocol r:executeRegionConns){
-			long[][] res = r.fetchResult(queryId, 1);
-			System.out.println("result len 1:" + Arrays.toString());
-		}
-		for(RegionProtocol r:executeRegionConns){
-			System.out.println("result len 2:" + Arrays.toString(r.fetchResult(queryId, 2)));
-		}
-		for(RegionProtocol r:executeRegionConns){
-			r.fetchResult(queryId, 3);
+		int len = 1;
+		boolean hasMore = true;
+		while(hasMore){
+			hasMore = false;
+			for(RegionProtocol r:executeRegionConns){
+				ResultPackWritable result = r.fetchResult(queryId, len);
+				hasMore = hasMore || result.isHasMore();
+				System.out.println("result len " + len + ": " + result);
+			}
+			len++;
 		}
 	}
-
 }

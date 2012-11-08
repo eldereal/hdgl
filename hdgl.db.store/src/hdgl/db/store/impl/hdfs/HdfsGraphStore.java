@@ -3,6 +3,8 @@ package hdgl.db.store.impl.hdfs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,16 +13,17 @@ import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 
 
 import hdgl.db.conf.GraphConf;
 import hdgl.db.graph.HGraphIds;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.HConf;
-import hdgl.db.store.HEdge;
-import hdgl.db.store.HVertex;
 import hdgl.db.store.impl.hdfs.mapreduce.Edge;
 import hdgl.db.store.impl.hdfs.mapreduce.EdgeInputStream;
+import hdgl.db.store.impl.hdfs.mapreduce.HEdge;
+import hdgl.db.store.impl.hdfs.mapreduce.HVertex;
 import hdgl.db.store.impl.hdfs.mapreduce.Parameter;
 import hdgl.db.store.impl.hdfs.mapreduce.Vertex;
 import hdgl.db.store.impl.hdfs.mapreduce.VertexInputStream;
@@ -28,14 +31,40 @@ import hdgl.util.StringHelper;
 
 public class HdfsGraphStore implements GraphStore {
 	
+	static class PrefixPathFilter implements PathFilter{
+
+		String prefix;
+		
+		public PrefixPathFilter(String prefix) {
+			super();
+			this.prefix = prefix;
+		}
+
+		@Override
+		public boolean accept(Path path) {
+			return path.getName().startsWith(prefix);
+		}
+		
+	}
+	
+	static class SuffixComparator implements Comparator<FileStatus>{
+		public static final SuffixComparator I = new SuffixComparator();
+		
+		@Override
+		public int compare(FileStatus o1, FileStatus o2) {
+			return o1.getPath().getName().compareTo(o2.getPath().getName());
+		}
+		
+	}
+	
 	//vertex fixed length file
-	FileStatus v_f;
+	FileStatus[] v_f;
 	//vertex vary length file
-	FileStatus v_v;
+	FileStatus[] v_v;
 	//edge fixed length file
-	FileStatus e_f;
+	FileStatus[] e_f;
 	//edge vary length file
-	FileStatus e_v;
+	FileStatus[] e_v;
 	
 	FileSystem fs;
 	
@@ -44,6 +73,11 @@ public class HdfsGraphStore implements GraphStore {
 	int vtrunkSize;
 	int etrunkSize;
 	
+	long vcount;
+	long ecount;
+	long vcountPerBlock;
+	long ecountPerBlock;
+	
 	public HdfsGraphStore(Configuration conf) throws IOException{
 		this.conf = conf;
 		String root = GraphConf.getGraphRoot(conf);
@@ -51,10 +85,25 @@ public class HdfsGraphStore implements GraphStore {
 		vtrunkSize = GraphConf.getVertexTrunkSize(conf);
 		etrunkSize = GraphConf.getEdgeTrunkSize(conf);
 		Path rootPath = new Path(root);
-		v_f = fs.getFileStatus(new Path(rootPath,Parameter.VERTEX_REGULAR_FILE_NAME));
-		v_v = fs.getFileStatus(new Path(rootPath,Parameter.VERTEX_IRREGULAR_FILE_NAME));
-		e_f = fs.getFileStatus(new Path(rootPath,Parameter.EDGE_REGULAR_FILE_NAME));
-		e_v = fs.getFileStatus(new Path(rootPath,Parameter.EDGE_IRREGULAR_FILE_NAME));
+		v_f = fs.listStatus(rootPath, new PrefixPathFilter(Parameter.VERTEX_REGULAR_FILE_NAME));
+		v_v = fs.listStatus(rootPath, new PrefixPathFilter(Parameter.VERTEX_IRREGULAR_FILE_NAME));
+		e_f = fs.listStatus(rootPath, new PrefixPathFilter(Parameter.EDGE_REGULAR_FILE_NAME));
+		e_v = fs.listStatus(rootPath, new PrefixPathFilter(Parameter.EDGE_IRREGULAR_FILE_NAME));
+		Arrays.sort(v_f, 0, v_f.length, SuffixComparator.I);
+		Arrays.sort(v_v, 0, v_v.length, SuffixComparator.I);
+		Arrays.sort(e_f, 0, e_f.length, SuffixComparator.I);
+		Arrays.sort(e_v, 0, e_v.length, SuffixComparator.I);
+		long len=0;
+		for(FileStatus f:v_f){
+			len+=f.getLen();
+		}
+		vcount = len/vtrunkSize;
+		len=0;
+		for(FileStatus f:e_f){
+			len+=f.getLen();
+		}
+		ecount = len/etrunkSize;
+		
 	}
 	
 	public InputStream getVertexData(long id) throws IOException
@@ -158,7 +207,16 @@ public class HdfsGraphStore implements GraphStore {
 	@Override
 	public String[] bestPlacesForVertex(long vId) throws IOException {
 		vId = HGraphIds.extractEntityId(vId);
-		BlockLocation[] locs = fs.getFileBlockLocations(v_f, vId * vtrunkSize, vtrunkSize);
+		long offset= vId * vtrunkSize;
+		int nthfile=0;
+		while (v_f[nthfile].getLen()<offset) {
+			offset -= v_f[nthfile].getLen();
+			nthfile++;
+			if(nthfile>=v_f.length){
+				return new String[0];
+			}
+		}		
+		BlockLocation[] locs = fs.getFileBlockLocations(v_f[nthfile], offset, vtrunkSize);
 		Set<String> hosts=new HashSet<String>();
 		for(BlockLocation loc:locs){
 			for(String host:loc.getHosts()){
@@ -171,7 +229,16 @@ public class HdfsGraphStore implements GraphStore {
 	@Override
 	public String[] bestPlacesForEdge(long entityId) throws IOException {
 		entityId = HGraphIds.extractEntityId(entityId);
-		BlockLocation[] locs = fs.getFileBlockLocations(e_f, entityId * etrunkSize, etrunkSize);
+		long offset= entityId * etrunkSize;
+		int nthfile=0;
+		while (e_f[nthfile].getLen()<offset) {
+			offset -= e_f[nthfile].getLen();
+			nthfile++;
+			if(nthfile>=e_f.length){
+				return new String[0];
+			}
+		}	
+		BlockLocation[] locs = fs.getFileBlockLocations(e_f[nthfile], offset, etrunkSize);
 		Set<String> hosts = new HashSet<String>();
 		for(BlockLocation loc:locs){
 			for(String host:loc.getHosts()){
@@ -183,22 +250,22 @@ public class HdfsGraphStore implements GraphStore {
 
 	@Override
 	public long getVertexCount() throws IOException {
-		return v_f.getLen()/vtrunkSize;
+		return vcount;
 	}
 
 	@Override
 	public long getEdgeCount() throws IOException {
-		return e_f.getLen()/etrunkSize;
+		return ecount;
 	}
 
 	@Override
 	public long getVertexCountPerBlock() throws IOException {
-		return v_f.getBlockSize()/vtrunkSize;
+		return v_f[0].getBlockSize()/vtrunkSize;
 	}
 
 	@Override
 	public long getEdgeCountPerBlock() throws IOException {
-		return e_f.getBlockSize()/etrunkSize;
+		return e_f[0].getBlockSize()/etrunkSize;
 	}
 
 	@Override

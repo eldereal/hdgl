@@ -30,6 +30,7 @@ import hdgl.db.protocol.MessagePackWritable;
 import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.RegionMasterProtocol;
+import hdgl.db.protocol.ResultPackWritable;
 import hdgl.db.query.QueryContext;
 import hdgl.db.query.RegionQueryContext;
 import hdgl.db.server.bsp.BSPContainer;
@@ -212,12 +213,18 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	}
 
 	@Override
-	public long[][] fetchResult(int queryId, int pathLen) {
+	public ResultPackWritable fetchResult(int queryId, int pathLen) {
 		try{
 			RegionQueryContext qctx=getRegionQueryContext(queryId);
 			qctx.setNeededResultLength(pathLen);
 			qctx.waitResult(pathLen);
-			return qctx.getResults().get(pathLen).toArray(new long[0][]);
+			long[][] paths;
+			if(qctx.getResults().containsKey(pathLen)){
+				paths = qctx.getResults().get(pathLen).toArray(new long[0][]);
+			}else{
+				paths=new long[0][];
+			}
+			return new ResultPackWritable(paths, !qctx.isComplete());
 		}catch(InterruptedException ex){
 			throw new HdglException(ex);
 		}
@@ -308,8 +315,11 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	}
 	
 	@Override
-	public void process(WatchedEvent arg0) {
-		// TODO Auto-generated method stub
+	public void process(WatchedEvent e) {
+		if(e.getType()==Watcher.Event.EventType.NodeChildrenChanged &&
+				e.getPath().startsWith(HConf.getZKRegionRoot(conf))){
+			updateRegions();
+		}
 		
 	}
 

@@ -15,7 +15,7 @@ public interface RegionProtocol{
 	
 	public int doQuery(int queryId, int pathLen);
 	
-	public long[][] fetchResult(int queryId, int pathLen);
+	public ResultPackWritable fetchResult(int queryId, int pathLen);
 	
 	public int beginTx();
 	
