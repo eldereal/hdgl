@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Vector;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -183,12 +182,16 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 		// }
 		// }
 	}
+	
+	void deleteRegionQueryContext(int queryId){
+		queries.remove(queryId);
+	}
 
-	RegionQueryContext getRegionQueryContext(int sessionId) {
-		if (!queries.containsKey(sessionId)) {
+	RegionQueryContext getRegionQueryContext(int queryId) {
+		if (!queries.containsKey(queryId)) {
 			throw new HdglException("Bad query id");
 		}
-		return queries.get(sessionId);
+		return queries.get(queryId);
 	}
 
 	@Override
@@ -215,6 +218,7 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 					BSPRunner bspRunner = new BSPRunner(graph, ctx,
 							ctx.getZkRoot(), regionCount, regionId, queryId,
 							this, conf);
+					zk().exists(ctx.getZkRoot(), true);
 					bspRunner.start();
 
 					RegionQueryContext qctx = new RegionQueryContext(ctx,
@@ -345,6 +349,12 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 				&& e.getPath().startsWith(HConf.getZKRegionRoot(conf))) {
 			updateRegions();
 		}
+		if(e.getType() == Watcher.Event.EventType.NodeDeleted
+				&& e.getPath().startsWith(HConf.getZKQuerySessionRoot(conf))){
+			int queryId = StringHelper.getLastInt(e.getPath());
+			RegionQueryContext qctx = getRegionQueryContext(queryId);
+			qctx.setComplete();	
+		}
 	}
 
 	@Override
@@ -365,13 +375,13 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	}
 
 	@Override
-	public void superStepFinish(int sessionId, int superstep) {
+	public boolean superStepFinish(int sessionId, int superstep) {
+		RegionQueryContext qctx = getRegionQueryContext(sessionId);
 		try {
-			RegionQueryContext qctx = getRegionQueryContext(sessionId);
 			qctx.waitNeed(superstep - 1);
 		} catch (InterruptedException e) {
-
 		}
+		return qctx.isComplete();
 	}
 
 	@Override

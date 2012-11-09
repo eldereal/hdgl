@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.exception.BadQueryException;
 import hdgl.db.protocol.ClientMasterProtocol;
+import hdgl.db.protocol.RegionMapWritable;
 import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.Protocol;
@@ -52,7 +53,7 @@ public class SystemTest {
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
 		assertEquals(1, master.getRegions().entrySet().size());
-		for(Entry<Writable, Writable> v : master.getRegions().entrySet()){
+		for(Entry<Integer, InetSocketAddress> v : master.getRegions().entrySet()){
 			System.out.println("region "+v.getKey()+" - "+v.getValue());
 		}
 	}
@@ -61,10 +62,10 @@ public class SystemTest {
 	public void forRegion() throws Exception {
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		MapWritable regions = master.getRegions();
+		RegionMapWritable regions = master.getRegions();
 		int count=0;
-		for(Writable region:regions.values()){
-			InetSocketAddress addr = ((InetSocketAddressWritable)region).toAddress();
+		for(InetSocketAddress region:regions.values()){
+			InetSocketAddress addr = region;
 			RegionProtocol r = Protocol.region(addr, conf);
 			assertEquals("abcde", r.echo("abcde"));
 			count++;
@@ -77,23 +78,29 @@ public class SystemTest {
 	public void queryTest() throws Exception{
 		Configuration conf = GraphConf.getDefault();
 		ClientMasterProtocol master = Protocol.master(conf);
-		query(".(-.)+", conf, master);
-		query(".", conf, master);
-		query(".-forward.", conf, master);
-		query(".-[len<0].", conf, master);
+//		query(".(-.)+", conf, master);
+//		query(".", conf, master);
+//		query(".-forward.", conf, master);
+//		query(".-[len<0].", conf, master);
+		query(".[id=1]", conf);
 	}
 
-	private void query(String query, Configuration conf, ClientMasterProtocol master)
+	private void query(String query, Configuration conf)
 			throws BadQueryException, IOException {
+		query(query, -1, conf);
+	}
+	
+	private void query(String query, int maxlen, Configuration conf)
+			throws BadQueryException, IOException {
+		ClientMasterProtocol master = Protocol.master(conf);
 		int queryId = master.prepareQuery(query);
 		System.out.println("query id: "+queryId);
-		IntWritable[] regionIds=master.query(queryId);
-		MapWritable regions = master.getRegions();
+		int[] regionIds = master.query(queryId);
+		RegionMapWritable regions = master.getRegions();
 		ArrayList<RegionProtocol> executeRegionConns=new ArrayList<RegionProtocol>();
-		for(IntWritable regionId:regionIds){
-			System.out.println("execute region: "+regionId.get()+" - "+regions.get(regionId));
-			InetSocketAddress regionAddress=((InetSocketAddressWritable)regions.get(regionId)).toAddress();
-			executeRegionConns.add(Protocol.region(regionAddress, conf));
+		for(int regionId:regionIds){
+			System.out.println("execute region: "+regionId+" - "+regions.get(regionId));
+			executeRegionConns.add(Protocol.region(regions.get(regionId), conf));
 		}
 		
 		for(RegionProtocol r:executeRegionConns){
@@ -101,7 +108,7 @@ public class SystemTest {
 		}
 		int len = 1;
 		boolean hasMore = true;
-		while(hasMore){
+		while(hasMore && (maxlen<0 || len <= maxlen)){
 			hasMore = false;
 			for(RegionProtocol r:executeRegionConns){
 				ResultPackWritable result = r.fetchResult(queryId, len);
@@ -110,5 +117,6 @@ public class SystemTest {
 			}
 			len++;
 		}
+		master.completeQuery(queryId);
 	}
 }

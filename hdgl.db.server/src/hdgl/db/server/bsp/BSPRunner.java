@@ -289,14 +289,14 @@ public class BSPRunner extends Thread implements Watcher {
 			throw new HdglException("unknown condition type");
 		}
 	}
-
-	boolean test(AbstractCondition cond, Entity e) {
+	
+	boolean test(AbstractCondition cond, long entityId, Entity e) {
 		if (cond instanceof NoRestriction) {
 			return true;
 		} else if (cond instanceof Conjunction) {
 			for (AbstractCondition subcond : ((Conjunction) cond)
 					.getConditions()) {
-				if (!test(subcond, e)) {
+				if (!test(subcond, entityId, e)) {
 					return false;
 				}
 			}
@@ -309,7 +309,7 @@ public class BSPRunner extends Thread implements Watcher {
 			if (name.equalsIgnoreCase("id")) {
 				if (value instanceof IntNumberValue) {
 					return testBinary((BinaryCondition) cond,
-							((IntNumberValue) value).getValue(), e.getId());
+							((IntNumberValue) value).getValue(), entityId);
 				} else {
 					return false;
 				}
@@ -366,14 +366,14 @@ public class BSPRunner extends Thread implements Watcher {
 				if (v == null && needParse(cond.getTest())) {
 					v = graphStore.parseVertex(vid);
 				}
-				if (test(cond.getTest(), v)) {
+				if (test(cond.getTest(), vid, v)) {
 					for (StateMachine.Transition t : cond.getTransitions()) {
 						switch (t.getType()) {
 						case In:
 							if (v == null)
 								v = graphStore.parseVertex(vid);
 							e: for (Edge e : v.getInEdges()) {
-								if (test(t.getTest(), e)) {
+								if (test(t.getTest(), e.getId(), e)) {
 									long ovid = e.getInVertex().getId();
 									for (long p : path) {
 										if (ovid == p) {
@@ -394,7 +394,7 @@ public class BSPRunner extends Thread implements Watcher {
 							if (v == null)
 								v = graphStore.parseVertex(vid);
 							e: for (Edge e : v.getOutEdges()) {
-								if (test(t.getTest(), e)) {
+								if (test(t.getTest(), e.getId(), e)) {
 									long ovid = e.getOutVertex().getId();
 									for (long p : path) {
 										if (ovid == p) {
@@ -547,7 +547,9 @@ public class BSPRunner extends Thread implements Watcher {
 					}
 				}
 				superStep++;
-				container.superStepFinish(sessionId, superStep - 1);
+				if(container.superStepFinish(sessionId, superStep - 1)){
+					
+				}
 
 			}
 		} catch (Throwable th) {

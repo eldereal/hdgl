@@ -1,6 +1,7 @@
 package hdgl.db.server;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import hdgl.db.exception.BadQueryException;
 import hdgl.db.exception.HdglException;
 import hdgl.db.graph.HGraphIds;
 import hdgl.db.protocol.ClientMasterProtocol;
+import hdgl.db.protocol.RegionMapWritable;
 import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.RegionMasterProtocol;
@@ -62,7 +64,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	ZooKeeper zk; 
 	int masterId;
 	GraphStore store;
-	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
+	Map<Integer, InetSocketAddress> regions = new HashMap<Integer, InetSocketAddress>();
 	Map<Integer, RegionProtocol> regionConns = new HashMap<Integer, RegionProtocol>();
 	
 	Map<Integer, String> queryZKRoots = new HashMap<Integer, String>();
@@ -128,8 +130,8 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				Stat s = zk().exists(path, false);
 				byte[] addrData = zk().getData(path, false, s);
 				int regionId = StringHelper.getLastInt(path);
-				InetSocketAddressWritable addr=WritableHelper.parse(addrData, InetSocketAddressWritable.class);
-				regions.put(regionId, addr);
+				InetSocketAddressWritable addr = WritableHelper.parse(addrData, InetSocketAddressWritable.class);
+				regions.put(regionId, addr.toAddress());
 				regionConns.put(regionId, RPC.getProxy(RegionProtocol.class, 1, addr.toAddress(), conf));
 			}
 		}catch(Exception ex){
@@ -138,18 +140,18 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	}
 	
 	@Override
-	public MapWritable getRegions() {
-		MapWritable mapWritable = new MapWritable();
-		for(Map.Entry<Integer, InetSocketAddressWritable> region:regions.entrySet()){
-			mapWritable.put(new IntWritable(region.getKey()), region.getValue());
+	public RegionMapWritable getRegions() {
+		RegionMapWritable regions = new RegionMapWritable();
+		for(Map.Entry<Integer, InetSocketAddress> region:this.regions.entrySet()){
+			regions.put(region.getKey(), region.getValue());
 		}
-		return mapWritable;
+		return regions;
 	}
 
 	@Override
-	public IntWritable[] findEntity(long id) {
+	public int[] findEntity(long id) {
 		try{
-			Set<IntWritable> addresses = new HashSet<IntWritable>();
+			Set<Integer> addresses = new HashSet<Integer>();
 			String[] hosts;
 			Set<String> hostSet = new HashSet<String>();
 			if(HGraphIds.isVertexId(id)){
@@ -164,12 +166,17 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 			for(String str:hosts){
 				hostSet.add(str);
 			}
-			for(Map.Entry<Integer, InetSocketAddressWritable> map:regions.entrySet()){
-				if(hostSet.contains(map.getValue().getHost())){
-					addresses.add(new IntWritable(map.getKey()));
+			for(Map.Entry<Integer, InetSocketAddress> map:regions.entrySet()){
+				if(hostSet.contains(map.getValue().getHostName())){
+					addresses.add(map.getKey());
 				}
 			}
-			return addresses.toArray(new IntWritable[0]);
+			int i=0;
+			int[] result=new int[addresses.size()];
+			for(Integer num:addresses){
+				result[i++]=num;
+			}
+			return result;
 		}catch (IOException e) {
 			throw new HdglException(host);
 		}
@@ -199,8 +206,8 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 			for(long id=1;id<max;id+=step){
 				String[] hosts = store.bestPlacesForVertex(id);
 				String usehost = hosts[(int) (Math.random()*hosts.length)];
-				for(Map.Entry<Integer, InetSocketAddressWritable> map:regions.entrySet()){
-					if(usehost.equals(map.getValue().getHost())){
+				for(Map.Entry<Integer, InetSocketAddress> map:regions.entrySet()){
+					if(usehost.equals(map.getValue().getHostName())){
 						ctx.put(id, map.getKey());
 						break;
 					}
@@ -220,7 +227,7 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	}
 
 	@Override
-	public IntWritable[] query(int queryId) {
+	public int[] query(int queryId) {
 		try{
 			String queryZKRoot = queryZKRoots.get(queryId);
 			Stat ctxdata=zk().exists(queryZKRoot, false);
@@ -228,12 +235,17 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 				throw new HdglException("Bad query session id");
 			}
 			QueryContext ctx = WritableHelper.parse(zk().getData(queryZKRoot, false, ctxdata), QueryContext.class);
-			Set<IntWritable> regions=new HashSet<IntWritable>();
+			Set<Integer> regions=new HashSet<Integer>();
 			for(Map.Entry<Long, Integer> map : ctx.getIdMap().entrySet()){
 				//bspnode.getValue().initBSP(queryId, queryZKRoot, ctx);
-				regions.add(new IntWritable(map.getValue()));
+				regions.add(map.getValue());
 			}
-			return regions.toArray(new IntWritable[0]);			
+			int i = 0;
+			int[] result = new int[regions.size()];
+			for(Integer num:regions){
+				result[i++] = num;
+			}
+			return result;		
 		}catch(Exception ex){
 			throw new HdglException(ex);
 		}
@@ -255,6 +267,22 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	@Override
 	public void regionStop() {
 		//updateRegions();
+	}
+
+	@Override
+	public void completeQuery(int queryId) {
+		String queryZKRoot = queryZKRoots.get(queryId);
+		if(queryZKRoot==null){
+			throw new HdglException("bad query id");
+		}
+		try{
+			zk.delete(queryZKRoot, 0);
+			queryZKRoots.remove(queryId);
+		}catch(KeeperException ex){
+			throw new HdglException(ex);
+		}catch(InterruptedException ex){
+			throw new HdglException(ex);
+		}
 	}
 	
 }

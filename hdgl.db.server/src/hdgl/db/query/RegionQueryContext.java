@@ -82,9 +82,12 @@ public class RegionQueryContext {
 	}
 
 	public void setComplete() {
+		this.complete = true;
 		synchronized (resultMutex) {
-			this.complete = true;
 			resultMutex.notifyAll();
+		}
+		synchronized(needMutex){
+			needMutex.notifyAll();
 		}
 	}
 	
@@ -93,10 +96,8 @@ public class RegionQueryContext {
 	}
 
 	public void setError(Throwable err) {
-		synchronized (resultMutex) {
-			this.error = err;
-			resultMutex.notifyAll();
-		}
+		this.error = err;
+		setComplete();
 	}
 
 	public QueryContext getContext() {
