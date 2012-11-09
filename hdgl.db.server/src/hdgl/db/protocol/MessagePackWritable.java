@@ -9,42 +9,47 @@ import org.apache.hadoop.io.Writable;
 
 public class MessagePackWritable implements Writable{
 
-	ArrayList<Integer> stateIds = new ArrayList<Integer>();
-	ArrayList<long[]> paths = new ArrayList<long[]>();
+	ArrayList<Long> receivers = new ArrayList<Long>();
+	ArrayList<MessageWritable> msgs = new ArrayList<MessageWritable>();
 	
-	synchronized public void add(int stateId, long[] path){
-		stateIds.add(stateId);
-		paths.add(path);
+	synchronized public void add(long receiver, MessageWritable msg){
+		receivers.add(receiver);
+		msgs.add(msg);
 	}
 
 	@Override
 	synchronized public void readFields(DataInput in) throws IOException {
-		stateIds.clear();
-		paths.clear();
+		receivers.clear();
+		msgs.clear();
 		int len = in.readInt();
 		for(int i=0;i<len;i++){
-			int stateId=in.readInt();
-			int pathlen = in.readInt();
-			long[] path=new long[pathlen];
-			for(int j=0;j<pathlen;j++){
-				path[j]=in.readLong();
-			}
-			stateIds.add(stateId);
-			paths.add(path);
+			long receiver=in.readLong();
+			MessageWritable msg=new MessageWritable();
+			msg.readFields(in);
+			receivers.add(receiver);
+			msgs.add(msg);
 		}
 	}
 
 	@Override
 	synchronized public void write(DataOutput out) throws IOException {
-		int len = stateIds.size();
+		int len = receivers.size();
 		out.writeInt(len);
 		for(int i=0; i<len; i++){
-			out.writeInt(stateIds.get(i));
-			long[] path=paths.get(i);
-			out.writeInt(path.length);
-			for(long p:path){
-				out.writeLong(p);
-			}
+			out.writeLong(receivers.get(i));
+			msgs.get(i).write(out);
 		}		
 	}	
+	
+	public int size(){
+		return receivers.size();
+	}
+	
+	public long getReceiver(int index){
+		return receivers.get(index);
+	}
+	
+	public MessageWritable getMessage(int index){
+		return msgs.get(index);
+	}
 }

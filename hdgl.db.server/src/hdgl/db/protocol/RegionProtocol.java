@@ -1,20 +1,21 @@
 package hdgl.db.protocol;
 
+import hdgl.db.query.QueryContext;
 import hdgl.db.store.Log;
 
 import org.apache.hadoop.ipc.ProtocolInfo;
 
 
-@ProtocolInfo(protocolName = "ClientRegionProtocol", protocolVersion = 1)
-public interface ClientRegionProtocol{
+@ProtocolInfo(protocolName = "RegionProtocol", protocolVersion = 1)
+public interface RegionProtocol{
 
 	public String echo(String value);
 	
 	public byte[] getEntity(long id);
 	
-	public InetSocketAddressWritable[] doQuery(int queryId);
+	public int doQuery(int queryId, int pathLen);
 	
-	public long[][] fetchResult(int queryId, int pathLen);
+	public ResultPackWritable fetchResult(int queryId, int pathLen);
 	
 	public int beginTx();
 	
@@ -28,5 +29,6 @@ public interface ClientRegionProtocol{
 	
 	public boolean txTaskResult(int txId);
 
+	public void sendMessage(int querySession, MessagePackWritable msg);
 	
 }

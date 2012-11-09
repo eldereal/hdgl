@@ -79,13 +79,19 @@ public class ParserTest {
 		
 		assertEquals("(.[id=1]|((. -[price<10]) .) (- .)*)", QueryCompletion.complete(parser(".[id=1]|-[price<10](.)*").expression()).toString());
 		assertEquals("((. -[price<10])|(.[id=1] -) ((. -)* .))", QueryCompletion.complete(parser("-[price<10]|.[id=1](.)*").expression()).toString());
-		
-		Expression q = QueryCompletion.complete(parser(".[id=1]|-[price<10](.)*").expression());
+		Expression q = QueryCompletion.complete(parser(".-.").expression());
 		SimpleStateMachine stm = QueryToStateMachine.convert(q);
-		//stm.print(System.out);
+		stm.print(System.out);
 		StateMachine fstm = stm.buildStateMachine();
 		//fstm.print(System.out);
 		System.out.print(fstm);
+		
+		q = QueryCompletion.complete(parser(".[id=1]|-[price<10](.)*").expression());
+		stm = QueryToStateMachine.convert(q);
+		//stm.print(System.out);
+		fstm = stm.buildStateMachine();
+		//fstm.print(System.out);
+		//System.out.print(fstm);
 		try{
 			ByteArrayOutputStream out=new ByteArrayOutputStream();
 			DataOutput d = new DataOutputStream(out);

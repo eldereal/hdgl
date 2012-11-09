@@ -10,9 +10,11 @@ import hdgl.db.graph.Entity;
 import hdgl.db.graph.HGraphIds;
 import hdgl.db.store.impl.hdfs.HdfsGraphStore;
 import hdgl.db.task.AsyncResult;
+import hdgl.db.task.CallableAsyncResult;
 import hdgl.util.StringHelper;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 public class MutableGraph implements hdgl.db.graph.MutableGraph {
 	
@@ -20,13 +22,17 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 	private FileSystem hdfs;
 	private long vertex = 0;
 	private long edge = 0;
+	Configuration configuration;
+	int sessionId;
 	
 	public MutableGraph(Configuration conf, int sessionId)
 	{
+		configuration = conf;
+		this.sessionId = sessionId;
 		try
 		{
 			hdfs = FileSystem.get(conf);
-			Path dfs = new Path(GraphConf.getGraphSessionRoot(conf, sessionId));
+			Path dfs = new Path(GraphConf.getGraphSessionRoot(conf, sessionId),"log/1");
 			outputStream = hdfs.create(dfs, true);
 		}
 		catch (IOException e)
@@ -54,6 +60,12 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 		catch (IOException e) 
 		{
 			e.printStackTrace();
+		}finally{
+			try {
+				hdfs.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	private long createVertex()
@@ -131,7 +143,16 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 	
 	@Override
 	public AsyncResult<Boolean> commit() {
-		return null;
+		close();
+		return new CallableAsyncResult<Boolean>(new Callable<Boolean>() {
+
+			@Override
+			public Boolean call() throws Exception {
+				PersistentGraph persistentGraph 
+					= new PersistentGraph(configuration, sessionId, (int)vertex, (int)edge);
+				return persistentGraph.runMapReduce();
+			}
+		});
 	}
 	@Override
 	public AsyncResult<Boolean> abort() {

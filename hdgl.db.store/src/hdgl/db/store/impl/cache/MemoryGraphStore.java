@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.io.Writable;
+import org.eclipse.jdt.core.dom.ThrowStatement;
 
 import hdgl.db.exception.HdglException;
 import hdgl.db.graph.Edge;
@@ -111,11 +112,17 @@ public class MemoryGraphStore implements GraphStore {
 	
 	@Override
 	public InputStream getVertexData(long id) throws IOException {
+		if(!vdata.containsKey(id)){
+			throw new HdglException("Bad vertex id: "+id);
+		}
 		return new ByteArrayInputStream(vdata.get(id));
 	}
 
 	@Override
 	public InputStream getEdgeData(long id) throws IOException {
+		if(!edata.containsKey(id)){
+			throw new HdglException("Bad edge id: "+id);
+		}
 		return new ByteArrayInputStream(edata.get(id));
 	}
 

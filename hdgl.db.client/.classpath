@@ -8,34 +8,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/hdgl.db.server"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/hdgl.util"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-2.0.0-alpha-gridmix.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-2.0.0-alpha-sources.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-app-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-common-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-core-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-hs-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.0.0-alpha-tests.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-examples-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-test-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-mapreduce-test-2.0.0-alpha-sources.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-api-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-applications-distributedshell-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-common-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-server-common-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-server-nodemanager-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-server-resourcemanager-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-server-web-proxy-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/mapreduce/hadoop-yarn-site-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha-sources.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha-tests.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/common/hadoop-common-2.0.0-alpha-test-sources.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha-sources.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha-tests.jar"/>
-	<classpathentry kind="lib" path="D:/hadoop/hdfs/hadoop-hdfs-2.0.0-alpha-test-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

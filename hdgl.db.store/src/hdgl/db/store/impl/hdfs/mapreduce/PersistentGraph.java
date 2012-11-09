@@ -1,7 +1,9 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
 import hdgl.db.conf.GraphConf;
+import hdgl.util.StringHelper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -12,8 +14,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.partition.HashPartitioner;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.*;
 
 public class PersistentGraph {
@@ -178,13 +182,13 @@ public class PersistentGraph {
 	public PersistentGraph(Configuration conf, int sessionId, int vNum, int eNum)
 	{
 		this.conf = conf;
-		inPath = new Path(GraphConf.getGraphSessionRoot(conf, sessionId));
-		outPath = new Path(GraphConf.getPersistentGraphRoot(conf));
+		inPath = new Path(GraphConf.getGraphSessionRoot(conf, sessionId),"log");
+		outPath = new Path(GraphConf.getGraphSessionRoot(conf, sessionId), "persist");
 		VertexNumber = vNum;
 		EdgeNumber = eNum;
 	}
 	
-	public void runMapReduce() throws IOException, ClassNotFoundException, InterruptedException
+	public boolean runMapReduce() throws IOException, ClassNotFoundException, InterruptedException
 	{
 		Job job1 = new Job(conf, "PersistentGraph");
 		job1.setJarByClass(PersistentGraph.class);
@@ -205,6 +209,31 @@ public class PersistentGraph {
 		MultipleOutputs.addNamedOutput(job1, Parameter.EDGE_IRREGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
 		MultipleOutputs.addNamedOutput(job1, Parameter.VERTEX_REGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
 		MultipleOutputs.addNamedOutput(job1, Parameter.EDGE_REGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
-		job1.waitForCompletion(true);
+		
+		job1.waitForCompletion(true);		
+		if(job1.isSuccessful()){
+			FileSystem fs = FileSystem.get(conf);
+			mv(outPath, Parameter.VERTEX_REGULAR_FILE_NAME, 
+					new Path(GraphConf.getGraphRoot(conf)),fs);
+			mv(outPath, Parameter.VERTEX_IRREGULAR_FILE_NAME, 
+					new Path(GraphConf.getGraphRoot(conf)),fs);
+			mv(outPath, Parameter.EDGE_REGULAR_FILE_NAME, 
+					new Path(GraphConf.getGraphRoot(conf)),fs);
+			mv(outPath, Parameter.EDGE_IRREGULAR_FILE_NAME, 
+					new Path(GraphConf.getGraphRoot(conf)),fs);
+		}
+		return true;
+	}
+	
+	void mv(Path root, final String name, Path outroot, FileSystem fs) throws IOException{
+		FileStatus[] status = fs.listStatus(root, new PathFilter() {
+			@Override
+			public boolean accept(Path path) {
+				return path.getName().startsWith(name);
+			}
+		});
+		for(FileStatus f:status){
+			fs.rename(f.getPath(), new Path(outroot,f.getPath().getName()));
+		}
 	}
 }
