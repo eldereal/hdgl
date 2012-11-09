@@ -209,7 +209,6 @@ public class PersistentGraph {
 		MultipleOutputs.addNamedOutput(job1, Parameter.EDGE_IRREGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
 		MultipleOutputs.addNamedOutput(job1, Parameter.VERTEX_REGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
 		MultipleOutputs.addNamedOutput(job1, Parameter.EDGE_REGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
-		
 		job1.waitForCompletion(true);	
 		boolean succ=true;
 		if(job1.isSuccessful()){

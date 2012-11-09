@@ -13,12 +13,14 @@ import hdgl.db.task.AsyncResult;
 import hdgl.db.task.CallableAsyncResult;
 import hdgl.util.StringHelper;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.Callable;
 
 public class MutableGraph implements hdgl.db.graph.MutableGraph {
 	
-	private FSDataOutputStream outputStream;
+	private OutputStream outputStream;
 	private FileSystem hdfs;
 	private long vertex = 0;
 	private long edge = 0;
@@ -33,7 +35,7 @@ public class MutableGraph implements hdgl.db.graph.MutableGraph {
 		{
 			hdfs = FileSystem.get(conf);
 			Path dfs = new Path(GraphConf.getGraphSessionRoot(conf, sessionId),"log/1");
-			outputStream = hdfs.create(dfs, true);
+			outputStream = new BufferedOutputStream(hdfs.create(dfs, true), 4096);
 		}
 		catch (IOException e)
 		{
