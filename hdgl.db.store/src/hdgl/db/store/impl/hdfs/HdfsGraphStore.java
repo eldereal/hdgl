@@ -80,7 +80,7 @@ public class HdfsGraphStore implements GraphStore {
 	
 	public HdfsGraphStore(Configuration conf) throws IOException{
 		this.conf = conf;
-		String root = GraphConf.getGraphRoot(conf);
+		String root = GraphConf.getPersistentGraphRoot(conf);
 		fs = HConf.getFileSystem(conf);
 		vtrunkSize = GraphConf.getVertexTrunkSize(conf);
 		etrunkSize = GraphConf.getEdgeTrunkSize(conf);
@@ -121,20 +121,20 @@ public class HdfsGraphStore implements GraphStore {
 	public hdgl.db.graph.Vertex parseVertex(long id) throws IOException
 	{
 		VertexInputStream vis = (VertexInputStream) getVertexData(id);
-		HVertex v = new HVertex(vis.readInt(), "");
+		HVertex v = new HVertex(-vis.readInt(), "", this);
 		int outNum, edge, vertex, inNum, num;
 		outNum = vis.readInt();
 		inNum = vis.readInt();
 		for (int i = 0; i < outNum; i++)
 		{
-			edge = vis.readInt();
-			vertex = vis.readInt();
+			edge = -vis.readInt();
+			vertex = -vis.readInt();
 			v.addOutEdge(edge, vertex);
 		}
 		for (int i = 0; i < inNum; i++)
 		{
-			edge = vis.readInt();
-			vertex = vis.readInt();
+			edge = -vis.readInt();
+			vertex = -vis.readInt();
 			v.addInEdge(edge, vertex);
 		}
 		num = vis.readInt();
@@ -156,10 +156,12 @@ public class HdfsGraphStore implements GraphStore {
 			}
 			if (!(key.length() == 0))
 			{
-				v.addLabel(key, StringHelper.stringToBytes(value));
 				if (key.compareTo("type") == 0)
 				{
 					v.setType(new String(StringHelper.stringToBytes(value)));
+				}
+				else {
+					v.addLabel(key, StringHelper.stringToBytes(value));
 				}
 			}
 		}
@@ -170,10 +172,10 @@ public class HdfsGraphStore implements GraphStore {
 	{
 		EdgeInputStream eis = (EdgeInputStream) getEdgeData(id);
 		int eid, v1, v2;
-		eid = eis.readInt();
-		v1 = eis.readInt();
-		v2 = eis.readInt();
-		HEdge e = new HEdge(eid, "", new HVertex(v1, ""), new HVertex(v2, ""));
+		eid = -eis.readInt();
+		v1 = -eis.readInt();
+		v2 = -eis.readInt();
+		HEdge e = new HEdge(eid, "", v1, v2, this);
 		int num;
 		num = eis.readInt();
 		int len;
@@ -194,10 +196,12 @@ public class HdfsGraphStore implements GraphStore {
 			}
 			if (!(key.length() == 0))
 			{
-				e.addLabel(key, StringHelper.stringToBytes(value));
 				if (key.compareTo("type") == 0)
 				{
 					e.setType(new String(StringHelper.stringToBytes(value)));
+				}
+				else {
+					e.addLabel(key, StringHelper.stringToBytes(value));
 				}
 			}
 		}
@@ -276,5 +280,4 @@ public class HdfsGraphStore implements GraphStore {
 			
 		}
 	}
-	
 }

@@ -1,21 +1,36 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import hdgl.db.exception.HdglException;
 import hdgl.db.graph.Edge;
 import hdgl.db.graph.LabelValue;
 import hdgl.db.graph.Vertex;
+import hdgl.db.store.GraphStore;
+import hdgl.util.IterableHelper;
 
 public class HEdge implements Edge {
 	
 	long id;
 	String type;
-	Vertex start;
-	Vertex end;
+	long start;
+	long end;
+	Map<String, byte[]> labelsMap=new HashMap<String, byte[]>();
+	GraphStore store;
 	
-	public HEdge(long id, String type, Vertex start, Vertex end){
+	public HEdge(long id, String type, long start, long end, GraphStore store){
+		assert id<0;
+		assert start>0;
+		assert end>0;
+		
 		this.id = id;
 		this.type = type;
 		this.start = start;
 		this.end = end;
+		this.store = store;
 	}
 	
 	public void setType(String type)
@@ -25,7 +40,7 @@ public class HEdge implements Edge {
 	
 	public void addLabel(String key, byte[] value)
 	{
-		
+		labelsMap.put(key, value);
 	}
 	
 	@Override
@@ -40,34 +55,58 @@ public class HEdge implements Edge {
 
 	@Override
 	public Iterable<LabelValue> getLabels() {
-		// TODO Auto-generated method stub
-		return null;
+		return  IterableHelper.select(labelsMap.entrySet(), new IterableHelper.Map<Map.Entry<String,byte[]>, LabelValue>() {
+
+			@Override
+			public LabelValue select(final Entry<String, byte[]> element) {
+				return new LabelValue() {
+					
+					@Override
+					public byte[] getValue() {
+						return element.getValue();
+					}
+					
+					@Override
+					public String getName() {
+						return element.getKey();
+					}
+				};
+			}
+
+		});
 	}
 
 	@Override
 	public Vertex getInVertex() {
-		return start;
+		try {
+			return store.parseVertex(start);
+		} catch (IOException e) {
+			throw new HdglException(e);
+		}
 	}
 
 	@Override
 	public Vertex getOutVertex() {
-		return end;
+		try {
+			return store.parseVertex(end);
+		} catch (IOException e) {
+			throw new HdglException(e);
+		}
 	}
 
 	@Override
 	public Vertex getOtherVertex(Vertex one) {
-		if(one==start){
-			return end;
-		}else if(one == end){
-			return start;
+		if(one.getId()==start){
+			return getOutVertex();
+		}else if(one.getId() == end){
+			return getInVertex();
 		}else{
-			return null;
+			throw new HdglException("vertex(id="+one.getId()+") not found");
 		}
 	}
 
 	@Override
 	public byte[] getLabel(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return labelsMap.get(name);
 	}
 }

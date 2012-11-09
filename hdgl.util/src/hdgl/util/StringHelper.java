@@ -90,7 +90,7 @@ public class StringHelper {
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < value.length; i++)
 		{
-			int tmp = (int)value[i];
+			int tmp = (int)value[i] + 128;
 			String str = String.format("%03d", tmp);
 			result.append(str);
 		}
@@ -103,7 +103,7 @@ public class StringHelper {
 		byte[] result = new byte[len];
 		for (int i = 0; i < len; i++)
 		{
-			result[i] = (byte)Integer.parseInt(value.substring(i*3, i*3+3));
+			result[i] = (byte)(Integer.parseInt(value.substring(i*3, i*3+3)) - 128);
 		}
 		return result;
 	}

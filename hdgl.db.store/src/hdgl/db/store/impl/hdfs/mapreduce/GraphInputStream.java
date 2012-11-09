@@ -46,6 +46,7 @@ public class GraphInputStream extends InputStream{
 		}
 		inputStream = hdfs.open(path);
 		inputStream.seek((id - count + 1)*REGULAR_BLOCK_SIZE - 8);
+		assert offset>0;
 		offset = inputStream.readLong();
 		inputStream.seek((id - count)*REGULAR_BLOCK_SIZE);
 		return ret;
@@ -169,8 +170,8 @@ public class GraphInputStream extends InputStream{
 		}
 		if (bs[0] >= 128)
 		{
-			long tmp = (bs[0] << 24) + (bs[1] << 16) + (bs[2] << 8) + bs[3];
-			ret = (int) (tmp - (1 << 32));
+			long tmp = (((long)bs[0]) << 24) + (((long)bs[1]) << 16) + (((long)bs[2]) << 8) + (long)bs[3];
+			ret = (int) (tmp - (((long)1) << 32));
 		}
 		else
 		{

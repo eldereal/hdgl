@@ -77,7 +77,11 @@ public class ResultPackWritable implements Writable{
 			}
 			buf.append(Arrays.toString(result[i]));
 		}
-		buf.append("\n]\n");
+		if(buf.length()>0){
+			buf.append("\n]\n");
+		}else{
+			return "empty\n";
+		}
 		return buf.toString();
 	}
 	

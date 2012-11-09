@@ -210,30 +210,41 @@ public class PersistentGraph {
 		MultipleOutputs.addNamedOutput(job1, Parameter.VERTEX_REGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
 		MultipleOutputs.addNamedOutput(job1, Parameter.EDGE_REGULAR_FILE_NAME, GraphOutputFormat.class, NullWritable.class, GraphWritable.class);
 		
-		job1.waitForCompletion(true);		
+		job1.waitForCompletion(true);	
+		boolean succ=true;
 		if(job1.isSuccessful()){
 			FileSystem fs = FileSystem.get(conf);
-			mv(outPath, Parameter.VERTEX_REGULAR_FILE_NAME, 
-					new Path(GraphConf.getGraphRoot(conf)),fs);
-			mv(outPath, Parameter.VERTEX_IRREGULAR_FILE_NAME, 
-					new Path(GraphConf.getGraphRoot(conf)),fs);
-			mv(outPath, Parameter.EDGE_REGULAR_FILE_NAME, 
-					new Path(GraphConf.getGraphRoot(conf)),fs);
-			mv(outPath, Parameter.EDGE_IRREGULAR_FILE_NAME, 
-					new Path(GraphConf.getGraphRoot(conf)),fs);
+			Path dirPath = new Path(GraphConf.getPersistentGraphRoot(conf));
+			if(!fs.exists(dirPath)){
+				fs.mkdirs(dirPath);
+			}
+			succ = succ && mv(outPath, Parameter.VERTEX_REGULAR_FILE_NAME, 
+					dirPath, fs);
+			succ = succ && mv(outPath, Parameter.VERTEX_IRREGULAR_FILE_NAME, 
+					dirPath, fs);
+			succ = succ && mv(outPath, Parameter.EDGE_REGULAR_FILE_NAME, 
+					dirPath, fs);
+			succ = succ && mv(outPath, Parameter.EDGE_IRREGULAR_FILE_NAME, 
+					dirPath, fs);
 		}
-		return true;
+		return succ;
 	}
 	
-	void mv(Path root, final String name, Path outroot, FileSystem fs) throws IOException{
+	boolean mv(Path root, final String name, Path outroot, FileSystem fs) throws IOException{
 		FileStatus[] status = fs.listStatus(root, new PathFilter() {
 			@Override
 			public boolean accept(Path path) {
 				return path.getName().startsWith(name);
 			}
 		});
+		boolean r = true;
 		for(FileStatus f:status){
-			fs.rename(f.getPath(), new Path(outroot,f.getPath().getName()));
+			Path destPath=new Path(outroot,f.getPath().getName());
+			if(fs.exists(destPath)){
+				r = r && fs.delete(destPath, true);
+			}
+			r = r && fs.rename(f.getPath(), destPath);
 		}
+		return r;
 	}
 }
