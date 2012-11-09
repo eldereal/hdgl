@@ -1,5 +1,6 @@
 package hdgl.db.store.impl.hdfs;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -24,6 +25,7 @@ import hdgl.db.store.impl.hdfs.mapreduce.Edge;
 import hdgl.db.store.impl.hdfs.mapreduce.EdgeInputStream;
 import hdgl.db.store.impl.hdfs.mapreduce.HEdge;
 import hdgl.db.store.impl.hdfs.mapreduce.HVertex;
+import hdgl.db.store.impl.hdfs.mapreduce.JumpInputStream;
 import hdgl.db.store.impl.hdfs.mapreduce.Parameter;
 import hdgl.db.store.impl.hdfs.mapreduce.Vertex;
 import hdgl.db.store.impl.hdfs.mapreduce.VertexInputStream;
@@ -108,104 +110,122 @@ public class HdfsGraphStore implements GraphStore {
 	
 	public InputStream getVertexData(long id) throws IOException
 	{
-		VertexInputStream vis = new VertexInputStream(id, conf);
-		return vis;
+		VertexInputStream eis = new VertexInputStream(id, conf);
+		return eis;
+//		long seekPos = (id - 1) * vtrunkSize;
+//		return new JumpInputStream(v_f, v_v, seekPos, vtrunkSize, fs);
 	}
 	
 	public InputStream getEdgeData(long id) throws IOException
 	{
 		EdgeInputStream eis = new EdgeInputStream(id, conf);
 		return eis;
+		//long seekpos = (-id - 1) * etrunkSize;
+		//return new JumpInputStream(e_f, e_v, seekpos, etrunkSize, fs);
 	}
 	
 	public hdgl.db.graph.Vertex parseVertex(long id) throws IOException
 	{
-		VertexInputStream vis = (VertexInputStream) getVertexData(id);
-		HVertex v = new HVertex(-vis.readInt(), "", this);
-		int outNum, edge, vertex, inNum, num;
-		outNum = vis.readInt();
-		inNum = vis.readInt();
-		for (int i = 0; i < outNum; i++)
-		{
-			edge = -vis.readInt();
-			vertex = -vis.readInt();
-			v.addOutEdge(edge, vertex);
-		}
-		for (int i = 0; i < inNum; i++)
-		{
-			edge = -vis.readInt();
-			vertex = -vis.readInt();
-			v.addInEdge(edge, vertex);
-		}
-		num = vis.readInt();
-		int len;
-		for (int i = 0; i < num; i++)
-		{
-			len = vis.readInt();
-			byte[] b = new byte[len];
-			String key = null, value = null;
-			if (len == vis.read(b))
+		VertexInputStream vis = null;
+		try{
+			vis = (VertexInputStream)getVertexData(id);		
+			HVertex v = new HVertex(-vis.readInt(), "", this);
+			int outNum, edge, vertex, inNum, num;
+			outNum = vis.readInt();
+			inNum = vis.readInt();
+			for (int i = 0; i < outNum; i++)
 			{
-				key = new String(b);
+				edge = -vis.readInt();
+				vertex = -vis.readInt();
+				v.addOutEdge(edge, vertex);
 			}
-			len = vis.readInt();
-			b = new byte[len];
-			if (len == vis.read(b))
+			for (int i = 0; i < inNum; i++)
 			{
-				value = new String(b);
+				edge = -vis.readInt();
+				vertex = -vis.readInt();
+				v.addInEdge(edge, vertex);
 			}
-			if (!(key.length() == 0))
+			num = vis.readInt();
+			int len;
+			for (int i = 0; i < num; i++)
 			{
-				if (key.compareTo("type") == 0)
+				len = vis.readInt();
+				byte[] b = new byte[len];
+				String key = null, value = null;
+				if (len == vis.read(b))
 				{
-					v.setType(new String(StringHelper.stringToBytes(value)));
+					key = new String(b);
 				}
-				else {
-					v.addLabel(key, StringHelper.stringToBytes(value));
+				len = vis.readInt();
+				b = new byte[len];
+				if (len == vis.read(b))
+				{
+					value = new String(b);
 				}
+				if (!(key.length() == 0))
+				{
+					if (key.compareTo("type") == 0)
+					{
+						v.setType(new String(StringHelper.stringToBytes(value)));
+					}
+					else {
+						v.addLabel(key, StringHelper.stringToBytes(value));
+					}
+				}
+			}			
+			return v;
+		}finally{
+			if(vis!=null){
+				vis.close();
 			}
 		}
-		return v;
 	}
 	
 	public hdgl.db.graph.Edge parseEdge(long id) throws IOException
 	{
-		EdgeInputStream eis = (EdgeInputStream) getEdgeData(id);
-		int eid, v1, v2;
-		eid = -eis.readInt();
-		v1 = -eis.readInt();
-		v2 = -eis.readInt();
-		HEdge e = new HEdge(eid, "", v1, v2, this);
-		int num;
-		num = eis.readInt();
-		int len;
-		for (int i = 0; i < num; i++)
-		{
-			len = eis.readInt();
-			byte[] b = new byte[len];
-			String key = null, value = null;
-			if (len == eis.read(b))
+		EdgeInputStream eis = null;
+		try{
+			eis = (EdgeInputStream)getEdgeData(id);
+			int eid, v1, v2;
+			eid = -eis.readInt();
+			v1 = -eis.readInt();
+			v2 = -eis.readInt();
+			HEdge e = new HEdge(eid, "", v1, v2, this);
+			int num;
+			num = eis.readInt();
+			int len;
+			for (int i = 0; i < num; i++)
 			{
-				key = new String(b);
-			}
-			len = eis.readInt();
-			b = new byte[len];
-			if (len == eis.read(b))
-			{
-				value = new String(b);
-			}
-			if (!(key.length() == 0))
-			{
-				if (key.compareTo("type") == 0)
+				len = eis.readInt();
+				byte[] b = new byte[len];
+				String key = null, value = null;
+				if (len == eis.read(b))
 				{
-					e.setType(new String(StringHelper.stringToBytes(value)));
+					key = new String(b);
 				}
-				else {
-					e.addLabel(key, StringHelper.stringToBytes(value));
+				len = eis.readInt();
+				b = new byte[len];
+				if (len == eis.read(b))
+				{
+					value = new String(b);
 				}
+				if (!(key.length() == 0))
+				{
+					if (key.compareTo("type") == 0)
+					{
+						e.setType(new String(StringHelper.stringToBytes(value)));
+					}
+					else {
+						e.addLabel(key, StringHelper.stringToBytes(value));
+					}
+				}
+			}
+			return e;
+		}finally{
+			if(eis!=null){
+				eis.close();
 			}
 		}
-		return e;
 	}
 
 	@Override

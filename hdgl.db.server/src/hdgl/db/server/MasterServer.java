@@ -212,8 +212,10 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 						break;
 					}
 				}
-			}			
+			}
+			
 			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+			zk().create(StringHelper.makePath(idPath, "alive"), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 			int id = StringHelper.getLastInt(idPath);
 			queryZKRoots.put(id, idPath);
 			ctx.setZkRoot(idPath);
@@ -270,19 +272,25 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 	}
 
 	@Override
-	public void completeQuery(int queryId) {
-		String queryZKRoot = queryZKRoots.get(queryId);
+	public void completeQuery(final int queryId) {
+		final String queryZKRoot = queryZKRoots.get(queryId);
 		if(queryZKRoot==null){
 			throw new HdglException("bad query id");
 		}
-		try{
-			zk.delete(queryZKRoot, 0);
-			queryZKRoots.remove(queryId);
-		}catch(KeeperException ex){
-			throw new HdglException(ex);
-		}catch(InterruptedException ex){
-			throw new HdglException(ex);
-		}
+		queryZKRoots.remove(queryId);
+		new Thread(){
+			public void run() {
+				Log.info("clearing query " + queryId);
+				Object mutex = new Object();
+				try{
+					zk().delete(StringHelper.makePath(queryZKRoot,"alive"), -1);
+					
+				}catch (Exception e) {
+					Log.error("error during clearing query "+queryId, e);
+				}
+			};
+		}.start();
+		
 	}
 	
 }

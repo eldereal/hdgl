@@ -57,11 +57,13 @@ import hdgl.util.StringHelper;
 public class BSPRunner extends Thread implements Watcher {
 
 	static final String readyFile = "ready0";
+	static final String dieFile = "die0";
 
 	GraphStore graphStore;
 	ZooKeeper zk;
 	String barrierZkRoot;
 	String dieZkRoot;
+	String alivePath;
 	int runnerCount;
 	int superStep = 0;
 	String myname;
@@ -72,6 +74,7 @@ public class BSPRunner extends Thread implements Watcher {
 	int nodeId;
 	QueryContext ctx;
 	boolean IamPivot = false;
+	boolean IamDiePivot = false;
 	BSPContainer container;
 	int sessionId;
 
@@ -89,6 +92,7 @@ public class BSPRunner extends Thread implements Watcher {
 		this.zk = HConf.getZooKeeper(conf, this);
 		this.barrierZkRoot = StringHelper.makePath(zkRoot, "b");
 		this.dieZkRoot = StringHelper.makePath(zkRoot, "d");
+		this.alivePath = StringHelper.makePath(zkRoot, "alive");
 		this.runnerCount = runnerCount;
 		this.conf = conf;
 		this.myname = "bsp";
@@ -104,17 +108,68 @@ public class BSPRunner extends Thread implements Watcher {
 		return superStep;
 	}
 
-	boolean die() throws KeeperException, InterruptedException {
-		diePath = zk.create(StringHelper.makePath(dieZkRoot, myname),
+	boolean dieNoWait() throws KeeperException, InterruptedException {
+		if(diePath == null){
+			diePath = zk.create(StringHelper.makePath(dieZkRoot, myname),
 				new byte[0], Ids.OPEN_ACL_UNSAFE,
 				CreateMode.EPHEMERAL_SEQUENTIAL);
+		}
 		// Log.info("bsp node " + nodeId +" is dying");
 		return zk.getChildren(dieZkRoot, false).size() >= runnerCount;
+	}
+	
+	void dieWait() throws KeeperException, InterruptedException {
+		int lockNumber = StringHelper.getLastInt(diePath);
+		List<String> list = zk.getChildren(dieZkRoot, false);
+		int maxId = -1;
+		for (String cn : list) {
+			int theirNumber = StringHelper.getLastInt(cn);
+			if (theirNumber > maxId)
+				maxId = theirNumber;
+		}
+		if (list.size() < runnerCount || maxId != lockNumber) {
+			IamDiePivot = false;
+			while (true) {
+				synchronized (mutex) {
+					if (zk.exists(
+							StringHelper.makePath(dieZkRoot, dieFile),
+							true) == null) {
+						mutex.wait();
+					} else {
+						return;
+					}
+				}
+			}
+		} else {
+			IamPivot = true;
+			zk.create(StringHelper.makePath(dieZkRoot, dieFile),
+					new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+			return;
+		}
+	}
+	
+	void died() throws KeeperException, InterruptedException{
+		zk.delete(diePath, -1);
+		if(IamDiePivot){
+			while (true) {
+				synchronized (mutex) {
+					if (zk.getChildren(dieZkRoot, true).size() > 1) {
+						mutex.wait();
+					} else {
+						zk.delete(
+								StringHelper.makePath(dieZkRoot, dieFile),
+								-1);
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	void alive() throws KeeperException, InterruptedException {
 		if (diePath != null) {
-			zk.delete(diePath, 0);
+			zk.delete(diePath, -1);
+			diePath = null;
 		}
 		// Log.info("bsp node " + nodeId +" is alive");
 	}
@@ -164,7 +219,7 @@ public class BSPRunner extends Thread implements Watcher {
 	}
 
 	void leaveNoWait() throws InterruptedException, KeeperException {
-		zk.delete(lockPath, 0);
+		zk.delete(lockPath, -1);
 		// Log.info("bsp node " + nodeId +" leaving barrier " + superStep);
 	}
 
@@ -177,7 +232,7 @@ public class BSPRunner extends Thread implements Watcher {
 					} else {
 						zk.delete(
 								StringHelper.makePath(barrierZkRoot, readyFile),
-								0);
+								-1);
 						// Log.info("bsp node " + nodeId +" has left barrier " +
 						// superStep);
 						// Log.info("== all bsp nodes has left barrier " +
@@ -529,7 +584,9 @@ public class BSPRunner extends Thread implements Watcher {
 			}
 			while (true) {
 				// Log.info("node " + nodeId +" working in step " + superStep);
-
+				if(zk.exists(alivePath, true) == null){
+					break;
+				}
 				doQuery();
 				received.clear();
 				enterNoWait();
@@ -541,17 +598,18 @@ public class BSPRunner extends Thread implements Watcher {
 				leaveNoWait();
 				leaveWait();
 				if (received.isEmpty()) {
-					if (die()) {
+					if (dieNoWait()) {
 						// Log.info("node " + nodeId +" has died");
 						break;
 					}
 				}
 				superStep++;
-				if(container.superStepFinish(sessionId, superStep - 1)){
-					
+				if(container.superStepFinish(sessionId, superStep - 1, mutex)){
+					break;
 				}
-
 			}
+			dieWait();
+			died();
 		} catch (Throwable th) {
 			throwable = th;
 			Log.error("error during bsp", th);

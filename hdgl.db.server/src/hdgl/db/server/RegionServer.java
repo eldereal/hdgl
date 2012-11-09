@@ -375,10 +375,10 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	}
 
 	@Override
-	public boolean superStepFinish(int sessionId, int superstep) {
+	public boolean superStepFinish(int sessionId, int superstep, Object mutex) {
 		RegionQueryContext qctx = getRegionQueryContext(sessionId);
 		try {
-			qctx.waitNeed(superstep - 1);
+			qctx.waitNeed(mutex, superstep - 1);
 		} catch (InterruptedException e) {
 		}
 		return qctx.isComplete();

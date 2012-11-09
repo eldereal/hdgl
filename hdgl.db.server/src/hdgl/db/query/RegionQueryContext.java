@@ -16,7 +16,7 @@ public class RegionQueryContext {
 	private boolean complete;
 	private Throwable error;
 	private Object resultMutex = new Object();
-	private Object needMutex = new Object();
+	private Object needMutex;
 	
 	public RegionQueryContext(QueryContext context, BSPRunner runner) {
 		super();
@@ -24,8 +24,9 @@ public class RegionQueryContext {
 		this.runner = runner;
 	}
 
-	public void waitNeed(int len) throws InterruptedException{
+	public void waitNeed(Object mutex, int len) throws InterruptedException{
 		while(neededResultLength<len){
+			needMutex = mutex;
 			synchronized (needMutex) {
 				needMutex.wait();
 			}
@@ -70,9 +71,11 @@ public class RegionQueryContext {
 
 	public void setNeededResultLength(int neededResultLength) {
 		if(neededResultLength>this.neededResultLength){
-			synchronized (needMutex) {
-				this.neededResultLength = neededResultLength;
-				needMutex.notifyAll();
+			this.neededResultLength = neededResultLength;
+			if(needMutex!=null){
+				synchronized (needMutex) {
+					needMutex.notifyAll();
+				}
 			}
 		}
 	}
@@ -86,8 +89,10 @@ public class RegionQueryContext {
 		synchronized (resultMutex) {
 			resultMutex.notifyAll();
 		}
-		synchronized(needMutex){
-			needMutex.notifyAll();
+		if(needMutex!=null){
+			synchronized(needMutex){
+				needMutex.notifyAll();
+			}
 		}
 	}
 	

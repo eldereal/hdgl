@@ -11,6 +11,7 @@ import hdgl.db.store.impl.hdfs.mapreduce.PersistentGraph;
 import hdgl.util.ByteArrayHelper;
 
 import org.apache.hadoop.conf.Configuration;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HdfsStoreTest {
@@ -38,13 +39,19 @@ public class HdfsStoreTest {
 //		hg.parseVertex(-1);
 //		hg.parseEdge(1);
 	}
-	
-	@Test
-	public void UseExampleTest() throws IOException, ClassNotFoundException, InterruptedException {
+	static GraphStore g;
+	@BeforeClass
+	public static void beforeClass() throws IOException{
 		Configuration conf = GraphConf.getDefault();
 
-		GraphStore g = StoreFactory.createGraphStore(conf);
-		
+		g = StoreFactory.createGraphStore(conf);
+	}
+	
+	@Test
+	public void UseExampleTest() throws IOException {
+		for(int i=0;i<1000;i++){
+			g.parseVertex(1);
+		}
 		assertEquals(5, g.getVertexCount());
 		assertEquals(9, g.getEdgeCount());
 		assertEquals("person", g.parseVertex(1).getType());
