@@ -13,7 +13,7 @@ public interface RegionProtocol{
 	
 	public byte[] getEntity(long id);
 	
-	public int doQuery(int queryId, int pathLen);
+	public void doQuery(int queryId);
 	
 	public ResultPackWritable fetchResult(int queryId, int pathLen);
 	

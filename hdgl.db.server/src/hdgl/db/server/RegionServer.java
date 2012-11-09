@@ -42,65 +42,71 @@ import hdgl.db.store.StoreFactory;
 import hdgl.util.StringHelper;
 import hdgl.util.WritableHelper;
 
-
 public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 
 	static final Pattern ZK_ID_PATTERN = Pattern.compile(".*?(\\d+)");
-	
-	private static final org.apache.commons.logging.Log log = LogFactory.getLog(HGRegion.class);
-	
+
+	private static final org.apache.commons.logging.Log log = LogFactory
+			.getLog(HGRegion.class);
+
 	Configuration conf;
 	RegionMasterProtocol master;
 	String host;
 	int port;
 	int regionId;
-	ZooKeeper zk; 
+	ZooKeeper zk;
 	GraphStore graph;
-	
+
 	Map<Integer, LogStore> logStores = new ConcurrentHashMap<Integer, LogStore>();
-	
-	Map<Integer, Boolean> taskResults =  new ConcurrentHashMap<Integer, Boolean>();
-	
+
+	Map<Integer, Boolean> taskResults = new ConcurrentHashMap<Integer, Boolean>();
+
 	Map<Integer, InetSocketAddressWritable> regions = new HashMap<Integer, InetSocketAddressWritable>();
 	Map<Integer, RegionProtocol> regionConns = new HashMap<Integer, RegionProtocol>();
-	
+
 	Map<Integer, RegionQueryContext> queries = new HashMap<Integer, RegionQueryContext>();
-	
-	public ZooKeeper zk() throws IOException, InterruptedException, KeeperException{
-		if(this.zk == null){
+
+	public ZooKeeper zk() throws IOException, InterruptedException,
+			KeeperException {
+		if (this.zk == null) {
 			this.zk = HConf.getZooKeeper(conf, this);
 		}
-		if(zk.exists(GraphConf.getZookeeperRoot(conf), false)==null){
-			zk.create(GraphConf.getZookeeperRoot(conf), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+		if (zk.exists(GraphConf.getZookeeperRoot(conf), false) == null) {
+			zk.create(GraphConf.getZookeeperRoot(conf), null,
+					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		}
 		return zk;
 	}
-	
-	public RegionServer(String host, int port, Configuration conf){
+
+	public RegionServer(String host, int port, Configuration conf) {
 		this.host = host;
 		this.port = port;
 		this.conf = conf;
 	}
 
-	void updateRegions(){
-		try{
-			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf), true);
+	void updateRegions() {
+		try {
+			List<String> paths = zk().getChildren(HConf.getZKRegionRoot(conf),
+					true);
 			regions.clear();
 			regionConns.clear();
 			for (int i = 0; i < paths.size(); i++) {
-				String path = StringHelper.makePath(HConf.getZKRegionRoot(conf), paths.get(i));
+				String path = StringHelper.makePath(
+						HConf.getZKRegionRoot(conf), paths.get(i));
 				Stat s = zk().exists(path, false);
 				byte[] addrData = zk().getData(path, false, s);
 				int regionId = StringHelper.getLastInt(path);
-				InetSocketAddressWritable addr=WritableHelper.parse(addrData, InetSocketAddressWritable.class);
+				InetSocketAddressWritable addr = WritableHelper.parse(addrData,
+						InetSocketAddressWritable.class);
 				regions.put(regionId, addr);
-				regionConns.put(regionId, RPC.getProxy(RegionProtocol.class, 1, addr.toAddress(), conf));
+				regionConns.put(regionId, RPC.getProxy(RegionProtocol.class, 1,
+						addr.toAddress(), conf));
 			}
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			log.error(ex);
 		}
 	}
-	
+
 	@Override
 	public String echo(String value) {
 		return value;
@@ -110,100 +116,115 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	public byte[] getEntity(long id) {
 		return null;
 	}
-	
-	public void stop(){
-		//master.regionStop();
-		try{
-			zk.close();			
-		}catch(Exception ex){
-			
+
+	public void stop() {
+		// master.regionStop();
+		try {
+			zk.close();
+		} catch (Exception ex) {
+
 		}
-		if(graph!=null){
+		if (graph != null) {
 			graph.close();
 		}
-		for(LogStore stores:logStores.values()){
-			try{
+		for (LogStore stores : logStores.values()) {
+			try {
 				stores.close();
-			}catch(Exception ex){
-				
+			} catch (Exception ex) {
+
 			}
 		}
 	}
 
-	public void start() throws IOException, KeeperException, InterruptedException {
+	public void start() throws IOException, KeeperException,
+			InterruptedException {
 		final String mhost = MasterConf.getMasterHost(conf);
 		final int mport = MasterConf.getRegionMasterPort(conf);
-		master = RPC.getProxy(RegionMasterProtocol.class, 1, new InetSocketAddress(mhost, mport), conf);
+		master = RPC.getProxy(RegionMasterProtocol.class, 1,
+				new InetSocketAddress(mhost, mport), conf);
 		String zkRegionRoot = HConf.getZKRegionRoot(conf);
-		if(zk().exists(zkRegionRoot, false)==null){
-			zk().create(zkRegionRoot, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+		if (zk().exists(zkRegionRoot, false) == null) {
+			zk().create(zkRegionRoot, null, Ids.OPEN_ACL_UNSAFE,
+					CreateMode.PERSISTENT);
 		}
-		InetSocketAddressWritable myAddress = new InetSocketAddressWritable(host, port);
-		String path = zk().create(StringHelper.makePath(zkRegionRoot, "region"), WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+		InetSocketAddressWritable myAddress = new InetSocketAddressWritable(
+				host, port);
+		String path = zk().create(
+				StringHelper.makePath(zkRegionRoot, "region"),
+				WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE,
+				CreateMode.EPHEMERAL_SEQUENTIAL);
 		Matcher m = ZK_ID_PATTERN.matcher(path);
-		if(!m.matches()){
+		if (!m.matches()) {
 			throw new IOException("Wrong path");
 		}
 		regionId = Integer.parseInt(m.group(1));
-		graph=StoreFactory.createGraphStore(conf);
-		//master.regionStart();
+		graph = StoreFactory.createGraphStore(conf);
+		// master.regionStart();
 		updateRegions();
-//		long step = graph.getVertexCountPerBlock();
-//		long max = graph.getVertexCount();
-//		String localhost = NetHelper.getMyHostName();
-//		for(int id=0;id<max;id+=step){
-//			String[] hosts = graph.bestPlacesForVertex(id);
-//			for(String host:hosts){
-//				if(host.equals(localhost)){
-//					log.info("try starting bfs host id=(" + id + "-" + (id + step - 1) + ") on " + host);
-//					try{
-//						zk().create(StringHelper.makePath(HConf.getZKBSPRoot(conf), Long.toString(id/step)), WritableHelper.toBytes(myAddress), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-//					}catch(NodeExistsException ex){
-//						log.info("another bfs host already started id=(" + id + "-" + (id + step - 1) + ")");						
-//					}
-//					break;
-//				}
-//			}
-//		}		
+		// long step = graph.getVertexCountPerBlock();
+		// long max = graph.getVertexCount();
+		// String localhost = NetHelper.getMyHostName();
+		// for(int id=0;id<max;id+=step){
+		// String[] hosts = graph.bestPlacesForVertex(id);
+		// for(String host:hosts){
+		// if(host.equals(localhost)){
+		// log.info("try starting bfs host id=(" + id + "-" + (id + step - 1) +
+		// ") on " + host);
+		// try{
+		// zk().create(StringHelper.makePath(HConf.getZKBSPRoot(conf),
+		// Long.toString(id/step)), WritableHelper.toBytes(myAddress),
+		// Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+		// }catch(NodeExistsException ex){
+		// log.info("another bfs host already started id=(" + id + "-" + (id +
+		// step - 1) + ")");
+		// }
+		// break;
+		// }
+		// }
+		// }
 	}
 
-	RegionQueryContext getRegionQueryContext(int sessionId){
-		if(!queries.containsKey(sessionId)){
+	RegionQueryContext getRegionQueryContext(int sessionId) {
+		if (!queries.containsKey(sessionId)) {
 			throw new HdglException("Bad query id");
 		}
 		return queries.get(sessionId);
 	}
-	
+
 	@Override
-	public int doQuery(int queryId, int pathlen) {
-		try{
-			if(pathlen==0){
-				List<String> ids = zk().getChildren(HConf.getZKQuerySessionRoot(conf), false);
-				for(int i=ids.size()-1;i>=0;i--){
-					String id=ids.get(i);
-					if(StringHelper.getLastInt(id)==queryId){
-						QueryContext ctx = WritableHelper.parse(
-								zk().getData(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), id), false, null),
-								QueryContext.class);
-						
-						Set<Integer> regions = new HashSet<Integer>();
-						for(Map.Entry<Long, Integer> map : ctx.getIdMap().entrySet()){
-							regions.add(map.getValue());
-						}
-						int regionCount = regions.size();
-						BSPRunner bspRunner = new BSPRunner(graph,ctx, ctx.getZkRoot(), regionCount, regionId, queryId, this, conf);
-						bspRunner.start();
-						
-						RegionQueryContext qctx= new RegionQueryContext(ctx, bspRunner);
-						queries.put(queryId, qctx);
-						return 1;
+	public void doQuery(int queryId) {
+		try {
+			List<String> ids = zk().getChildren(
+					HConf.getZKQuerySessionRoot(conf), false);
+			for (int i = ids.size() - 1; i >= 0; i--) {
+				String id = ids.get(i);
+				if (StringHelper.getLastInt(id) == queryId) {
+					QueryContext ctx = WritableHelper.parse(
+							zk().getData(
+									StringHelper.makePath(
+											HConf.getZKQuerySessionRoot(conf),
+											id), false, null),
+							QueryContext.class);
+
+					Set<Integer> regions = new HashSet<Integer>();
+					for (Map.Entry<Long, Integer> map : ctx.getIdMap()
+							.entrySet()) {
+						regions.add(map.getValue());
 					}
+					int regionCount = regions.size();
+					BSPRunner bspRunner = new BSPRunner(graph, ctx,
+							ctx.getZkRoot(), regionCount, regionId, queryId,
+							this, conf);
+					bspRunner.start();
+
+					RegionQueryContext qctx = new RegionQueryContext(ctx,
+							bspRunner);
+					queries.put(queryId, qctx);
+					return;
 				}
-				throw new HdglException("Bad query id");
-			}else{
-				throw new HdglException("Unsupported");
 			}
-		}catch(IOException ex){
+			throw new HdglException("Bad query id");
+		} catch (IOException ex) {
 			throw new HdglException(ex);
 		} catch (KeeperException ex) {
 			throw new HdglException(ex);
@@ -214,38 +235,42 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 
 	@Override
 	public ResultPackWritable fetchResult(int queryId, int pathLen) {
-		try{
-			RegionQueryContext qctx=getRegionQueryContext(queryId);
+		try {
+			RegionQueryContext qctx = getRegionQueryContext(queryId);
 			qctx.setNeededResultLength(pathLen);
 			qctx.waitResult(pathLen);
 			long[][] paths;
-			if(qctx.getResults().containsKey(pathLen)){
+			if (qctx.getResults().containsKey(pathLen)) {
 				paths = qctx.getResults().get(pathLen).toArray(new long[0][]);
-			}else{
-				paths=new long[0][];
+			} else {
+				paths = new long[0][];
 			}
 			return new ResultPackWritable(paths, !qctx.isComplete());
-		}catch(InterruptedException ex){
+		} catch (InterruptedException ex) {
 			throw new HdglException(ex);
 		}
 	}
 
 	@Override
 	public int beginTx() {
-		try{
+		try {
 			String sessionRoot = HConf.getZKSessionRoot(conf);
-			if(zk().exists(sessionRoot, false)==null){
-				zk().create(sessionRoot, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			if (zk().exists(sessionRoot, false) == null) {
+				zk().create(sessionRoot, null, Ids.OPEN_ACL_UNSAFE,
+						CreateMode.PERSISTENT);
 			}
-			String path = zk().create(StringHelper.makePath(sessionRoot, "region"), null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+			String path = zk().create(
+					StringHelper.makePath(sessionRoot, "region"), null,
+					Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
 			Matcher m = ZK_ID_PATTERN.matcher(path);
-			if(!m.matches()){
+			if (!m.matches()) {
 				throw new IOException("Wrong path");
 			}
 			int sessionId = Integer.parseInt(m.group(1));
-			logStores.put(sessionId, StoreFactory.createLogStore(conf, sessionId));
+			logStores.put(sessionId,
+					StoreFactory.createLogStore(conf, sessionId));
 			return sessionId;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new HdglException(e);
 		}
 	}
@@ -253,7 +278,7 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	@Override
 	public void writeLog(int txId, Log log) {
 		LogStore store = logStores.get(txId);
-		if(store==null){
+		if (store == null) {
 			throw new HdglException("Bad Transaction Id");
 		}
 		try {
@@ -274,7 +299,7 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 	public int abort(int txId) {
 		try {
 			LogStore store = logStores.get(txId);
-			if(store==null){
+			if (store == null) {
 				throw new HdglException("Bad Transaction Id");
 			}
 			store.abort();
@@ -282,70 +307,70 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 			logStores.remove(txId);
 			taskResults.put(txId, true);
 			return txId;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new HdglException(e);
 		}
 	}
 
 	@Override
 	public boolean txTaskStatus(int txId, int waitMilliseconds) {
-		if(taskResults.containsKey(txId)){
+		if (taskResults.containsKey(txId)) {
 			return true;
-		}else{
+		} else {
 			try {
 				taskResults.wait(waitMilliseconds);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(taskResults.containsKey(txId)){
+			if (taskResults.containsKey(txId)) {
 				return true;
-			}else{
+			} else {
 				return false;
 			}
-		}		
+		}
 	}
 
 	@Override
 	public boolean txTaskResult(int txId) {
-		if(taskResults.containsKey(txId)){
+		if (taskResults.containsKey(txId)) {
 			return taskResults.get(txId);
-		}else{
+		} else {
 			throw new HdglException("Task not complte yet");
 		}
 	}
-	
+
 	@Override
 	public void process(WatchedEvent e) {
-		if(e.getType()==Watcher.Event.EventType.NodeChildrenChanged &&
-				e.getPath().startsWith(HConf.getZKRegionRoot(conf))){
+		if (e.getType() == Watcher.Event.EventType.NodeChildrenChanged
+				&& e.getPath().startsWith(HConf.getZKRegionRoot(conf))) {
 			updateRegions();
 		}
-		
 	}
 
 	@Override
 	public void sendMessage(int querySession, MessagePackWritable msg) {
-		RegionQueryContext qctx=getRegionQueryContext(querySession);
-		qctx.getRunner().receiveMessages(msg);		
+		RegionQueryContext qctx = getRegionQueryContext(querySession);
+		qctx.getRunner().receiveMessages(msg);
 	}
 
 	@Override
-	public void sendMessagePack(int querySession, int regionId, MessagePackWritable pack) {
-		if(regionId==this.regionId||!regionConns.containsKey(regionId)){
+	public void sendMessagePack(int querySession, int regionId,
+			MessagePackWritable pack) {
+		if (regionId == this.regionId || !regionConns.containsKey(regionId)) {
 			sendMessage(querySession, pack);
-		}else{
-			RegionProtocol connProtocol=regionConns.get(regionId);
+		} else {
+			RegionProtocol connProtocol = regionConns.get(regionId);
 			connProtocol.sendMessage(querySession, pack);
 		}
 	}
 
 	@Override
 	public void superStepFinish(int sessionId, int superstep) {
-		try{
+		try {
 			RegionQueryContext qctx = getRegionQueryContext(sessionId);
 			qctx.waitNeed(superstep - 1);
-		}catch (InterruptedException e) {
-			
+		} catch (InterruptedException e) {
+
 		}
 	}
 
@@ -354,11 +379,17 @@ public class RegionServer implements RegionProtocol, Watcher, BSPContainer {
 		RegionQueryContext qctx = getRegionQueryContext(sessionId);
 		qctx.addResult(path);
 	}
-	
+
 	@Override
 	public void finish(int sessionId) {
 		RegionQueryContext qctx = getRegionQueryContext(sessionId);
 		qctx.setComplete();
 	}
-	
+
+	@Override
+	public void error(int sessionId, Throwable ex) {
+		RegionQueryContext qctx = getRegionQueryContext(sessionId);
+		qctx.setError(ex);
+	}
+
 }

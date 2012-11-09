@@ -10,5 +10,7 @@ public interface BSPContainer {
 	
 	public void finish(int sessionId);
 	
+	public void error(int sessionId, Throwable ex);
+	
 	public void sendResult(int sessionId, long[] path);
 }

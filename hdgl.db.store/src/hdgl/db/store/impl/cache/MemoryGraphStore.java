@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.io.Writable;
-import org.eclipse.jdt.core.dom.ThrowStatement;
 
 import hdgl.db.exception.HdglException;
 import hdgl.db.graph.Edge;

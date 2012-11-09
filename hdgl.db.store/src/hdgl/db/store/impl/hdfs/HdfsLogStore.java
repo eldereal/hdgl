@@ -1,6 +1,5 @@
 package hdgl.db.store.impl.hdfs;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -21,7 +20,7 @@ public class HdfsLogStore implements LogStore {
 	FileSystem fs;
 	FileStatus logfile;
 	FSDataOutputStream outputStream;
-	boolean closed=false;
+	boolean closed = false;
 	
 	public HdfsLogStore(Configuration configuration, int sessionId) throws IOException {
 		super();

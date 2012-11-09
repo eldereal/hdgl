@@ -97,7 +97,7 @@ public class SystemTest {
 		}
 		
 		for(RegionProtocol r:executeRegionConns){
-			r.doQuery(queryId, 0);
+			r.doQuery(queryId);
 		}
 		int len = 1;
 		boolean hasMore = true;

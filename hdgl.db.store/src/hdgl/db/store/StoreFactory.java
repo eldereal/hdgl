@@ -25,12 +25,12 @@ public class StoreFactory {
 	}
 	
 	public static GraphStore createGraphStore(Configuration conf) throws IOException{
-		//return new HdfsGraphStore(conf);
-		try{
-			return new MemoryGraphStoreTest().test();
-		}catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return new HdfsGraphStore(conf);
+//		try{
+//			return new MemoryGraphStoreTest().test();
+//		}catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
 	}
 	
 	public static LogStore createLogStore(Configuration conf, int sessionId) throws IOException{

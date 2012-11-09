@@ -45,6 +45,9 @@ public class CreateGraph {
 		m.setLabel(eids.get(8), "len", ByteArrayHelper.toBytes(3));
 		m.setLabel(eids.get(9), "len", ByteArrayHelper.toBytes(-1));
 		assertTrue(m.commit().get());
+		
+		
+		
 	}
 
 }

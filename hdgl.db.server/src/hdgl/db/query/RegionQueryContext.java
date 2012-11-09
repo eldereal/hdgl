@@ -1,5 +1,6 @@
 package hdgl.db.query;
 
+import hdgl.db.exception.HdglException;
 import hdgl.db.server.bsp.BSPRunner;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ public class RegionQueryContext {
 	private Map<Integer, Vector<long[]>> result = new HashMap<Integer, Vector<long[]>>();
 	private int neededResultLength;
 	private boolean complete;
+	private Throwable error;
 	private Object resultMutex = new Object();
 	private Object needMutex = new Object();
 	
@@ -31,7 +33,7 @@ public class RegionQueryContext {
 	}
 	
 	public void waitResult(int len) throws InterruptedException{
-		while(!complete && !result.containsKey(len+1)){
+		while(!complete && error == null && !result.containsKey(len+1)){
 			synchronized (resultMutex) {
 				resultMutex.wait();
 			}
@@ -56,6 +58,9 @@ public class RegionQueryContext {
 	}
 	
 	public Map<Integer, Vector<long[]>> getResults() {
+		if(error!=null){
+			throw new HdglException("error during query processing: " + error.getMessage(), error);
+		}
 		return result;
 	}
 
@@ -79,6 +84,17 @@ public class RegionQueryContext {
 	public void setComplete() {
 		synchronized (resultMutex) {
 			this.complete = true;
+			resultMutex.notifyAll();
+		}
+	}
+	
+	public Throwable getError() {
+		return error;
+	}
+
+	public void setError(Throwable err) {
+		synchronized (resultMutex) {
+			this.error = err;
 			resultMutex.notifyAll();
 		}
 	}

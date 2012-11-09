@@ -21,17 +21,13 @@ public class HdfsStoreTest {
 	@Test
 	public void readTest() throws IOException {
 		Configuration conf = GraphConf.getDefault();
+		GraphStore g = StoreFactory.createGraphStore(conf);
 		
-		GraphStore gs = StoreFactory.createGraphStore(conf);
-		
-//		for (int i = 0; i < 5; i++)
-//		{
-//			System.out.println(gs.parseVertex(i).getString());
-//		}
-//		for (int i = 0; i < 9; i++)
-//		{
-//			System.out.println(gs.parseEdge(i).getString());
-//		}
+		//assertEquals(5, g.getVertexCount());
+		assertEquals(9, g.getEdgeCount());
+		assertEquals("back", g.parseEdge(-5).getType());
+		assertEquals("forward", g.parseEdge(-1).getType());
+		assertEquals("jump", g.parseEdge(-8).getType());
 	}
 
 }
