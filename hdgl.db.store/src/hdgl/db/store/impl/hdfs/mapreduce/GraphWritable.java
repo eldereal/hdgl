@@ -41,8 +41,8 @@ public class GraphWritable implements WritableComparable<GraphWritable>{
 		{
 			ret = count - REGULAR_BLOCK_SIZE + Parameter.OFFSET_MAX_LEN;
 			needIrr = true;
+			ret = ret + 4;
 		}
-		ret = ret + 4;
 		return ret;
 	}
 	

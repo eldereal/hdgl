@@ -45,22 +45,22 @@ public class PersistentGraph {
 			str = value_str.split(":");
 			if (posV == POS_LABEL)
 			{
-				context.write(new Text(str[0].substring(POS_LABEL)), new Text("l " + str[1]));
+				context.write(new Text(StringHelper.fillToMakeOrder(str[0].substring(POS_LABEL))), new Text("l " + str[1]));
 			}
 			else if (posV == POS_ADD)
 			{
-				context.write(new Text(str[0].substring(POS_ADD)), new Text("  "));
+				context.write(new Text(StringHelper.fillToMakeOrder(str[0].substring(POS_ADD))), new Text("  "));
 			}
 			if (posE == POS_ADD)
 			{
 				String[] vertexInEdge = str[1].split(" - ");
-				context.write(new Text("vertex " + vertexInEdge[0]), new Text("o " + str[0].substring(POS_EDGE) + " " + vertexInEdge[1]));
-				context.write(new Text("vertex " + vertexInEdge[1]), new Text("i " + str[0].substring(POS_EDGE) + " " + vertexInEdge[0]));
-				context.write(new Text(str[0].substring(POS_ADD)), new Text("  " + str[1]));				
+				context.write(new Text(StringHelper.fillToMakeOrder("vertex " + vertexInEdge[0])), new Text("o " + str[0].substring(POS_EDGE) + " " + vertexInEdge[1]));
+				context.write(new Text(StringHelper.fillToMakeOrder("vertex " + vertexInEdge[1])), new Text("i " + str[0].substring(POS_EDGE) + " " + vertexInEdge[0]));
+				context.write(new Text(StringHelper.fillToMakeOrder(str[0].substring(POS_ADD))), new Text("  " + str[1]));				
 			}
 			else if (posE == POS_LABEL)
 			{
-				context.write(new Text(str[0].substring(POS_LABEL)), new Text("l " + str[1]));
+				context.write(new Text(StringHelper.fillToMakeOrder(str[0].substring(POS_LABEL))), new Text("l " + str[1]));
 			}
 		}
 	}

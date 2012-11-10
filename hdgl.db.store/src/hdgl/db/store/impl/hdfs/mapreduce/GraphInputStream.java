@@ -108,7 +108,9 @@ public class GraphInputStream extends InputStream{
 			else
 			{
 				long skipNum = limit - position;
-				return (skipNum + skip(n - limit + position));
+				long left = n - limit + position;
+				changeFile();
+				return (skipNum + skip(left));
 			}
 		}
 	}

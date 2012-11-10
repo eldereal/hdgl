@@ -108,4 +108,11 @@ public class StringHelper {
 		return result;
 	}
     
+	public static String fillToMakeOrder(String value)
+	{
+		int pos = value.indexOf(" ");
+		int v = Integer.parseInt(value.substring(pos + 1));
+		
+		return value.substring(0, pos + 1) + String.format("%011d", v);
+	}
 }
