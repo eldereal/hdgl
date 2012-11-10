@@ -8,53 +8,30 @@ import java.io.InputStream;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 public class GraphInputStream extends InputStream{
-	private FSDataInputStream inputStream = null;
-	private FileSystem hdfs;
-	private long id;
-	private long position = 0;
-	private long limit;
-	protected String fileIrr = null;
-	private long offset = -1;
-	private int REGULAR_BLOCK_SIZE;
+	protected FSDataInputStream inputStream = null;
+	protected static FileSystem hdfs = null;
+	protected long id;
+	protected int position = 0;
+	protected int limit;
+	protected int fileIrr = 0;
+	private int flag = 0;
+	protected boolean hasNext = true;
+	protected int REGULAR_BLOCK_SIZE;
+	protected Configuration conf;
 	
-	public GraphInputStream(long id, Configuration conf, int blockSize) throws IOException
+	public GraphInputStream(long id, Configuration conf, int flag) throws IOException
 	{
 		this.id = id;
-		REGULAR_BLOCK_SIZE = blockSize;
-		hdfs = FileSystem.get(conf);
-		limit = REGULAR_BLOCK_SIZE - Parameter.OFFSET_MAX_LEN;
-	}
-	
-	public int locate(String file) throws IOException
-	{
-		long count = 0;
-		int ret = 0;
-		Path path = null;
-		for (int i = 0; i < Parameter.REDUCER_NUMBER; i++)
-		{
-			path = new Path(file + "-r-" + StringHelper.fillToLength(i));
-			long temp = hdfs.getFileStatus(path).getLen() / REGULAR_BLOCK_SIZE;
-			if (count + temp > id)
-			{
-				ret = i;
-				break;
-			}
-			count = count + temp;
-		}
-		inputStream = hdfs.open(path);
-		inputStream.seek((id - count + 1)*REGULAR_BLOCK_SIZE - 8);
-		assert offset>0;
-		offset = inputStream.readLong();
-		inputStream.seek((id - count)*REGULAR_BLOCK_SIZE);
-		return ret;
+		this.flag = flag;
+		this.conf = conf;
+		if (hdfs == null) hdfs = FileSystem.get(conf);
 	}
 	
 	public void close() throws IOException
 	{
-		inputStream.close();
+		//inputStream.close();
 	}
 
 	@Override
@@ -63,10 +40,6 @@ public class GraphInputStream extends InputStream{
 		int ret;
 		if (position >= limit)
 		{
-			if (offset == -1)
-			{
-				return -1;
-			}
 			changeFile();
 			ret = inputStream.read();
 		}
@@ -78,90 +51,54 @@ public class GraphInputStream extends InputStream{
 		return ret;
 	}
 	
-	private void changeFile() throws IOException
+	private boolean changeFile() throws IOException
 	{
-		Path path = new Path(fileIrr);
-		inputStream.close();
-		inputStream = hdfs.open(path);
+		if (!hasNext) return false; 
+		long offset = inputStream.readLong();
+		if (flag == 0) inputStream = FSDataInputStreamPool.getVsp_v(hdfs, conf, fileIrr);
+		else inputStream = FSDataInputStreamPool.getEsp_v(hdfs, conf, fileIrr);
 		inputStream.seek(offset);
 		position = 0;
-		offset = -1;
 		limit = inputStream.readInt();
-	}
-	
-	public long skip(long n) throws IOException
-	{
-		if (limit - position >= n)
-		{
-			position = position + n;
-			inputStream.skip(n);
-			return n;
-		}
-		else
-		{
-			if (offset == -1)
-			{
-				inputStream.skip(limit - position);
-				position = limit;
-				return limit - position;
-			}
-			else
-			{
-				long skipNum = limit - position;
-				long left = n - limit + position;
-				changeFile();
-				return (skipNum + skip(left));
-			}
-		}
+		hasNext = false;
+		return true;
 	}
 
 	public int read(byte[] b, int off, int len) throws IOException
 	{
-		int tmp;
-		int count = 0;
 		if (len == 0) return 0;
-		if (off >= b.length) return 0;
-		while (true)
+		if (off + len > b.length) return 0;
+		if (limit - position >= len)
 		{
-			tmp = read();
-			if (tmp == -1)
-			{
-				return count;
-			}
-			b[off + count] = (byte) tmp;
-			count++;
-			if ((count >= len) || (off + count >= b.length))
-			{
-				return count;
-			}
+			inputStream.read(b, off, len);
+			position = position + len;
+			return len;
+		}
+		else
+		{
+			inputStream.read(b, off, limit - position);
+			int left = len - (limit - position);
+			position = limit;
+			if (!changeFile()) return (len - left);
+			return (len - left + read(b, off + len - left, left));
 		}
 	}
 	
 	public int read(byte[] b) throws IOException
 	{
-		int point = 0;
-		int tmp;
 		if (b.length == 0) return 0;
-		while (true)
-		{
-			tmp = read();
-			if (tmp == -1)
-			{
-				return point;
-			}
-			b[point] = (byte) tmp;
-			point++;
-			if (point >= b.length)
-			{
-				return point;
-			}
-		}
+		return read(b, 0, b.length);
 	}
 
 	public int readInt() throws IOException
 	{
 		int[] bs = new int[4];
 		int ret = 0;
+		if (limit - position >= 4)
+		{
+			position = position + 4;
+			return inputStream.readInt();
+		}
 		for (int i = 0; i < 4; i++)
 		{
 			bs[i] = read();

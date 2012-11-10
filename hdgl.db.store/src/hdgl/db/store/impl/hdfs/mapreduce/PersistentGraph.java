@@ -200,6 +200,7 @@ public class PersistentGraph {
 		
 		job1.setMapperClass(PersistentGraphMapper1.class);
 		job1.setReducerClass(PersistentGraphReducer1.class);
+		job1.setNumReduceTasks(Parameter.REDUCER_NUMBER);
 		
 		job1.setInputFormatClass(TextInputFormat.class);
 		job1.setMapOutputKeyClass(Text.class);

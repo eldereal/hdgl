@@ -23,6 +23,7 @@ import hdgl.db.store.GraphStore;
 import hdgl.db.store.HConf;
 import hdgl.db.store.impl.hdfs.mapreduce.Edge;
 import hdgl.db.store.impl.hdfs.mapreduce.EdgeInputStream;
+import hdgl.db.store.impl.hdfs.mapreduce.FSDataInputStreamPool;
 import hdgl.db.store.impl.hdfs.mapreduce.HEdge;
 import hdgl.db.store.impl.hdfs.mapreduce.HVertex;
 import hdgl.db.store.impl.hdfs.mapreduce.JumpInputStream;
@@ -297,6 +298,7 @@ public class HdfsGraphStore implements GraphStore {
 	public void close() {
 		try{
 			fs.close();
+			FSDataInputStreamPool.close();
 		}catch(Exception ex){
 			
 		}
