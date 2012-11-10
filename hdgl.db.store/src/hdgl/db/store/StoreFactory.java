@@ -2,6 +2,7 @@ package hdgl.db.store;
 
 import java.io.IOException;
 
+import hdgl.db.store.impl.cache.MemoryCacheGraphStore;
 import hdgl.db.store.impl.cache.MemoryEdgeImpl;
 import hdgl.db.store.impl.cache.MemoryGraphStore;
 import hdgl.db.store.impl.cache.MemoryGraphStoreTest;
@@ -31,6 +32,10 @@ public class StoreFactory {
 //		}catch (Exception e) {
 //			throw new RuntimeException(e);
 //		}
+	}
+	
+	public static IndexGraphStore createIndexGraphStore(Configuration conf) throws IOException{
+		return new MemoryCacheGraphStore(new HdfsGraphStore(conf));
 	}
 	
 	public static LogStore createLogStore(Configuration conf, int sessionId) throws IOException{

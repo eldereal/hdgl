@@ -82,7 +82,7 @@ public class SystemTest {
 //		query(".", conf, master);
 //		query(".-forward.", conf, master);
 //		query(".-[len<0].", conf, master);
-		query(".[id=1]", conf);
+		query(".-.", conf);
 	}
 
 	private void query(String query, Configuration conf)

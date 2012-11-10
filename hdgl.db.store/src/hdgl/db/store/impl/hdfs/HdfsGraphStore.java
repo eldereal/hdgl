@@ -29,6 +29,7 @@ import hdgl.db.store.impl.hdfs.mapreduce.JumpInputStream;
 import hdgl.db.store.impl.hdfs.mapreduce.Parameter;
 import hdgl.db.store.impl.hdfs.mapreduce.Vertex;
 import hdgl.db.store.impl.hdfs.mapreduce.VertexInputStream;
+import hdgl.util.NetHelper;
 import hdgl.util.StringHelper;
 
 public class HdfsGraphStore implements GraphStore {
@@ -244,7 +245,7 @@ public class HdfsGraphStore implements GraphStore {
 		Set<String> hosts=new HashSet<String>();
 		for(BlockLocation loc:locs){
 			for(String host:loc.getHosts()){
-				hosts.add(host);
+				hosts.add(host.equals("localhost")?NetHelper.getMyHostName():host);
 			}
 		}
 		return hosts.toArray(new String[0]);
