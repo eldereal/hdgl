@@ -4,11 +4,9 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 import hdgl.db.conf.GraphConf;
 import hdgl.db.store.impl.hdfs.mapreduce.MutableGraph;
-import hdgl.util.ByteArrayHelper;
+import hdgl.util.WritableHelper;
 
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
@@ -35,15 +33,15 @@ public class CreateGraph {
 		eids.put(7, m.createEdge("jump", vids.get(1), vids.get(4)));
 		eids.put(8, m.createEdge("jump", vids.get(2), vids.get(5)));
 		eids.put(9, m.createEdge("back", vids.get(3), vids.get(2)));
-		m.setLabel(eids.get(1), "len", ByteArrayHelper.toBytes(1));
-		m.setLabel(eids.get(2), "len", ByteArrayHelper.toBytes(1));
-		m.setLabel(eids.get(3), "len", ByteArrayHelper.toBytes(1));
-		m.setLabel(eids.get(4), "len", ByteArrayHelper.toBytes(1));
-		m.setLabel(eids.get(5), "len", ByteArrayHelper.toBytes(-4));
-		m.setLabel(eids.get(6), "len", ByteArrayHelper.toBytes(2));
-		m.setLabel(eids.get(7), "len", ByteArrayHelper.toBytes(3));
-		m.setLabel(eids.get(8), "len", ByteArrayHelper.toBytes(3));
-		m.setLabel(eids.get(9), "len", ByteArrayHelper.toBytes(-1));
+		m.setLabel(eids.get(1), "len", WritableHelper.toBytes(1));
+		m.setLabel(eids.get(2), "len", WritableHelper.toBytes(1));
+		m.setLabel(eids.get(3), "len", WritableHelper.toBytes(1));
+		m.setLabel(eids.get(4), "len", WritableHelper.toBytes(1));
+		m.setLabel(eids.get(5), "len", WritableHelper.toBytes(-4));
+		m.setLabel(eids.get(6), "len", WritableHelper.toBytes(2));
+		m.setLabel(eids.get(7), "len", WritableHelper.toBytes(3));
+		m.setLabel(eids.get(8), "len", WritableHelper.toBytes(3));
+		m.setLabel(eids.get(9), "len", WritableHelper.toBytes(-1));
 		assertTrue(m.commit().get());
 		
 		

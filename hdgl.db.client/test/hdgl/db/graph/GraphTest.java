@@ -1,13 +1,10 @@
 package hdgl.db.graph;
 
-import static org.junit.Assert.*;
 import hdgl.db.conf.GraphConf;
 
 import java.util.concurrent.ExecutionException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class GraphTest {

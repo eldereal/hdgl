@@ -6,10 +6,6 @@ import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 
-
-import hdgl.db.conf.GraphConf;
-import hdgl.util.StringHelper;
-
 public class HConf {
 
 	public static FileSystem getFileSystem(Configuration conf) throws IOException{

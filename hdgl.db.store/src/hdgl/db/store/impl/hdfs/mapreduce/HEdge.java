@@ -18,7 +18,7 @@ public class HEdge implements Edge {
 	String type;
 	long start;
 	long end;
-	Map<String, byte[]> labelsMap=new HashMap<String, byte[]>();
+	Map<String, byte[]> labelsMap = new HashMap<String, byte[]>();
 	GraphStore store;
 	
 	public HEdge(long id, String type, long start, long end, GraphStore store){
@@ -78,20 +78,12 @@ public class HEdge implements Edge {
 
 	@Override
 	public Vertex getInVertex() {
-		try {
-			return store.parseVertex(start);
-		} catch (IOException e) {
-			throw new HdglException(e);
-		}
+		return new HPseudoVertex(start, store);
 	}
 
 	@Override
 	public Vertex getOutVertex() {
-		try {
-			return store.parseVertex(end);
-		} catch (IOException e) {
-			throw new HdglException(e);
-		}
+		return new HPseudoVertex(end, store);
 	}
 
 	@Override

@@ -3,14 +3,8 @@ package hdgl.db.store;
 import java.io.IOException;
 
 import hdgl.db.store.impl.cache.MemoryCacheGraphStore;
-import hdgl.db.store.impl.cache.MemoryEdgeImpl;
-import hdgl.db.store.impl.cache.MemoryGraphStore;
-import hdgl.db.store.impl.cache.MemoryGraphStoreTest;
-import hdgl.db.store.impl.cache.MemoryVertexImpl;
 import hdgl.db.store.impl.hdfs.HdfsGraphStore;
 import hdgl.db.store.impl.hdfs.HdfsLogStore;
-import hdgl.util.IterableHelper;
-
 import org.apache.hadoop.conf.Configuration;
 
 public class StoreFactory {
@@ -35,7 +29,7 @@ public class StoreFactory {
 	}
 	
 	public static IndexGraphStore createIndexGraphStore(Configuration conf) throws IOException{
-		return new MemoryCacheGraphStore(new HdfsGraphStore(conf));
+		return new MemoryCacheGraphStore(conf);
 	}
 	
 	public static LogStore createLogStore(Configuration conf, int sessionId) throws IOException{

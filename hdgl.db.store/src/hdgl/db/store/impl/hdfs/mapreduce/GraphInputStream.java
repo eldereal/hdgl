@@ -1,7 +1,5 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
-import hdgl.util.StringHelper;
-
 import java.io.IOException;
 import java.io.InputStream;
 

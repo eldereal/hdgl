@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableComparable;
 
 

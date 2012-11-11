@@ -4,20 +4,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
-import javax.swing.plaf.synth.Region;
 
 import hdgl.db.conf.MasterConf;
-import hdgl.db.conf.RegionConf;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.RegionProtocol;
-import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.util.IterableHelper;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.ipc.RPC;
 
 public class HConn {
@@ -25,7 +18,7 @@ public class HConn {
 	Configuration conf;
 	ClientMasterProtocol masterProtocol;
 	Map<Integer, RegionProtocol> regions = new HashMap<Integer, RegionProtocol>();
-	MapWritable regionAddrs;
+	Map<Integer, InetSocketAddress> regionAddrs;
 	
 	public HConn(Configuration conf){
 		this.conf = conf;
@@ -45,7 +38,7 @@ public class HConn {
 			if(regionAddrs == null){
 				regionAddrs = master().getRegions();
 			}
-			return region(((IntWritable)IterableHelper.first(IterableHelper.randomTake(regionAddrs.keySet(),1))).get());
+			return region(((Integer)IterableHelper.first(IterableHelper.randomTake(regionAddrs.keySet(),1))));
 		}
 	}
 	
@@ -56,8 +49,8 @@ public class HConn {
 		if(regionAddrs == null){
 			regionAddrs = master().getRegions();
 		}
-		InetSocketAddressWritable addr = (InetSocketAddressWritable) regionAddrs.get(new IntWritable(regionId));
-		RegionProtocol region = RPC.getProxy(RegionProtocol.class, 1, addr.toAddress(), conf);
+		InetSocketAddress addr = regionAddrs.get(regionId);
+		RegionProtocol region = RPC.getProxy(RegionProtocol.class, 1, addr, conf);
 		regions.put(regionId, region);
 		return region;		
 	}

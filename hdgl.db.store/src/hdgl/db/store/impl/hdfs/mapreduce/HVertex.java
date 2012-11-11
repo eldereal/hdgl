@@ -1,12 +1,9 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import hdgl.db.exception.HdglException;
 import hdgl.db.graph.Edge;
 import hdgl.db.graph.LabelValue;
 import hdgl.db.graph.Vertex;
@@ -18,8 +15,8 @@ public class HVertex implements Vertex {
 	long id;
 	String type;
 	Map<String, byte[]> labelsMap = new HashMap<String, byte[]>();
-	ArrayList<Long> inlist = new ArrayList<Long>();
-	ArrayList<Long> outlist = new ArrayList<Long>();
+	Map<Long, Long> inlist = new HashMap<Long, Long>();
+	Map<Long, Long> outlist = new HashMap<Long, Long>();
 	GraphStore store;
 	
 	public HVertex(long id, String type, GraphStore store){
@@ -36,12 +33,12 @@ public class HVertex implements Vertex {
 	
 	public void addInEdge(long edgeId, long anotherVertex)
 	{
-		inlist.add(edgeId);
+		inlist.put(edgeId, anotherVertex);
 	}
 	
 	public void addOutEdge(long edgeId, long anotherVertex)
 	{
-		outlist.add(edgeId);
+		outlist.put(edgeId, anotherVertex);
 	}
 	
 	public void addLabel(String key, byte[] value)
@@ -84,28 +81,20 @@ public class HVertex implements Vertex {
 
 	@Override
 	public Iterable<Edge> getOutEdges() {
-		return IterableHelper.select(outlist, new IterableHelper.Map<Long, Edge>(){
+		return IterableHelper.select(outlist.entrySet(), new IterableHelper.Map<Map.Entry<Long,Long>, Edge>(){
 			@Override
-			public Edge select(Long element) {
-				try {
-					return store.parseEdge(element);
-				} catch (IOException e) {
-					throw new HdglException(e);
-				}
+			public Edge select(Map.Entry<Long,Long> element) {
+				return new HPseudoEdge(element.getKey(), id, element.getValue(), store);
 			}
 		});
 	}
 
 	@Override
 	public Iterable<Edge> getInEdges() {
-		return IterableHelper.select(inlist, new IterableHelper.Map<Long, Edge>(){
+		return IterableHelper.select(inlist.entrySet(), new IterableHelper.Map<Map.Entry<Long,Long>, Edge>(){
 			@Override
-			public Edge select(Long element) {
-				try {
-					return store.parseEdge(element);
-				} catch (IOException e) {
-					throw new HdglException(e);
-				}
+			public Edge select(Map.Entry<Long,Long> element) {
+				return new HPseudoEdge(element.getKey(), element.getValue(), id, store);
 			}
 		});
 	}

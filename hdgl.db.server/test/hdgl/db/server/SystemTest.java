@@ -5,8 +5,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import hdgl.db.conf.GraphConf;
@@ -14,16 +12,9 @@ import hdgl.db.exception.BadQueryException;
 import hdgl.db.protocol.ClientMasterProtocol;
 import hdgl.db.protocol.RegionMapWritable;
 import hdgl.db.protocol.RegionProtocol;
-import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.protocol.Protocol;
 import hdgl.db.protocol.ResultPackWritable;
-import hdgl.util.NetHelper;
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.MapWritable;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.ipc.RPC;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,7 +73,7 @@ public class SystemTest {
 //		query(".", conf, master);
 //		query(".-forward.", conf, master);
 //		query(".-[len<0].", conf, master);
-		query(".-.", conf);
+		query(".[id=10]-.", conf);
 	}
 
 	private void query(String query, Configuration conf)

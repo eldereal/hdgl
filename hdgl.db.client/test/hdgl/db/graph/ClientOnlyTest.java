@@ -1,6 +1,5 @@
-package hdgl.db.server;
+package hdgl.db.graph;
 
-import static org.junit.Assert.*;
 import hdgl.db.conf.GraphConf;
 import hdgl.db.exception.BadQueryException;
 import hdgl.db.protocol.ClientMasterProtocol;

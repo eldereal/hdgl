@@ -3,7 +3,6 @@ package hdgl.db.store.impl.hdfs.mapreduce;
 import hdgl.db.conf.GraphConf;
 import hdgl.util.StringHelper;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;

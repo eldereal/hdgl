@@ -1,5 +1,7 @@
 package hdgl.db.query.condition;
 
+import hdgl.util.WritableHelper;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -87,5 +89,35 @@ public class IntNumberValue extends AbstractValue {
 	@Override
 	public void readTail(DataInput in) throws IOException {
 		value = in.readInt();
+	}
+
+	@Override
+	public boolean equalsTo(byte[] data) {
+		int d = WritableHelper.parseInt(data);
+		return d == getValue();
+	}
+
+	@Override
+	public boolean lessThan(byte[] data) {
+		int d = WritableHelper.parseInt(data);
+		return getValue() < d;
+	}
+
+	@Override
+	public boolean largerThan(byte[] data) {
+		int d = WritableHelper.parseInt(data);
+		return getValue() > d;
+	}
+
+	@Override
+	public boolean largerThanOrEqualsTo(byte[] data) {
+		int d = WritableHelper.parseInt(data);
+		return getValue() >= d;
+	}
+
+	@Override
+	public boolean lessThanOrEqualsTo(byte[] data) {
+		int d = WritableHelper.parseInt(data);
+		return getValue() <= d;
 	}
 }

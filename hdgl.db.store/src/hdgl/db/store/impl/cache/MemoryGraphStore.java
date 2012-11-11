@@ -7,7 +7,6 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +14,6 @@ import org.apache.hadoop.io.Writable;
 
 import hdgl.db.exception.HdglException;
 import hdgl.db.graph.Edge;
-import hdgl.db.graph.HGraphIds;
 import hdgl.db.graph.LabelValue;
 import hdgl.db.graph.Vertex;
 import hdgl.db.store.GraphStore;

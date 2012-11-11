@@ -1,5 +1,7 @@
 package hdgl.db.query.condition;
 
+import hdgl.db.graph.Entity;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -83,6 +85,16 @@ public class Conjunction extends AbstractCondition {
 		for (int i = 0; i < conditions.length; i++) {
 			conditions[i] = AbstractCondition.readAbstractCondition(input);
 		}
+	}
+
+	@Override
+	public boolean test(Entity e) {
+		for(AbstractCondition cond:conditions){
+			if(!cond.test(e)){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 }

@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import hdgl.db.exception.HdglException;
-import hdgl.db.graph.Edge;
 import hdgl.db.graph.Entity;
 import hdgl.db.graph.MutableGraph;
-import hdgl.db.graph.Vertex;
 import hdgl.db.protocol.RegionProtocol;
 import hdgl.db.store.Log;
 import hdgl.db.task.AsyncResult;

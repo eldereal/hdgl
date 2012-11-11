@@ -1,11 +1,6 @@
 package hdgl.db.store;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
 import java.net.URI;
-
-import hdgl.db.conf.GraphConf;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;

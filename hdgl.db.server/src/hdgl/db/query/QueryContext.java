@@ -3,17 +3,13 @@ package hdgl.db.query;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.collections.SequencedHashMap;
 import org.apache.hadoop.io.Writable;
 
-import hdgl.db.protocol.InetSocketAddressWritable;
 import hdgl.db.query.stm.StateMachine;
 
 public class QueryContext implements Writable {

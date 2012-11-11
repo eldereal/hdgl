@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.WeakHashMap;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
+import org.apache.hadoop.conf.Configuration;
 
 import hdgl.db.exception.HdglException;
 import hdgl.db.graph.Edge;
@@ -12,27 +12,27 @@ import hdgl.db.graph.Entity;
 import hdgl.db.graph.Vertex;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.IndexGraphStore;
+import hdgl.db.store.impl.hdfs.HdfsGraphStore;
 
-public class MemoryCacheGraphStore implements IndexGraphStore {
+public class MemoryCacheGraphStore extends HdfsGraphStore implements IndexGraphStore {
 
 	static final int CACHE_SIZE = 512;
 	
 	WeakHashMap<Long, Entity> cache = new WeakHashMap<Long, Entity>();
 	
-	GraphStore cached;
-	
-	public MemoryCacheGraphStore(GraphStore cached){
-		this.cached = cached;
+	public MemoryCacheGraphStore(Configuration conf) throws IOException {
+		super(conf);
 	}
-	
+
+
 	@Override
 	public InputStream getVertexData(long id) throws IOException {
-		return cached.getVertexData(id);
+		return super.getVertexData(id);
 	}
 
 	@Override
 	public InputStream getEdgeData(long id) throws IOException {
-		return cached.getEdgeData(id);
+		return super.getEdgeData(id);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class MemoryCacheGraphStore implements IndexGraphStore {
 		if(cache.containsKey(id)){
 			return (Vertex) cache.get(id);
 		}else{
-			Vertex v = cached.parseVertex(id);
+			Vertex v = super.parseVertex(id);
 			cache.put(id, v);
 			return v;
 		}
@@ -51,7 +51,7 @@ public class MemoryCacheGraphStore implements IndexGraphStore {
 		if(cache.containsKey(id)){
 			return (Edge) cache.get(id);
 		}else{
-			Edge e = cached.parseEdge(id);
+			Edge e = super.parseEdge(id);
 			cache.put(id, e);
 			return e;
 		}
@@ -59,37 +59,37 @@ public class MemoryCacheGraphStore implements IndexGraphStore {
 
 	@Override
 	public String[] bestPlacesForVertex(long entityId) throws IOException {
-		return cached.bestPlacesForVertex(entityId);
+		return super.bestPlacesForVertex(entityId);
 	}
 
 	@Override
 	public String[] bestPlacesForEdge(long entityId) throws IOException {
-		return cached.bestPlacesForEdge(entityId);
+		return super.bestPlacesForEdge(entityId);
 	}
 
 	@Override
 	public long getVertexCount() throws IOException {
-		return cached.getVertexCount();
+		return super.getVertexCount();
 	}
 
 	@Override
 	public long getVertexCountPerBlock() throws IOException {
-		return cached.getVertexCountPerBlock();
+		return super.getVertexCountPerBlock();
 	}
 
 	@Override
 	public long getEdgeCount() throws IOException {
-		return cached.getEdgeCount();
+		return super.getEdgeCount();
 	}
 
 	@Override
 	public long getEdgeCountPerBlock() throws IOException {
-		return cached.getEdgeCountPerBlock();
+		return super.getEdgeCountPerBlock();
 	}
 
 	@Override
 	public void close() {
-		cached.close();
+		super.close();
 	}
 
 	@Override

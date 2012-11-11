@@ -1,22 +1,7 @@
 package hdgl.db.server.bsp;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
-import hdgl.db.conf.GraphConf;
-import hdgl.db.server.HConf;
-import hdgl.util.StringHelper;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs.Ids;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
 
 public class BSPTest implements Watcher{

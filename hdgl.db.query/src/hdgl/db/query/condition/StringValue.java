@@ -1,5 +1,7 @@
 package hdgl.db.query.condition;
 
+import hdgl.util.WritableHelper;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -75,5 +77,35 @@ public class StringValue extends AbstractValue {
 	@Override
 	public void readTail(DataInput in) throws IOException {
 		value = in.readUTF();
+	}
+
+	@Override
+	public boolean equalsTo(byte[] data) {
+		String s = WritableHelper.parseString(data);
+		return value.equalsIgnoreCase(s);
+	}
+
+	@Override
+	public boolean lessThan(byte[] data) {
+		String s = WritableHelper.parseString(data);
+		return value.compareToIgnoreCase(s) < 0;
+	}
+
+	@Override
+	public boolean largerThan(byte[] data) {
+		String s = WritableHelper.parseString(data);
+		return value.compareToIgnoreCase(s) > 0;
+	}
+
+	@Override
+	public boolean largerThanOrEqualsTo(byte[] data) {
+		String s = WritableHelper.parseString(data);
+		return value.compareToIgnoreCase(s) >= 0;
+	}
+
+	@Override
+	public boolean lessThanOrEqualsTo(byte[] data) {
+		String s = WritableHelper.parseString(data);
+		return value.compareToIgnoreCase(s) <= 0;
 	}
 }

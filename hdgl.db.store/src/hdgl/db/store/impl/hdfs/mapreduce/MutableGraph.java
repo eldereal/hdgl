@@ -1,14 +1,12 @@
 package hdgl.db.store.impl.hdfs.mapreduce;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import hdgl.db.conf.GraphConf;
 import hdgl.db.graph.Entity;
 import hdgl.db.graph.HGraphIds;
-import hdgl.db.store.impl.hdfs.HdfsGraphStore;
 import hdgl.db.task.AsyncResult;
 import hdgl.db.task.CallableAsyncResult;
 import hdgl.util.StringHelper;

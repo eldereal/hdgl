@@ -1,20 +1,19 @@
 package hdgl.db.store.impl.cache;
 
 import static org.junit.Assert.*;
-import hdgl.db.graph.Vertex;
-import hdgl.util.ByteArrayHelper;
 import hdgl.util.IterableHelper;
+import hdgl.util.WritableHelper;
 
 import org.junit.Test;
 
 public class MemoryGraphStoreTest {
 	
 	public byte[] data(int i){
-		return ByteArrayHelper.toBytes(i);
+		return WritableHelper.toBytes(i);
 	}
 	
 	public byte[] data(String i){
-		return ByteArrayHelper.toBytes(i);
+		return WritableHelper.toBytes(i);
 	}
 	
 	@Test

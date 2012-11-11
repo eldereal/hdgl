@@ -1,5 +1,7 @@
 package hdgl.db.query.condition;
 
+import hdgl.db.graph.Entity;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -88,6 +90,12 @@ public class OfType extends AbstractCondition {
 	@Override
 	public void readTail(DataInput input) throws IOException {
 		type = input.readUTF();
+	}
+
+	@Override
+	public boolean test(Entity e) {
+		String type = e.getType();
+		return type.equalsIgnoreCase(getType());
 	}
 	
 	

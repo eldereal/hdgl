@@ -2,8 +2,6 @@ package hdgl.db.protocol;
 
 import hdgl.db.exception.BadQueryException;
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.ipc.ProtocolInfo;
 
 @ProtocolInfo(protocolName = "ClientMasterProtocol", protocolVersion=1)

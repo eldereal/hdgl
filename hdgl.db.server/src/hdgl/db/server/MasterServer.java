@@ -2,22 +2,16 @@ package hdgl.db.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenRewriteStream;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -48,7 +42,7 @@ import hdgl.db.query.stm.SimpleStateMachine;
 import hdgl.db.query.stm.StateMachine;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.StoreFactory;
-import hdgl.util.NetHelper;
+import hdgl.util.IterableHelper;
 import hdgl.util.StringHelper;
 import hdgl.util.WritableHelper;
 
@@ -203,15 +197,16 @@ public class MasterServer implements RegionMasterProtocol, ClientMasterProtocol,
 			ctx.setStateMachine(stm);
 			long step = store.getVertexCountPerBlock();
 			long max = store.getVertexCount();
-			for(long id=1;id<max;id+=step){
+			o:for(long id=1;id<max;id+=step){
 				String[] hosts = store.bestPlacesForVertex(id);
 				String usehost = hosts[(int) (Math.random()*hosts.length)];
 				for(Map.Entry<Integer, InetSocketAddress> map:regions.entrySet()){
 					if(usehost.equals(map.getValue().getHostName())){
 						ctx.put(id, map.getKey());
-						break;
+						continue o;
 					}
 				}
+				ctx.put(id, IterableHelper.first(IterableHelper.randomTake(regions.keySet(), 1)));
 			}
 			
 			String idPath = zk().create(StringHelper.makePath(HConf.getZKQuerySessionRoot(conf), "q"), null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);

@@ -1,23 +1,15 @@
 package hdgl.db.server.bsp;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.antlr.grammar.v3.ANTLRParser.defaultNodeOption_return;
-import org.antlr.works.editor.navigation.GoToHistory;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec.Dir;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -33,25 +25,18 @@ import hdgl.db.protocol.MessagePackWritable;
 import hdgl.db.protocol.MessageWritable;
 import hdgl.db.query.QueryContext;
 import hdgl.db.query.condition.AbstractCondition;
-import hdgl.db.query.condition.AbstractValue;
 import hdgl.db.query.condition.BinaryCondition;
 import hdgl.db.query.condition.Conjunction;
 import hdgl.db.query.condition.EqualTo;
-import hdgl.db.query.condition.IntNumberValue;
 import hdgl.db.query.condition.LargerThan;
 import hdgl.db.query.condition.LargerThanOrEqualTo;
 import hdgl.db.query.condition.LessThan;
 import hdgl.db.query.condition.LessThanOrEqualTo;
 import hdgl.db.query.condition.NoRestriction;
 import hdgl.db.query.condition.NotEqualTo;
-import hdgl.db.query.condition.OfType;
-import hdgl.db.query.condition.StringValue;
-import hdgl.db.query.expression.Condition;
 import hdgl.db.query.stm.StateMachine;
 import hdgl.db.server.HConf;
 import hdgl.db.store.GraphStore;
-import hdgl.util.ByteArrayHelper;
-import hdgl.util.IterableHelper;
 import hdgl.util.StringHelper;
 
 public class BSPRunner extends Thread implements Watcher {
@@ -291,144 +276,19 @@ public class BSPRunner extends Thread implements Watcher {
 		}
 	}
 
-	boolean needParse(AbstractCondition cond) {
-		if (cond instanceof NoRestriction) {
-			return false;
-		} else if (cond instanceof BinaryCondition) {
-			return !((BinaryCondition) cond).getLabel().equalsIgnoreCase("id");
-		} else if (cond instanceof Conjunction) {
-			for (AbstractCondition subcond : ((Conjunction) cond)
-					.getConditions()) {
-				if (needParse(subcond)) {
-					return true;
-				}
-			}
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	boolean testBinary(BinaryCondition cond, long test, long actual) {
-		if (cond instanceof EqualTo) {
-			return actual == test;
-		} else if (cond instanceof NotEqualTo) {
-			return actual != test;
-		} else if (cond instanceof LessThan) {
-			return actual < test;
-		} else if (cond instanceof LessThanOrEqualTo) {
-			return actual <= test;
-		} else if (cond instanceof LargerThan) {
-			return actual > test;
-		} else if (cond instanceof LargerThanOrEqualTo) {
-			return actual >= test;
-		} else {
-			throw new HdglException("unknown condition type");
-		}
-	}
-
-	boolean testBinary(BinaryCondition cond, String test, String actual) {
-		if (cond instanceof EqualTo) {
-			return actual.equalsIgnoreCase(test);
-		} else if (cond instanceof NotEqualTo) {
-			return !actual.equalsIgnoreCase(test);
-		} else if (cond instanceof LessThan) {
-			return actual.compareToIgnoreCase(test) < 0;
-		} else if (cond instanceof LessThanOrEqualTo) {
-			return actual.compareToIgnoreCase(test) <= 0;
-		} else if (cond instanceof LargerThan) {
-			return actual.compareToIgnoreCase(test) > 0;
-		} else if (cond instanceof LargerThanOrEqualTo) {
-			return actual.compareToIgnoreCase(test) >= 0;
-		} else {
-			throw new HdglException("unknown condition type");
-		}
-	}
-	
-	boolean test(AbstractCondition cond, long entityId, Entity e) {
-		if (cond instanceof NoRestriction) {
-			return true;
-		} else if (cond instanceof Conjunction) {
-			for (AbstractCondition subcond : ((Conjunction) cond)
-					.getConditions()) {
-				if (!test(subcond, entityId, e)) {
-					return false;
-				}
-			}
-			return true;
-		} else if (cond instanceof OfType) {
-			return e.getType().equalsIgnoreCase(((OfType) cond).getType());
-		} else if (cond instanceof BinaryCondition) {
-			AbstractValue value = ((BinaryCondition) cond).getValue();
-			String name = ((BinaryCondition) cond).getLabel();
-			if (name.equalsIgnoreCase("id")) {
-				if (value instanceof IntNumberValue) {
-					return testBinary((BinaryCondition) cond,
-							((IntNumberValue) value).getValue(), entityId);
-				} else {
-					return false;
-				}
-			} else if (name.equalsIgnoreCase("outdegree")) {
-				if (value instanceof IntNumberValue && e instanceof Vertex) {
-					return testBinary((BinaryCondition) cond,
-							((IntNumberValue) value).getValue(),
-							IterableHelper.count(((Vertex) e).getOutEdges()));
-				} else {
-					return false;
-				}
-			} else if (name.equalsIgnoreCase("indegree")) {
-				if (value instanceof IntNumberValue && e instanceof Vertex) {
-					return testBinary((BinaryCondition) cond,
-							((IntNumberValue) value).getValue(),
-							IterableHelper.count(((Vertex) e).getInEdges()));
-				} else {
-					return false;
-				}
-			} else if (name.equalsIgnoreCase("degree")) {
-				if (value instanceof IntNumberValue && e instanceof Vertex) {
-					return testBinary((BinaryCondition) cond,
-							((IntNumberValue) value).getValue(),
-							IterableHelper.count(((Vertex) e).getEdges()));
-				} else {
-					return false;
-				}
-			} else {
-				byte[] data = e.getLabel(name);
-				if (value instanceof IntNumberValue) {
-					return testBinary((BinaryCondition) cond,
-							((IntNumberValue) value).getValue(),
-							ByteArrayHelper.parseInt(data));
-				} else if (value instanceof StringValue) {
-					return testBinary((BinaryCondition) cond,
-							((StringValue) value).getValue(),
-							ByteArrayHelper.parseString(data));
-				} else {
-					throw new HdglException("unknown value type");
-				}
-			}
-		} else {
-			throw new HdglException("unknown condition type");
-		}
-	}
-
 	void doQueryForVertex(long vid, MessageWritable msg) throws IOException {
-		Vertex v = null;
+		Vertex v = graphStore.getVertex(vid);
 		for (int i = 0; i < msg.size(); i++) {
 			int stateId = msg.getState(i);
 			long[] path = msg.getPath(i);
 			StateMachine.State state = ctx.getStateMachine().getState(stateId);
 			for (StateMachine.Condition cond : state.getConditions()) {
-				if (v == null && needParse(cond.getTest())) {
-					v = graphStore.parseVertex(vid);
-				}
-				if (test(cond.getTest(), vid, v)) {
+				if (cond.getTest().test(v)) {
 					for (StateMachine.Transition t : cond.getTransitions()) {
 						switch (t.getType()) {
 						case In:
-							if (v == null)
-								v = graphStore.parseVertex(vid);
 							e: for (Edge e : v.getInEdges()) {
-								if (test(t.getTest(), e.getId(), e)) {
+								if (t.getTest().test(e)) {
 									long ovid = e.getInVertex().getId();
 									for (long p : path) {
 										if (ovid == p) {
@@ -446,10 +306,8 @@ public class BSPRunner extends Thread implements Watcher {
 							}
 							break;
 						case Out:
-							if (v == null)
-								v = graphStore.parseVertex(vid);
 							e: for (Edge e : v.getOutEdges()) {
-								if (test(t.getTest(), e.getId(), e)) {
+								if (t.getTest().test(e)) {
 									long ovid = e.getOutVertex().getId();
 									for (long p : path) {
 										if (ovid == p) {

@@ -1,6 +1,5 @@
 package hdgl.db.protocol;
 
-import hdgl.db.query.QueryContext;
 import hdgl.db.store.Log;
 
 import org.apache.hadoop.ipc.ProtocolInfo;

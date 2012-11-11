@@ -1,5 +1,9 @@
 package hdgl.db.query.condition;
 
+import hdgl.db.graph.Entity;
+import hdgl.db.graph.Vertex;
+import hdgl.util.IterableHelper;
+
 public class LessThanOrEqualTo extends BinaryCondition {
 
 	public static final byte FLAG_BYTE=-6;
@@ -57,6 +61,28 @@ public class LessThanOrEqualTo extends BinaryCondition {
 			return getValue().largerThanOrEqualTo(((LargerThanOrEqualTo) other).getValue());
 		}else{
 			return true;
+		}
+	}
+
+	@Override
+	public boolean test(Entity e) {
+		if(getLabel().equalsIgnoreCase("id")){
+			return getValue() instanceof IntNumberValue &&
+					e.getId() <= ((IntNumberValue)getValue()).getValue();
+		}else if(getLabel().equalsIgnoreCase("degree")){
+			return getValue() instanceof IntNumberValue &&
+					e instanceof Vertex &&
+					IterableHelper.count(((Vertex)e).getEdges()) <= ((IntNumberValue)getValue()).getValue();
+		}else if(getLabel().equalsIgnoreCase("indegree")){
+			return getValue() instanceof IntNumberValue &&
+					e instanceof Vertex &&
+					IterableHelper.count(((Vertex)e).getInEdges()) <= ((IntNumberValue)getValue()).getValue();
+		}else if(getLabel().equalsIgnoreCase("outdegree")){
+			return getValue() instanceof IntNumberValue &&
+					e instanceof Vertex &&
+					IterableHelper.count(((Vertex)e).getOutEdges()) <= ((IntNumberValue)getValue()).getValue();
+		}else{
+			return getValue().largerThanOrEqualsTo(e.getLabel(getLabel()));
 		}
 	}
 }

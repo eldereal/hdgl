@@ -1,6 +1,7 @@
 package hdgl.db.query.condition;
 
 import hdgl.db.exception.HdglException;
+import hdgl.db.graph.Entity;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -63,6 +64,8 @@ public abstract class AbstractCondition implements Writable{
 		in.readByte();
 		readTail(in);
 	}
+	
+	public abstract boolean test(Entity e);
 	
 	public static AbstractCondition readAbstractCondition(DataInput in) throws IOException{
 		AbstractCondition cond;

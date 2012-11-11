@@ -1,9 +1,7 @@
 package hdgl.db.store.impl.hdfs;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -18,17 +16,18 @@ import org.apache.hadoop.fs.PathFilter;
 
 
 import hdgl.db.conf.GraphConf;
+import hdgl.db.graph.Edge;
 import hdgl.db.graph.HGraphIds;
+import hdgl.db.graph.Vertex;
 import hdgl.db.store.GraphStore;
 import hdgl.db.store.HConf;
-import hdgl.db.store.impl.hdfs.mapreduce.Edge;
 import hdgl.db.store.impl.hdfs.mapreduce.EdgeInputStream;
 import hdgl.db.store.impl.hdfs.mapreduce.FSDataInputStreamPool;
 import hdgl.db.store.impl.hdfs.mapreduce.HEdge;
+import hdgl.db.store.impl.hdfs.mapreduce.HFullPseudoEdge;
+import hdgl.db.store.impl.hdfs.mapreduce.HPseudoVertex;
 import hdgl.db.store.impl.hdfs.mapreduce.HVertex;
-import hdgl.db.store.impl.hdfs.mapreduce.JumpInputStream;
 import hdgl.db.store.impl.hdfs.mapreduce.Parameter;
-import hdgl.db.store.impl.hdfs.mapreduce.Vertex;
 import hdgl.db.store.impl.hdfs.mapreduce.VertexInputStream;
 import hdgl.util.NetHelper;
 import hdgl.util.StringHelper;
@@ -302,5 +301,15 @@ public class HdfsGraphStore implements GraphStore {
 		}catch(Exception ex){
 			
 		}
+	}
+
+	@Override
+	public Vertex getVertex(long id) throws IOException {
+		return new HPseudoVertex(id, this);
+	}
+
+	@Override
+	public Edge getEdge(long id) throws IOException {
+		return new HFullPseudoEdge(id, this);
 	}
 }

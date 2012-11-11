@@ -1,6 +1,5 @@
 package hdgl.db.graph;
 
-import static org.junit.Assert.*;
 import hdgl.db.exception.HdglException;
 
 import org.junit.Test;

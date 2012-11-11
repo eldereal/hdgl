@@ -16,6 +16,16 @@ public abstract class AbstractValue implements Writable {
 	@Override
 	public abstract boolean equals(Object obj);
 	
+	public abstract boolean equalsTo(byte[] data);
+	
+	public abstract boolean lessThan(byte[] data);
+	
+	public abstract boolean largerThanOrEqualsTo(byte[] data);
+	
+	public abstract boolean lessThanOrEqualsTo(byte[] data);
+	
+	public abstract boolean largerThan(byte[] data);
+	
 	public abstract boolean lessThan(AbstractValue obj);
 	
 	public abstract boolean largerThan(AbstractValue obj);

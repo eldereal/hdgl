@@ -5,11 +5,8 @@ import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-
 import hdgl.db.conf.GraphConf;
 import hdgl.db.store.impl.hdfs.mapreduce.MutableGraph;
-import hdgl.util.ByteArrayHelper;
 
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
